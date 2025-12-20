@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Life - Quiz Słówek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #c53030;
+            --accent-light: #fc8181;
+            --success: #276749;
+            --success-light: #9ae6b4;
+            --bg: #f7f5f0;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --gold: #d69e2e;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: var(--text);
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(26, 54, 93, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(197, 48, 48, 0.03) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-top: 8px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-value.correct {
+            color: var(--success);
+        }
+
+        .stat-value.wrong {
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 4px;
+        }
+
+        .quiz-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out 0.4s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quiz-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--gold) 50%, var(--accent) 100%);
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 25px;
+        }
+
+        .polish-word {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 35px;
+            line-height: 1.4;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 1.2rem;
+            font-family: 'Source Sans 3', sans-serif;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .answer-input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
+        }
+
+        .answer-input.correct {
+            border-color: var(--success);
+            background: linear-gradient(to right, rgba(154, 230, 180, 0.2), white);
+        }
+
+        .answer-input.wrong {
+            border-color: var(--accent);
+            background: linear-gradient(to right, rgba(252, 129, 129, 0.2), white);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Source Sans 3', sans-serif;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 54, 93, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .feedback {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, rgba(154, 230, 180, 0.3) 0%, rgba(154, 230, 180, 0.1) 100%);
+            border: 1px solid var(--success-light);
+        }
+
+        .feedback.wrong {
+            background: linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(252, 129, 129, 0.1) 100%);
+            border: 1px solid var(--accent-light);
+        }
+
+        .feedback-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .feedback-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .correct-answer {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .correct-answer strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--gold) 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .mode-btn:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .end-screen {
+            text-align: center;
+            padding: 60px 40px;
+            display: none;
+        }
+
+        .end-screen.show {
+            display: block;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .end-icon {
+            font-size: 5rem;
+            margin-bottom: 30px;
+        }
+
+        .end-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .end-score {
+            font-size: 1.3rem;
+            color: var(--text);
+            margin-bottom: 40px;
+        }
+
+        .end-score strong {
+            color: var(--success);
+            font-size: 1.5rem;
+        }
+
+        .quiz-content {
+            display: block;
+        }
+
+        .quiz-content.hide {
+            display: none;
+        }
+
+        .hint-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .hint-btn:hover {
+            opacity: 1;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .quiz-card {
+                padding: 30px 20px;
+            }
+
+            .polish-word {
+                font-size: 1.5rem;
+            }
+
+            .stats-bar {
+                gap: 20px;
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .mode-selector {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+            </div>
+            <h1>University Life</h1>
+            <p class="subtitle">Quiz słówek angielsko-polskich</p>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="all">Wszystkie</button>
+            <button class="mode-btn" data-mode="lead-in">Lead-in</button>
+            <button class="mode-btn" data-mode="vocab">Vocab</button>
+            <button class="mode-btn" data-mode="idioms">Idiomy</button>
+            <button class="mode-btn" data-mode="phrasal">Phrasal Verbs</button>
+            <button class="mode-btn" data-mode="reading">Reading</button>
+            <button class="mode-btn" data-mode="video">Video</button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="currentNum">1</div>
+                <div class="stat-label">Pytanie</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value correct" id="correctCount">0</div>
+                <div class="stat-label">Poprawne</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value wrong" id="wrongCount">0</div>
+                <div class="stat-label">Błędne</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Łącznie</div>
+            </div>
+        </div>
+
+        <div class="quiz-card">
+            <div class="quiz-content" id="quizContent">
+                <div class="category-badge" id="categoryBadge">Lead-in</div>
+                <div class="polish-word" id="polishWord">kopalnia</div>
+                
+                <div class="input-group">
+                    <label for="answerInput">Wpisz tłumaczenie po angielsku:</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="answerInput" class="answer-input" placeholder="Twoja odpowiedź..." autocomplete="off">
+                        <button class="hint-btn" id="hintBtn" title="Pokaż pierwszą literę">💡</button>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback">
+                    <span class="feedback-icon" id="feedbackIcon">✓</span>
+                    <span class="feedback-text" id="feedbackText">Poprawnie!</span>
+                    <div class="correct-answer" id="correctAnswer"></div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="checkBtn">Sprawdź</button>
+                    <button class="btn btn-secondary" id="nextBtn" style="display: none;">Następne →</button>
+                    <button class="btn btn-secondary" id="skipBtn">Pomiń</button>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="progressText">0 z 0 słówek</div>
+            </div>
+
+            <div class="end-screen" id="endScreen">
+                <div class="end-icon">🏆</div>
+                <h2 class="end-title">Gratulacje!</h2>
+                <p class="end-score">
+                    Twój wynik: <strong id="finalScore">0%</strong><br>
+                    <span id="finalStats"></span>
+                </p>
+                <button class="btn btn-primary" id="restartBtn">Zacznij od nowa</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            // Lead-in
+            { polish: "kopalnia", english: ["a mine", "mine"], category: "lead-in" },
+            { polish: "korzystny", english: ["beneficial"], category: "lead-in" },
+            { polish: "rozwiązać problem", english: ["to solve a problem", "solve a problem"], category: "lead-in" },
+            { polish: "zainspirować kogoś", english: ["to inspire somebody", "to inspire someone", "inspire somebody", "inspire someone"], category: "lead-in" },
+            { polish: "upoważnić kogoś do zrobienia czegoś", english: ["to empower somebody to do something", "to empower someone to do something", "empower somebody to do something"], category: "lead-in" },
+            { polish: "przyczynić się do czegoś", english: ["to contribute to something", "contribute to something"], category: "lead-in" },
+            { polish: "pasjonować się czymś", english: ["to be passionate about something", "be passionate about something"], category: "lead-in" },
+            { polish: "kierunek studiów", english: ["a major", "major"], category: "lead-in" },
+            { polish: "dążyć do czegoś", english: ["to pursue something", "pursue something"], category: "lead-in" },
+            { polish: "krótki", english: ["brief"], category: "lead-in" },
+            { polish: "być z czymś kojarzonym", english: ["be associated with something", "to be associated with something"], category: "lead-in" },
+            { polish: "przychodzić do głowy", english: ["to come to one's mind", "come to one's mind", "to come to mind", "come to mind"], category: "lead-in" },
+
+            // Vocab
+            { polish: "profesor zwyczajny", english: ["a full professor", "full professor"], category: "vocab" },
+            { polish: "skala ocen", english: ["a grading scale", "grading scale"], category: "vocab" },
+            { polish: "dziekanat", english: ["the dean's office", "dean's office"], category: "vocab" },
+            { polish: "audytorium", english: ["an auditorium", "auditorium"], category: "vocab" },
+            { polish: "zaliczenie", english: ["a pass", "pass"], category: "vocab" },
+            { polish: "ocena pozytywna", english: ["a pass mark", "a passing grade", "pass mark", "passing grade"], category: "vocab" },
+            { polish: "dziekan", english: ["a dean", "dean"], category: "vocab" },
+            { polish: "wydział (lub katedra)", english: ["a faculty", "faculty"], category: "vocab" },
+            { polish: "średnia ocen", english: ["grade point average", "gpa"], category: "vocab" },
+            { polish: "egzamin na koniec semestru", english: ["an end-of-term exam", "end-of-term exam"], category: "vocab" },
+            { polish: "akademik", english: ["a hall of residence", "a dormitory", "hall of residence", "dormitory", "dorm"], category: "vocab" },
+            { polish: "opiekun roku", english: ["an academic advisor", "academic advisor"], category: "vocab" },
+            { polish: "promotor", english: ["a supervisor", "supervisor"], category: "vocab" },
+            { polish: "poprawka (egzaminu, testu)", english: ["a retake", "retake"], category: "vocab" },
+            { polish: "wykładowca", english: ["a lecturer", "lecturer"], category: "vocab" },
+            { polish: "uczęszczać na wykłady", english: ["to attend lectures", "attend lectures"], category: "vocab" },
+            { polish: "oddać prace/zadania", english: ["to submit assignments", "submit assignments"], category: "vocab" },
+            { polish: "prowadzić badanie", english: ["to conduct research", "conduct research"], category: "vocab" },
+            { polish: "dotrzymać terminów", english: ["to meet deadlines", "meet deadlines"], category: "vocab" },
+            { polish: "mieć tytuł licencjata", english: ["to have a bachelor's degree", "have a bachelor's degree"], category: "vocab" },
+            { polish: "oceniać prace egzaminacyjne", english: ["to mark exam papers", "mark exam papers"], category: "vocab" },
+            { polish: "zdobywać wiedzę", english: ["to acquire knowledge", "acquire knowledge"], category: "vocab" },
+            { polish: "uiścić opłatę za zaliczenie warunkowe przedmiotu", english: ["to pay a course retake fee", "pay a course retake fee"], category: "vocab" },
+            { polish: "otrzymać stypendium socjalne", english: ["to receive a bursary", "receive a bursary"], category: "vocab" },
+            { polish: "ukończyć staż", english: ["to complete an internship", "complete an internship"], category: "vocab" },
+            { polish: "praca dyplomowa", english: ["thesis", "a thesis"], category: "vocab" },
+            { polish: "analiza", english: ["analysis", "an analysis"], category: "vocab" },
+            { polish: "opłata wstępna, opłata rekrutacyjna", english: ["an admission fee", "admission fee"], category: "vocab" },
+            { polish: "czesne", english: ["a tuition fee", "tuition fee", "tuition"], category: "vocab" },
+            { polish: "stypendium socjalne", english: ["a grant", "grant"], category: "vocab" },
+            { polish: "stypendium naukowe", english: ["a scholarship", "scholarship"], category: "vocab" },
+
+            // Idioms
+            { polish: "usiąść do książek", english: ["to hit the books", "hit the books"], category: "idioms" },
+            { polish: "zacząć od początku", english: ["to go back to the drawing board", "go back to the drawing board"], category: "idioms" },
+            { polish: "zdać śpiewająco", english: ["to pass with flying colours", "to pass with flying colors", "pass with flying colours", "pass with flying colors"], category: "idioms" },
+            { polish: "zaliczyć test celująco", english: ["to ace a test", "ace a test"], category: "idioms" },
+            { polish: "wagarować", english: ["to cut class", "cut class"], category: "idioms" },
+            { polish: "pracować do późna w nocy", english: ["to burn the midnight oil", "burn the midnight oil"], category: "idioms" },
+            { polish: "załapać/zrozumieć (coś)", english: ["to catch on", "to catch on to something", "catch on", "catch on to something"], category: "idioms" },
+            { polish: "pupilek nauczyciela", english: ["a teacher's pet", "teacher's pet"], category: "idioms" },
+            { polish: "uczyć się fachu", english: ["to learn the ropes", "learn the ropes"], category: "idioms" },
+
+            // Phrasal verbs
+            { polish: "przebrnąć przez coś", english: ["to get through something", "get through something"], category: "phrasal" },
+            { polish: "odświeżyć sobie coś (np. wiedzę)", english: ["to brush up on something", "brush up on something"], category: "phrasal" },
+            { polish: "radzić sobie (z czymś)", english: ["to get by", "get by", "to get by on something", "to get by with something"], category: "phrasal" },
+            { polish: "poruszyć coś (np. temat)", english: ["to bring something up", "bring something up", "to bring up something", "bring up something"], category: "phrasal" },
+            { polish: "odłożyć coś na później", english: ["to put something off", "put something off", "to put off something", "put off something"], category: "phrasal" },
+            { polish: "zdecydować się na coś", english: ["to opt for something", "opt for something"], category: "phrasal" },
+            { polish: "rzucić (np. szkołę, kurs)", english: ["to drop out", "drop out", "to drop out of something", "drop out of something"], category: "phrasal" },
+            { polish: "nadążać (za czymś)", english: ["to keep up", "keep up", "to keep up with something", "keep up with something"], category: "phrasal" },
+            { polish: "przejrzeć coś, powtórzyć coś", english: ["to go over something", "go over something"], category: "phrasal" },
+            { polish: "nadrobić zaległości (w czymś)", english: ["to catch up", "catch up", "to catch up on something", "catch up on something"], category: "phrasal" },
+
+            // Reading
+            { polish: "regulamin", english: ["regulations"], category: "reading" },
+            { polish: "wyjaśnić coś", english: ["to clear something up", "clear something up"], category: "reading" },
+            { polish: "nauczanie", english: ["instruction"], category: "reading" },
+            { polish: "zajęcia/przedmiot", english: ["a course", "a subject", "course", "subject"], category: "reading" },
+            { polish: "poziom kształcenia", english: ["a level of studies", "level of studies"], category: "reading" },
+            { polish: "prowadzący przedmiot / zajęcia", english: ["a tutor", "tutor"], category: "reading" },
+            { polish: "forma zajęć dydaktycznych", english: ["a form of instruction", "form of instruction"], category: "reading" },
+            { polish: "forma studiów", english: ["a form of study", "form of study"], category: "reading" },
+            { polish: "cykl kształcenia", english: ["a study cycle", "study cycle"], category: "reading" },
+            { polish: "merytoryczny", english: ["substantive"], category: "reading" },
+            { polish: "metoda weryfikacji", english: ["an assessment method", "assessment method"], category: "reading" },
+            { polish: "dostać zaliczenie", english: ["to obtain credit", "obtain credit"], category: "reading" },
+            { polish: "studia pierwszego stopnia", english: ["first-cycle studies"], category: "reading" },
+            { polish: "studia drugiego stopnia", english: ["second-cycle studies"], category: "reading" },
+            { polish: "wykład", english: ["a lecture", "lecture"], category: "reading" },
+            { polish: "ćwiczenia laboratoryjne", english: ["a laboratory class", "laboratory class", "lab class"], category: "reading" },
+            { polish: "seminarium", english: ["a tutorial", "tutorial"], category: "reading" },
+            { polish: "staż", english: ["a placement", "placement"], category: "reading" },
+            { polish: "studia niestacjonarne", english: ["part-time studies"], category: "reading" },
+            { polish: "studia stacjonarne", english: ["full-time studies"], category: "reading" },
+            { polish: "zapewnić komuś coś", english: ["to provide somebody with something", "to provide someone with something", "provide somebody with something"], category: "reading" },
+            { polish: "pomóc komuś w czymś", english: ["to assist somebody with something", "to assist someone with something", "assist somebody with something"], category: "reading" },
+            { polish: "zorganizować spotkanie", english: ["to hold a meeting", "hold a meeting"], category: "reading" },
+            { polish: "zachęcać kogoś do zrobienia czegoś", english: ["to encourage somebody to do something", "to encourage someone to do something", "encourage somebody to do something"], category: "reading" },
+            { polish: "korzystać z prawa do zrobienia czegoś", english: ["to exercise the right to do something", "exercise the right to do something"], category: "reading" },
+            { polish: "okoliczności", english: ["circumstances"], category: "reading" },
+            { polish: "wydalić kogoś (ze szkoły)", english: ["to expel somebody", "to expel someone", "to expel somebody from school", "expel somebody from school"], category: "reading" },
+
+            // Video
+            { polish: "dyplom uczelni wyższej", english: ["a college degree", "college degree"], category: "video" },
+            { polish: "zdobyć pracę", english: ["to land a job", "land a job"], category: "video" },
+            { polish: "zakładać, że", english: ["to assume that", "assume that"], category: "video" },
+            { polish: "równość, sprawiedliwość", english: ["equity"], category: "video" },
+            { polish: "pojęcie, koncepcja", english: ["a notion", "notion"], category: "video" },
+            { polish: "wkręcić się, uzyskać dostęp do czegoś", english: ["to get a foot in the door", "to get your foot in the door", "get a foot in the door", "get your foot in the door"], category: "video" },
+            { polish: "prosperujący, kwitnący", english: ["thriving"], category: "video" },
+            { polish: "aspiracje", english: ["aspirations"], category: "video" },
+            { polish: "wykluczone, nie wchodzi w grę", english: ["out of the question"], category: "video" },
+            { polish: "dotrzymywać kroku (komuś/czemuś)", english: ["to keep pace", "keep pace", "to keep pace with something", "to keep pace with somebody"], category: "video" },
+            { polish: "absolwent uczelni wyższej", english: ["a college graduate", "college graduate"], category: "video" },
+            { polish: "osoba bez wykształcenia wyższego", english: ["a non-graduate", "non-graduate"], category: "video" },
+            { polish: "dyplom", english: ["a diploma", "diploma"], category: "video" },
+            { polish: "wymaganie", english: ["a requirement", "requirement"], category: "video" },
+            { polish: "dobrze płatna praca", english: ["a high-paying job", "high-paying job"], category: "video" },
+            { polish: "pracodawca", english: ["an employer", "employer"], category: "video" }
+        ];
+
+        const categoryNames = {
+            "lead-in": "Lead-in",
+            "vocab": "Vocabulary",
+            "idioms": "Idiomy",
+            "phrasal": "Phrasal Verbs",
+            "reading": "Reading",
+            "video": "Video"
+        };
+
+        let currentMode = "all";
+        let currentWords = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = false;
+
+        const polishWordEl = document.getElementById("polishWord");
+        const answerInput = document.getElementById("answerInput");
+        const checkBtn = document.getElementById("checkBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const skipBtn = document.getElementById("skipBtn");
+        const feedback = document.getElementById("feedback");
+        const feedbackIcon = document.getElementById("feedbackIcon");
+        const feedbackText = document.getElementById("feedbackText");
+        const correctAnswerEl = document.getElementById("correctAnswer");
+        const currentNumEl = document.getElementById("currentNum");
+        const correctCountEl = document.getElementById("correctCount");
+        const wrongCountEl = document.getElementById("wrongCount");
+        const totalCountEl = document.getElementById("totalCount");
+        const progressFill = document.getElementById("progressFill");
+        const progressText = document.getElementById("progressText");
+        const categoryBadge = document.getElementById("categoryBadge");
+        const quizContent = document.getElementById("quizContent");
+        const endScreen = document.getElementById("endScreen");
+        const finalScore = document.getElementById("finalScore");
+        const finalStats = document.getElementById("finalStats");
+        const restartBtn = document.getElementById("restartBtn");
+        const hintBtn = document.getElementById("hintBtn");
+        const modeButtons = document.querySelectorAll(".mode-btn");
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function filterWords(mode) {
+            if (mode === "all") {
+                return shuffleArray(vocabulary);
+            }
+            return shuffleArray(vocabulary.filter(word => word.category === mode));
+        }
+
+        function initQuiz() {
+            currentWords = filterWords(currentMode);
+            currentIndex = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            answered = false;
+            
+            quizContent.classList.remove("hide");
+            endScreen.classList.remove("show");
+            
+            updateStats();
+            loadWord();
+        }
+
+        function loadWord() {
+            if (currentIndex >= currentWords.length) {
+                showEndScreen();
+                return;
+            }
+
+            const word = currentWords[currentIndex];
+            polishWordEl.textContent = word.polish;
+            categoryBadge.textContent = categoryNames[word.category];
+            answerInput.value = "";
+            answerInput.classList.remove("correct", "wrong");
+            answerInput.focus();
+            
+            feedback.classList.remove("show", "correct", "wrong");
+            checkBtn.style.display = "block";
+            nextBtn.style.display = "none";
+            skipBtn.style.display = "block";
+            answered = false;
+            
+            updateStats();
+        }
+
+        function normalizeAnswer(answer) {
+            return answer.toLowerCase().trim().replace(/\s+/g, ' ');
+        }
+
+        function checkAnswer() {
+            if (answered) return;
+
+            const userAnswer = normalizeAnswer(answerInput.value);
+            const currentWord = currentWords[currentIndex];
+            const correctAnswers = currentWord.english.map(normalizeAnswer);
+            
+            const isCorrect = correctAnswers.some(correct => {
+                if (userAnswer === correct) return true;
+                // Allow slight variations
+                if (correct.startsWith("to ") && userAnswer === correct.substring(3)) return true;
+                if (correct.startsWith("a ") && userAnswer === correct.substring(2)) return true;
+                if (correct.startsWith("an ") && userAnswer === correct.substring(3)) return true;
+                if (correct.startsWith("the ") && userAnswer === correct.substring(4)) return true;
+                return false;
+            });
+
+            answered = true;
+            
+            if (isCorrect) {
+                correctCount++;
+                answerInput.classList.add("correct");
+                feedback.classList.add("correct");
+                feedbackIcon.textContent = "✓";
+                feedbackText.textContent = "Poprawnie!";
+                correctAnswerEl.textContent = "";
+            } else {
+                wrongCount++;
+                answerInput.classList.add("wrong");
+                feedback.classList.add("wrong");
+                feedbackIcon.textContent = "✗";
+                feedbackText.textContent = "Niepoprawnie";
+                correctAnswerEl.innerHTML = `Poprawna odpowiedź: <strong>${currentWord.english[0]}</strong>`;
+            }
+
+            feedback.classList.add("show");
+            checkBtn.style.display = "none";
+            nextBtn.style.display = "block";
+            skipBtn.style.display = "none";
+            
+            updateStats();
+        }
+
+        function nextWord() {
+            currentIndex++;
+            loadWord();
+        }
+
+        function skipWord() {
+            wrongCount++;
+            const currentWord = currentWords[currentIndex];
+            
+            answerInput.classList.add("wrong");
+            feedback.classList.add("wrong");
+            feedbackIcon.textContent = "⏭";
+            feedbackText.textContent = "Pominięto";
+            correctAnswerEl.innerHTML = `Poprawna odpowiedź: <strong>${currentWord.english[0]}</strong>`;
+            feedback.classList.add("show");
+            
+            checkBtn.style.display = "none";
+            nextBtn.style.display = "block";
+            skipBtn.style.display = "none";
+            answered = true;
+            
+            updateStats();
+        }
+
+        function showHint() {
+            const currentWord = currentWords[currentIndex];
+            const firstAnswer = currentWord.english[0];
+            const hint = firstAnswer.substring(0, Math.ceil(firstAnswer.length / 3)) + "...";
+            answerInput.placeholder = `Podpowiedź: ${hint}`;
+        }
+
+        function updateStats() {
+            currentNumEl.textContent = Math.min(currentIndex + 1, currentWords.length);
+            correctCountEl.textContent = correctCount;
+            wrongCountEl.textContent = wrongCount;
+            totalCountEl.textContent = currentWords.length;
+            
+            const progress = currentWords.length > 0 ? (currentIndex / currentWords.length) * 100 : 0;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `${currentIndex} z ${currentWords.length} słówek`;
+        }
+
+        function showEndScreen() {
+            quizContent.classList.add("hide");
+            endScreen.classList.add("show");
+            
+            const percentage = currentWords.length > 0 ? Math.round((correctCount / currentWords.length) * 100) : 0;
+            finalScore.textContent = `${percentage}%`;
+            finalStats.textContent = `${correctCount} poprawnych z ${currentWords.length} słówek`;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            modeButtons.forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.mode === mode);
+            });
+            initQuiz();
+        }
+
+        // Event listeners
+        checkBtn.addEventListener("click", checkAnswer);
+        nextBtn.addEventListener("click", nextWord);
+        skipBtn.addEventListener("click", skipWord);
+        restartBtn.addEventListener("click", initQuiz);
+        hintBtn.addEventListener("click", showHint);
+
+        answerInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                if (answered) {
+                    nextWord();
+                } else {
+                    checkAnswer();
+                }
+            }
+        });
+
+        modeButtons.forEach(btn => {
+            btn.addEventListener("click", () => setMode(btn.dataset.mode));
+        });
+
+        // Initialize
+        initQuiz();
+    </script>
+</body>
+</html>
