@@ -1,0 +1,2819 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz IO - Inżynieria Oprogramowania</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        color: #667eea;
+        margin-bottom: 10px;
+        font-size: 2em;
+      }
+
+      .header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .start-screen,
+      .quiz-screen,
+      .result-screen {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .start-screen h2,
+      .result-screen h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 1.8em;
+      }
+
+      .settings {
+        margin: 30px 0;
+      }
+
+      .settings label {
+        display: block;
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .settings select,
+      .settings input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        transition: border 0.3s;
+      }
+
+      .settings select:focus,
+      .settings input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+        font-weight: 600;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .quiz-screen {
+        display: none;
+      }
+
+      .progress-bar {
+        background: #f0f0f0;
+        height: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-fill {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 100%;
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .question-container {
+        margin-bottom: 30px;
+      }
+
+      .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .question-number {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 1.1em;
+      }
+
+      .category-badge {
+        background: #f0f0f0;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        color: #666;
+      }
+
+      .question-text {
+        font-size: 1.3em;
+        color: #333;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        font-weight: 500;
+      }
+
+      .answers {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .answer {
+        padding: 20px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+        display: flex;
+        align-items: center;
+      }
+
+      .answer:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+        transform: translateX(5px);
+      }
+
+      .answer.selected {
+        border-color: #667eea;
+        background: #f0f4ff;
+      }
+
+      .answer.correct {
+        border-color: #4caf50;
+        background: #e8f5e9;
+      }
+
+      .answer.incorrect {
+        border-color: #f44336;
+        background: #ffebee;
+      }
+
+      .answer-letter {
+        display: inline-block;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        text-align: center;
+        line-height: 35px;
+        margin-right: 15px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .answer.correct .answer-letter {
+        background: #4caf50;
+      }
+
+      .answer.incorrect .answer-letter {
+        background: #f44336;
+      }
+
+      .answer-text {
+        flex: 1;
+      }
+
+      .navigation {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        flex: 1;
+      }
+
+      .btn-primary {
+        flex: 2;
+      }
+
+      .result-screen {
+        display: none;
+        text-align: center;
+      }
+
+      .score-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin: 30px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3em;
+        font-weight: bold;
+        color: white;
+        position: relative;
+      }
+
+      .score-circle.excellent {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+      }
+
+      .score-circle.good {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+      }
+
+      .score-circle.pass {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      }
+
+      .score-circle.fail {
+        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      }
+
+      .result-details {
+        margin: 30px 0;
+        text-align: left;
+      }
+
+      .result-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        font-size: 1.1em;
+      }
+
+      .result-row:last-child {
+        border-bottom: none;
+      }
+
+      .result-label {
+        color: #666;
+      }
+
+      .result-value {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header,
+        .start-screen,
+        .quiz-screen,
+        .result-screen {
+          padding: 20px;
+        }
+
+        .question-text {
+          font-size: 1.1em;
+        }
+
+        .navigation {
+          flex-direction: column;
+        }
+      }
+
+      .feedback {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .feedback.show {
+        display: block;
+      }
+
+      .feedback.correct {
+        background: #e8f5e9;
+        border-left: 4px solid #4caf50;
+        color: #2e7d32;
+      }
+
+      .feedback.incorrect {
+        background: #ffebee;
+        border-left: 4px solid #f44336;
+        color: #c62828;
+      }
+
+      .explanation {
+        margin-top: 10px;
+        font-size: 0.95em;
+        line-height: 1.5;
+      }
+
+      .source-link {
+        margin-top: 15px;
+        padding: 12px 15px;
+        background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        font-size: 0.95em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .source-link .pdf-icon {
+        font-size: 1.5em;
+      }
+
+      .source-link .source-text {
+        flex: 1;
+      }
+
+      .source-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 6px 12px;
+        background: white;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 5px rgba(102, 126, 234, 0.2);
+      }
+
+      .source-link a:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+      }
+
+      .source-link a::after {
+        content: " →";
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>⚙️ Quiz IO</h1>
+        <p>Inżynieria Oprogramowania - Test zaliczeniowy 2025/26</p>
+      </div>
+
+      <!-- Ekran startowy -->
+      <div class="start-screen" id="startScreen">
+        <h2>Witaj w quizie!</h2>
+        <p style="margin-bottom: 30px; color: #666">
+          Sprawdź swoją wiedzę z Inżynierii Oprogramowania. Quiz zawiera pytania
+          z materiałów wykładowych prof. dr hab. inż. Piotra Cofty obejmujących
+          metodologie, wymagania, projektowanie, implementację, testowanie i
+          utrzymanie.
+        </p>
+
+        <div class="settings">
+          <label for="categorySelect">Wybierz kategorię pytań:</label>
+          <select id="categorySelect">
+            <option value="all">Wszystkie tematy (Mix)</option>
+            <option value="podstawy">Podstawy IO i 5xP</option>
+            <option value="metodologie">Metodologie wytwórcze</option>
+            <option value="agile">Agile, Scrum, DevOps</option>
+            <option value="wymagania">Wymagania</option>
+            <option value="projektowanie">Projektowanie</option>
+            <option value="implementacja">Implementacja i Git</option>
+            <option value="testowanie">Testowanie</option>
+            <option value="utrzymanie">Utrzymanie</option>
+          </select>
+
+          <label for="questionCount">Liczba pytań:</label>
+          <select id="questionCount">
+            <option value="10">10 pytań</option>
+            <option value="15">15 pytań</option>
+            <option value="20" selected>20 pytań</option>
+            <option value="30">30 pytań</option>
+            <option value="50">50 pytań</option>
+            <option value="all">Wszystkie pytania</option>
+          </select>
+        </div>
+
+        <button class="btn" onclick="startQuiz()">Rozpocznij Quiz</button>
+      </div>
+
+      <!-- Ekran quizu -->
+      <div class="quiz-screen" id="quizScreen">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+
+        <div class="question-container">
+          <div class="question-header">
+            <span class="question-number" id="questionNumber"
+              >Pytanie 1/20</span
+            >
+            <span class="category-badge" id="categoryBadge">Kategoria</span>
+          </div>
+
+          <div class="question-text" id="questionText">
+            Treść pytania pojawi się tutaj...
+          </div>
+
+          <div class="answers" id="answersContainer"></div>
+
+          <div class="feedback" id="feedback">
+            <strong id="feedbackTitle"></strong>
+            <div class="explanation" id="explanation"></div>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <button
+            class="btn btn-secondary"
+            onclick="previousQuestion()"
+            id="prevBtn"
+          >
+            ← Poprzednie
+          </button>
+          <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn">
+            Następne →
+          </button>
+          <button
+            class="btn btn-primary hidden"
+            onclick="finishQuiz()"
+            id="finishBtn"
+          >
+            Zakończ Quiz
+          </button>
+        </div>
+      </div>
+
+      <!-- Ekran wyników -->
+      <div class="result-screen" id="resultScreen">
+        <h2>Wyniki Quizu</h2>
+
+        <div class="score-circle" id="scoreCircle">
+          <span id="scorePercentage">0%</span>
+        </div>
+
+        <div class="result-details">
+          <div class="result-row">
+            <span class="result-label">Poprawne odpowiedzi:</span>
+            <span class="result-value" id="correctCount">0</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Błędne odpowiedzi:</span>
+            <span class="result-value" id="incorrectCount">0</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Procent poprawnych:</span>
+            <span class="result-value" id="percentageText">0%</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Ocena:</span>
+            <span class="result-value" id="grade">-</span>
+          </div>
+        </div>
+
+        <button class="btn" onclick="restartQuiz()">Rozpocznij ponownie</button>
+      </div>
+    </div>
+
+    <script>
+      const questions = [
+        // ==================== PODSTAWY ====================
+        {
+          category: "podstawy",
+          question:
+            "Która definicja najlepiej opisuje inżynierię oprogramowania?",
+          answers: [
+            "Dziedzina informatyki dotycząca programowania w językach wysokiego poziomu",
+            "Dziedzina inżynierii dotycząca produkcji oprogramowania, której celem jest planowe uzyskanie wysokiej jakości produktu na czas i w ramach budżetu",
+            "Nauka o algorytmach i strukturach danych stosowanych w tworzeniu aplikacji",
+            "Metodologia zarządzania zespołami programistycznymi w dużych korporacjach",
+          ],
+          correct: 1,
+          explanation:
+            "Inżynieria oprogramowania to dziedzina inżynierii dotycząca produkcji oprogramowania, której celem jest planowe uzyskanie wysokiej jakości produktu (w tym bezpieczeństwa) na czas i w ramach budżetu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=1",
+        },
+        {
+          category: "podstawy",
+          question: "Jakość w kontekście inżynierii oprogramowania jest:",
+          answers: [
+            "Wymaganiem funkcjonalnym dotyczącym interfejsu użytkownika",
+            "Wymaganiem niefunkcjonalnym dotyczącym całego systemu",
+            "Opcjonalnym dodatkiem do specyfikacji projektu",
+            "Wymaganiem technicznym dotyczącym tylko kodu źródłowego",
+          ],
+          correct: 1,
+          explanation:
+            "Jakość jest wymaganiem niefunkcjonalnym dotyczącym całego systemu. Obejmuje poprawność, niezawodność, wydajność i bezpieczeństwo.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=1",
+        },
+        {
+          category: "podstawy",
+          question: "Co oznacza '5 x P' w kontekście przedsiębiorstwa?",
+          answers: [
+            "Plan, Produkt, Proces, Procedura, Personel",
+            "Przedsiębiorstwo, Proces, Program, Projekt, Produkt (deliverable)",
+            "Planowanie, Programowanie, Projektowanie, Prototypowanie, Produkcja",
+            "Przedsięwzięcie, Platforma, Pakiet, Profil, Protokół",
+          ],
+          correct: 1,
+          explanation:
+            "5 x P to: Przedsiębiorstwo, Proces (powtarzalny), Program (unikalne działania biznesowe), Projekt (wytworzenie produktu), Produkt (deliverable).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=2",
+        },
+        {
+          category: "podstawy",
+          question:
+            "Czym różni się 'proces' od 'programu' w kontekście działania przedsiębiorstwa?",
+          answers: [
+            "Proces jest jednorazowy, program jest powtarzalny",
+            "Proces nie zmienia stanu firmy i jest powtarzalny, program zmienia stan firmy i jest unikalny",
+            "Proces dotyczy tylko IT, program dotyczy całej organizacji",
+            "Proces wymaga dokumentacji, program nie wymaga",
+          ],
+          correct: 1,
+          explanation:
+            "Proces to działania powtarzalne, nie zmieniające stanu firmy (np. produkcja, księgowość). Program to unikalne działania biznesowe, które zmieniają stan firmy (np. wejście na nowy rynek).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=1",
+        },
+        {
+          category: "podstawy",
+          question:
+            "Która z poniższych faz NIE należy do standardowych faz wytwarzania oprogramowania?",
+          answers: ["Wymagania", "Implementacja", "Monetyzacja", "Utrzymanie"],
+          correct: 2,
+          explanation:
+            "Standardowe fazy wytwarzania oprogramowania to: Wymagania, Projekt, Implementacja, Testowanie, Utrzymanie. Monetyzacja nie jest fazą wytwarzania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=2",
+        },
+        {
+          category: "podstawy",
+          question: "Co oznacza skrót 'Dev / Sec / Ops'?",
+          answers: [
+            "Developer / Secretary / Operator",
+            "Development / Security / Operations",
+            "Device / Sector / Option",
+            "Design / Selection / Optimization",
+          ],
+          correct: 1,
+          explanation:
+            "Dev/Sec/Ops oznacza Development (wytwarzanie), Security (bezpieczeństwo), Operations (operacje). Są to trzy główne obszary w cyklu życia oprogramowania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=2",
+        },
+        {
+          category: "podstawy",
+          question:
+            "Dlaczego wymagania niefunkcjonalne stanowią problem w inżynierii oprogramowania?",
+          answers: [
+            "Są zawsze sprzeczne z wymaganiami funkcjonalnymi",
+            "Dotyczą całego systemu i są bardzo trudne do spełnienia oraz weryfikacji",
+            "Wymagają specjalnych narzędzi programistycznych do implementacji",
+            "Mogą być zdefiniowane tylko przez klienta końcowego",
+          ],
+          correct: 1,
+          explanation:
+            "Wymagania niefunkcjonalne dotyczą całego systemu, są bardzo trudne do spełnienia i bardzo trudne do weryfikacji - stąd stanowią istotny problem.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=1",
+        },
+        {
+          category: "podstawy",
+          question:
+            "Projekt w kontekście przedsiębiorstwa to aktywność mająca na celu:",
+          answers: [
+            "Zwiększenie zysków firmy w danym kwartale",
+            "Wytworzenie produktu-rezultatu (deliverable)",
+            "Utrzymanie bieżącej działalności operacyjnej",
+            "Rekrutację nowych pracowników do zespołu",
+          ],
+          correct: 1,
+          explanation:
+            "Projekt jest aktywnością mającą na cel wytworzenie produktu-rezultatu (deliverable), np. wytworzenie nowego oprogramowania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=1",
+        },
+
+        // ==================== METODOLOGIE ====================
+        {
+          category: "metodologie",
+          question: "Czym jest metodologia wytwórcza?",
+          answers: [
+            "Zbiorem narzędzi programistycznych używanych w projekcie",
+            "Standardem ciągu operacji w czasie i zakresie, obejmującym wszystkie fazy",
+            "Dokumentacją techniczną projektu informatycznego",
+            "Sposobem organizacji zespołu programistycznego",
+          ],
+          correct: 1,
+          explanation:
+            "Metodologia wytwórcza to standard ciągu operacji w czasie, zakresie itp., obejmujący wszystkie fazy wytwarzania oprogramowania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=2",
+        },
+        {
+          category: "metodologie",
+          question:
+            "Ile układów metodologii wytwórczych próbowano historycznie?",
+          answers: ["Około 3", "Około 5", "Około 10", "Około 20"],
+          correct: 2,
+          explanation:
+            "Historycznie próbowano około 10 układów metodologii wytwórczych ('klocki' można ułożyć na wiele sposobów).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=2",
+        },
+        {
+          category: "metodologie",
+          question: "Jak wygląda przepływ w metodologii waterfall?",
+          answers: [
+            "Cykliczny z powrotami do poprzednich faz w każdej iteracji",
+            "Sekwencyjny: Wymagania → Projekt → Implementacja → Testowanie → Utrzymanie",
+            "Równoległy: wszystkie fazy wykonywane jednocześnie",
+            "Losowy: fazy wykonywane w zależności od potrzeb projektu",
+          ],
+          correct: 1,
+          explanation:
+            "Metodologia waterfall ma przepływ sekwencyjny: Wymagania → Projekt → Implementacja → Testowanie → Utrzymanie, gdzie każda faza następuje po poprzedniej.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=2",
+        },
+        {
+          category: "metodologie",
+          question: "Jakie są trzy główne współczesne metodologie wytwórcze?",
+          answers: [
+            "Waterfall, Spiral, RAD",
+            "Zwinny (agile), Open source, Formalny",
+            "Scrum, Kanban, XP",
+            "DevOps, CI/CD, GitFlow",
+          ],
+          correct: 1,
+          explanation:
+            "Trzy główne współczesne metodologie to: Zwinny (agile), Open source i Formalny.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+        {
+          category: "metodologie",
+          question: "Jak firma zazwyczaj wykorzystuje metodologie?",
+          answers: [
+            "Zawsze stosuje tylko jedną metodologię dla wszystkich projektów",
+            "Może stosować jedną dominującą, kilka zależnie od klienta, lub szkodliwą mieszankę",
+            "Zawsze tworzy własną, unikalną metodologię",
+            "Metodologie są narzucane przez prawo i nie ma wyboru",
+          ],
+          correct: 1,
+          explanation:
+            "Firma zazwyczaj wykorzystuje: jedną metodologię jako dominującą, kilka metodologii zależnie od wymagań klienta, lub szkodliwą mieszankę metodologii.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+        {
+          category: "metodologie",
+          question:
+            "Dla jakiego typu oprogramowania stosuje się metodę formalną?",
+          answers: [
+            "Dla aplikacji mobilnych i webowych",
+            "Dla oprogramowania wysokiego ryzyka, którego błędne działanie może spowodować znaczne szkody",
+            "Dla prototypów i MVP (Minimum Viable Product)",
+            "Dla oprogramowania open source",
+          ],
+          correct: 1,
+          explanation:
+            "Metodę formalną stosuje się dla oprogramowania wysokiego ryzyka, którego błędne działanie może spowodować: uszkodzenie ciała lub śmierć, uszkodzenie krytycznej infrastruktury, destabilizację rynków, zmniejszenie potencjału obronnego.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=7",
+        },
+        {
+          category: "metodologie",
+          question: "Co jest kluczową zasadą w modelu V?",
+          answers: [
+            "Każda faza musi być zakończona przed rozpoczęciem następnej",
+            "Przypadki testowe są podstawową formą komunikacji między fazami",
+            "Dokumentacja ma priorytet nad działającym kodem",
+            "Testy wykonuje się tylko na końcu projektu",
+          ],
+          correct: 1,
+          explanation:
+            "W modelu V przypadki testowe są podstawową formą komunikacji - łączą odpowiadające sobie poziomy projektowania i testowania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=7",
+        },
+
+        // ==================== AGILE ====================
+        {
+          category: "agile",
+          question: "Co charakteryzuje metodologię Agile?",
+          answers: [
+            "Długie cykle planowania z pełną dokumentacją",
+            "Bardzo częste, małe przyrosty weryfikowane przez użytkownika",
+            "Sztywny plan projektu ustalany na początku",
+            "Brak bezpośredniego kontaktu z użytkownikiem końcowym",
+          ],
+          correct: 1,
+          explanation:
+            "Agile charakteryzuje się bardzo częstymi, małymi przyrostami, które są weryfikowane przez użytkownika.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+        {
+          category: "agile",
+          question: "Jak krótki horyzont planowania wpływa na wymagania?",
+          answers: [
+            "Pomaga wszystkim typom wymagań jednakowo",
+            "Pomaga wymaganiom funkcjonalnym, ale szkodzi wymaganiom niefunkcjonalnym",
+            "Szkodzi wymaganiom funkcjonalnym, ale pomaga niefunkcjonalnym",
+            "Nie ma wpływu na wymagania",
+          ],
+          correct: 1,
+          explanation:
+            "Krótki horyzont planowania pomaga wymaganiom funkcjonalnym, ale szkodzi wymaganiom niefunkcjonalnym. Wymogi bezpieczeństwa nie są lubiane w krótkim horyzoncie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+        {
+          category: "agile",
+          question: "Kiedy powstał Agile Manifesto?",
+          answers: ["1995", "2001", "2005", "2010"],
+          correct: 1,
+          explanation:
+            "Agile Manifesto powstało w 2001 roku (http://agilemanifesto.org/).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+        {
+          category: "agile",
+          question:
+            "Która metodologia agile jest najpopularniejsza według statystyk z 2017 roku?",
+          answers: ["Kanban (58%)", "Scrum (58%)", "XP (58%)", "Lean (58%)"],
+          correct: 1,
+          explanation:
+            "Według statystyk z 2017 roku, Scrum jest najpopularniejszą metodologią agile z 58% udziałem.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+        {
+          category: "agile",
+          question: "Jak długo trwa Sprint w Scrum?",
+          answers: [
+            "1-3 dni",
+            "5 dni do 1 miesiąca",
+            "2-3 miesiące",
+            "6-12 miesięcy",
+          ],
+          correct: 1,
+          explanation:
+            "Sprint trwa od 5 dni do 1 miesiąca. Jest to krótki, regularny odcinek czasu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=4",
+        },
+        {
+          category: "agile",
+          question: "Jaki jest zalecany rozmiar zespołu w Scrum?",
+          answers: ["3-5 osób", "7-12 osób", "15-20 osób", "25-30 osób"],
+          correct: 1,
+          explanation:
+            "Zespół Scrum powinien liczyć 7-12 osób i być stabilny (zmiany tylko w uzasadnionych przypadkach).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=4",
+        },
+        {
+          category: "agile",
+          question: "Kto uzupełnia backlog w Scrum?",
+          answers: [
+            "Tylko Scrum Master",
+            "Tylko klient zewnętrzny",
+            "Product Owner i członkowie zespołu",
+            "Tylko kierownik projektu",
+          ],
+          correct: 2,
+          explanation:
+            "Backlog jest uzupełniany przez Product Ownera (reprezentuje użytkownika) oraz członków zespołu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=4",
+        },
+        {
+          category: "agile",
+          question: "Jakie typy zadań mogą trafić do backlogu?",
+          answers: [
+            "Tylko zadania techniczne związane z kodowaniem",
+            "Techniczne, organizacyjne, precyzujące, porządkujące i inne",
+            "Tylko zadania zatwierdzone przez klienta",
+            "Tylko zadania z przypisanym budżetem",
+          ],
+          correct: 1,
+          explanation:
+            "Do backlogu trafiają zadania różnego typu: techniczne, organizacyjne (np. zamówić pizzę), precyzujące, porządkujące - tak długo jak zespół uważa, że powinny być zrealizowane.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=4",
+        },
+        {
+          category: "agile",
+          question:
+            "Kto dokonuje planowania sprintu poprzez dobór elementów z backlogu?",
+          answers: [
+            "Product Owner samodzielnie",
+            "Scrum Master samodzielnie",
+            "Zespół",
+            "Kierownictwo firmy",
+          ],
+          correct: 2,
+          explanation:
+            "Planowanie sprintu polega na doborze z backlogu elementów do wykonania przez zespół. To zespół decyduje co będzie wykonane.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=4",
+        },
+        {
+          category: "agile",
+          question: "Jak długo trwa codzienny scrum?",
+          answers: ["5 minut", "Kwadrans (15 minut)", "30 minut", "1 godzinę"],
+          correct: 1,
+          explanation:
+            "Codzienny scrum to krótkie spotkanie trwające kwadrans (15 minut), w którym uczestniczy cały zespół.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question:
+            "Co każdy członek zespołu raportuje podczas codziennego scruma?",
+          answers: [
+            "Tylko problemy techniczne",
+            "Nad czym pracuje, co zrobił, czy są kłopoty",
+            "Tylko postęp procentowy zadania",
+            "Tylko plany na następny tydzień",
+          ],
+          correct: 1,
+          explanation:
+            "Podczas codziennego scruma każdy raportuje: nad czym pracuje, co zrobił, czy są kłopoty - w odniesieniu do celów sprintu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Co powstaje na koniec sprintu?",
+          answers: [
+            "Tylko dokumentacja techniczna",
+            "Nowa wersja którą można pokazać użytkownikowi",
+            "Raport finansowy projektu",
+            "Lista błędów do naprawienia",
+          ],
+          correct: 1,
+          explanation:
+            "Na koniec sprintu powstaje nowa wersja którą można pokazać użytkownikowi (lub product owner) oraz odbywa się spotkanie retrospektywne.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Co jest omawiane na spotkaniu na koniec sprintu?",
+          answers: [
+            "Tylko plany na następny sprint",
+            "Co poszło dobrze, co poszło źle, co może być usprawnione",
+            "Tylko problemy techniczne",
+            "Tylko wymagania klienta",
+          ],
+          correct: 1,
+          explanation:
+            "Na spotkaniu na koniec sprintu omawiane jest: co poszło dobrze, co poszło źle, co może być usprawnione.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Czym jest DevOps?",
+          answers: [
+            "Nowym językiem programowania",
+            "Praktyką agile - zastosowaniem agile do bardzo szybkich cykli",
+            "Narzędziem do zarządzania projektami",
+            "Standardem dokumentacji technicznej",
+          ],
+          correct: 1,
+          explanation:
+            "DevOps jest praktyką agile - zastosowaniem agile do bardzo szybkich cykli. Podkreśla ciągłość współpracy 'dev' i 'ops' ze wspólną odpowiedzialnością.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Co podkreśla DevOps?",
+          answers: [
+            "Separację zespołów dev i ops",
+            "Ciągłość współpracy 'dev' i 'ops' ze wspólną odpowiedzialnością",
+            "Dominację dokumentacji nad kodem",
+            "Priorytet testowania nad implementacją",
+          ],
+          correct: 1,
+          explanation:
+            "DevOps podkreśla ciągłość współpracy 'dev' i 'ops' ze wspólną odpowiedzialnością. Jest to osobna specjalność zawodowa.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Co oznacza CI/CD?",
+          answers: [
+            "Code Integration / Code Development",
+            "Continuous Integration / Continuous Delivery (Deployment)",
+            "Customer Interface / Customer Design",
+            "Certified Implementation / Certified Deployment",
+          ],
+          correct: 1,
+          explanation:
+            "CI/CD to platforma narzędziowa DevOps. DevOps naciska na automatyzację - wszystko co może zostać zautomatyzowane, powinno być zautomatyzowane.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Gdzie jest bezpieczeństwo w Agile?",
+          answers: [
+            "Jest pomijane jako nieistotne",
+            "Jest to jedno z wymagań w backlog, stopniowo realizowane jak inne",
+            "Jest dodawane tylko na końcu projektu",
+            "Jest odpowiedzialnością zewnętrznej firmy",
+          ],
+          correct: 1,
+          explanation:
+            "W Agile bezpieczeństwo jest jednym z wymagań w backlog, stopniowo realizowanym tak jak inne wymagania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=6",
+        },
+        {
+          category: "agile",
+          question: "Jak szybko Amazon wdraża zmiany w oprogramowaniu?",
+          answers: [
+            "Raz dziennie",
+            "Co 11.6 sekundy",
+            "Raz na tydzień",
+            "Raz na miesiąc",
+          ],
+          correct: 1,
+          explanation:
+            "Amazon wdraża zmiany co 11.6 sekundy, co pokazuje jak szybko oprogramowanie musi nadążać za zmianami.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=3",
+        },
+
+        // ==================== OPEN SOURCE ====================
+        {
+          category: "metodologie",
+          question:
+            "Jakie warunki sprzyjały powstaniu ruchu open source w latach 80'-90'?",
+          answers: [
+            "Niskie koszty licencji oprogramowania komercyjnego",
+            "Doświadczeni deweloperzy, poczucie wspólnoty, docenianie technicznej doskonałości, nuda pracy dla korporacji",
+            "Wymogi prawne dotyczące udostępniania kodu",
+            "Brak alternatywnych metod dystrybucji oprogramowania",
+          ],
+          correct: 1,
+          explanation:
+            "Open source powstało dzięki: doświadczonym deweloperom, poczuciu wspólnoty, docenianiu technicznej doskonałości i nudzie pracy dla korporacji. Narzędzia: komputery osobiste, Internet, Git, mail.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=6",
+        },
+        {
+          category: "metodologie",
+          question: "Co charakteryzuje projekty open source?",
+          answers: [
+            "Zamknięty kod dostępny tylko dla wybranych deweloperów",
+            "Cel zrozumiany przez uczestników, kod dostępny dla wszystkich, łatwo dołączyć i odejść",
+            "Praca nad projektem jest głównym zajęciem uczestników",
+            "Hierarchiczna struktura zarządzania",
+          ],
+          correct: 1,
+          explanation:
+            "Open source charakteryzuje: cel zrozumiany przez uczestników, kod dostępny dla wszystkich, niezależna praca, łatwość dołączenia i odejścia, praca nie jest głównym zajęciem, każdy sensowny wkład jest doceniany.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=6",
+        },
+        {
+          category: "metodologie",
+          question: "Co oznacza 'merytokracja' w kontekście open source?",
+          answers: [
+            "Decyzje podejmuje najstarszy członek projektu",
+            "Szefem jest ten, kto wie i pracuje",
+            "Wszyscy mają równy głos niezależnie od wkładu",
+            "Decyzje podejmuje sponsor projektu",
+          ],
+          correct: 1,
+          explanation:
+            "W open source merytokracja oznacza, że szefem jest ten, kto wie i pracuje. Liczy się wiedza i wkład, nie stanowisko.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=6",
+        },
+        {
+          category: "metodologie",
+          question: "Jakie trzy elementy są istotne w open source?",
+          answers: [
+            "Marketing, sprzedaż, wsparcie",
+            "Dokumentacja, zarządzanie wersjami, merytokracja",
+            "Licencje, patenty, znaki towarowe",
+            "Budżet, harmonogram, zasoby",
+          ],
+          correct: 1,
+          explanation:
+            "W open source istotne są: Dokumentacja (wszystko na piśmie), Zarządzanie wersjami (wszystko pamiętane), Merytokracja (szefem jest ten, kto wie i pracuje).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=6",
+        },
+
+        // ==================== WYMAGANIA ====================
+        {
+          category: "wymagania",
+          question: "Co określa wymaganie w inżynierii oprogramowania?",
+          answers: [
+            "Tylko techniczne aspekty implementacji systemu",
+            "Cechy produktu ważne dla klienta/użytkownika/interesariusza oraz zgodności ze standardami",
+            "Wyłącznie budżet i harmonogram projektu",
+            "Tylko interfejs użytkownika systemu",
+          ],
+          correct: 1,
+          explanation:
+            "Wymaganie określa cechy produktu ważne dla klienta/użytkownika/interesariusza oraz konieczne zgodności ze standardami, kontraktami itp.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=7",
+        },
+        {
+          category: "wymagania",
+          question: "Kim są interesariusze (stakeholders)?",
+          answers: [
+            "Tylko klienci płacący za oprogramowanie",
+            "Osoby, grupy lub organizacje zainteresowane produktem",
+            "Tylko programiści pracujący nad projektem",
+            "Tylko kierownictwo firmy wytwarzającej oprogramowanie",
+          ],
+          correct: 1,
+          explanation:
+            "Interesariusze to osoby, grupy lub organizacje zainteresowane produktem: użytkownicy, dostawcy, deweloperzy, managerowie, księgowość, właściciele firmy i inni.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question:
+            "Który problem jest najczęstszy według badań dotyczących trudności z wymaganiami?",
+          answers: [
+            "Brak narzędzi do zarządzania wymaganiami",
+            "Nierealistyczne oczekiwania interesariuszy (Unrealistic expectations of stakeholders)",
+            "Zbyt duża liczba wymagań",
+            "Brak budżetu na analizę wymagań",
+          ],
+          correct: 1,
+          explanation:
+            "Według badań Jarzębowicz et al. (2018), najczęstszy problem to 'Unrealistic expectations of stakeholders', następnie scope creep, niewyrażanie oczywistości przez interesariuszy, brak czasu, niedostępność interesariuszy.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'scope creep'?",
+          answers: [
+            "Zmniejszanie zakresu projektu w czasie",
+            "Niekontrolowane rozszerzanie zakresu projektu",
+            "Stabilny zakres projektu przez cały czas trwania",
+            "Precyzyjne definiowanie zakresu na początku",
+          ],
+          correct: 1,
+          explanation:
+            "Scope creep to jeden z głównych problemów z wymaganiami - niekontrolowane rozszerzanie zakresu projektu w trakcie jego realizacji.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question: "Które z poniższych NIE jest cechą dobrego wymagania?",
+          answers: ["Testowalne", "Elastyczne", "Jednoznaczne", "Niesprzeczne"],
+          correct: 1,
+          explanation:
+            "Cechy dobrego wymagania to: Testowalne, Mierzalne, Kompletne, Zrozumiałe, Jednoznaczne, Niesprzeczne. 'Elastyczne' nie jest wymienione jako cecha dobrego wymagania.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question: "Dlaczego 'System ma być bezpieczny' to złe wymaganie?",
+          answers: [
+            "Jest za krótkie",
+            "Nie określa granic systemu, nie definiuje 'bezpieczny', nie jest testowalne",
+            "Używa niewłaściwego słownictwa",
+            "Nie zawiera daty realizacji",
+          ],
+          correct: 1,
+          explanation:
+            "To złe wymaganie bo: nie określa granic systemu, nie definiuje co znaczy 'bezpieczny', nie jest testowalne, nie określa czy musi być absolutnie i ciągle bezpieczny.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question: "Jakie są trzy typy wymagań?",
+          answers: [
+            "Krytyczne, ważne, opcjonalne",
+            "Funkcjonalne, niefunkcjonalne, ograniczenia",
+            "Użytkownika, systemowe, biznesowe",
+            "Krótkoterminowe, średnioterminowe, długoterminowe",
+          ],
+          correct: 1,
+          explanation:
+            "Trzy typy wymagań to: Funkcjonalne ('co' - oczekiwane wyniki), Niefunkcjonalne ('jak' - jakości), Ograniczenia (dodatkowe ograniczenia na wybór rozwiązania).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question: "Co określa wymaganie funkcjonalne?",
+          answers: [
+            "Jak szybko system ma działać",
+            "Oczekiwane wyniki lub elementy systemu ('co')",
+            "Jakie technologie należy użyć",
+            "Kto będzie odpowiedzialny za system",
+          ],
+          correct: 1,
+          explanation:
+            "Wymaganie funkcjonalne określa 'co': oczekiwane wyniki lub elementy systemu, np. 'MUSI mieć interfejs użytkownika'.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question: "Co określa wymaganie niefunkcjonalne?",
+          answers: [
+            "Listę funkcji systemu",
+            "W jaki sposób spełniane są wymagania funkcjonalne ('jak')",
+            "Budżet projektu",
+            "Skład zespołu projektowego",
+          ],
+          correct: 1,
+          explanation:
+            "Wymaganie niefunkcjonalne określa 'jak' (jakości): w jaki sposób spełniane są wymagania funkcjonalne, np. 'interfejs MUSI być użyteczny'.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question:
+            "Które z poniższych NIE jest istotnym wymaganiem niefunkcjonalnym?",
+          answers: [
+            "Bezpieczeństwo",
+            "Użyteczność",
+            "Kolorystyka",
+            "Testowalność",
+          ],
+          correct: 2,
+          explanation:
+            "Istotne wymagania niefunkcjonalne to: Bezpieczeństwo (odporność na ataki), Użyteczność (łatwość użycia), Utrzymywalność (łatwość dbania o system), Testowalność (gotowość do testowania).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+        {
+          category: "wymagania",
+          question:
+            "Co stosuje się w metodologiach przed agile do zarządzania wymaganiami?",
+          answers: [
+            "Backlog produktu",
+            "Inżynierię wymagań z certyfikatem IREB CPRE i standardem ISO9126",
+            "User stories",
+            "Epiki i inicjatywy",
+          ],
+          correct: 1,
+          explanation:
+            "W metodologiach przed agile stosuje się inżynierię wymagań: podejście systematyczne, zestandaryzowane (ISO9126), z certyfikatem (IREB CPRE) i stanowiskiem (requirement engineer).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=9",
+        },
+        {
+          category: "wymagania",
+          question:
+            "Czy twierdzenie 'W agile nie mamy wymagań' jest prawdziwe?",
+          answers: [
+            "Tak, agile całkowicie rezygnuje z wymagań",
+            "Nie, w agile też potrzebne są wymagania, ale inaczej zarządzane",
+            "Tak, wymagania zastępuje się prototypowaniem",
+            "Nie dotyczy, agile i wymagania to niezależne koncepcje",
+          ],
+          correct: 1,
+          explanation:
+            "To popularne ale nieprawdziwe twierdzenie. W agile też potrzebne są wymagania. Product owner jest źródłem wymagań, sprint planning jest sterowany przez wymagania, release to weryfikacja względem wymagań.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=9",
+        },
+        {
+          category: "wymagania",
+          question: "Jakie są podstawowe cechy wymagań w agile?",
+          answers: [
+            "Definiowane na początku projektu, niezmienne, szczegółowo dokumentowane",
+            "Określane tak późno jak możliwe, gotowość na zmiany, późne dokumentowanie",
+            "Definiowane przez zewnętrzną firmę, niezależne od zespołu",
+            "Identyczne jak w metodologii waterfall",
+          ],
+          correct: 1,
+          explanation:
+            "Wymagania w agile: określane tak późno jak możliwe, gotowość na zmiany, skoordynowanie z praktyką Sprint, późne dokumentowanie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=9",
+        },
+        {
+          category: "wymagania",
+          question:
+            "Jaka jest kolejność w procesie 'epickim' od biznesu do technologii?",
+          answers: [
+            "Zadanie → Historia → Epika → Inicjatywa → Temat",
+            "Temat → Inicjatywa → Epika → Historia → Zadanie",
+            "Epika → Historia → Zadanie → Temat → Inicjatywa",
+            "Inicjatywa → Temat → Historia → Epika → Zadanie",
+          ],
+          correct: 1,
+          explanation:
+            "Proces 'epicki' od biznesu do technologii: Temat (ogólny kierunek) → Inicjatywa (potrzeba zmiany) → Epika (fragment pracy) → Historia (perspektywa użytkownika) → Zadanie (jednostka pracy).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Czym jest 'Epika' w procesie epickim?",
+          answers: [
+            "Ogólnym kierunkiem organizacji",
+            "Dobrze zdefiniowanym fragmentem pracy dla projektu",
+            "Jednostką pracy dla pojedynczego programisty",
+            "Biznesową potrzebą zmiany",
+          ],
+          correct: 1,
+          explanation:
+            "Epika to dobrze zdefiniowany fragment pracy dla projektu, np. 'Musimy spełniać polskie normy bezpieczeństwa' czyli 'musimy zmodyfikować nasz produkt'.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Czym jest 'Historia' (user story)?",
+          answers: [
+            "Szczegółową dokumentacją techniczną funkcji",
+            "Luźno sformułowanymi oczekiwaniami różnych interesariuszy",
+            "Raportem z poprzedniego sprintu",
+            "Opisem architektury systemu",
+          ],
+          correct: 1,
+          explanation:
+            "Historia (user story) to luźno sformułowane oczekiwania różnych interesariuszy, zebrane bez specjalnej edycji. Nie ma gwarancji, że wszystkie będą spełnione lub zrozumiane poprawnie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'MUSI' według RFC 2119?",
+          answers: [
+            "Cecha jest opcjonalna ale zalecana",
+            "Cecha jest absolutnie konieczna, brak skutkuje odrzuceniem produktu",
+            "Cecha powinna być zaimplementowana jeśli jest czas",
+            "Cecha będzie rozważona w przyszłych wersjach",
+          ],
+          correct: 1,
+          explanation:
+            "Według RFC 2119, MUSI oznacza że cecha jest absolutnie konieczna - brak spełnienia skutkuje odrzuceniem produktu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'POWINIEN' według RFC 2119?",
+          answers: [
+            "Cecha jest absolutnie konieczna",
+            "Produkt powinien posiadać cechę, chyba że istnieją ważne powody, brak wymaga wyjaśnienia",
+            "Cecha jest całkowicie opcjonalna",
+            "Cecha nie może wystąpić w produkcie",
+          ],
+          correct: 1,
+          explanation:
+            "POWINIEN oznacza że produkt powinien posiadać daną cechę, chyba że istnieją ważne powody aby jej nie posiadał. Brak wymaga wyjaśnienia.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'M' w metodzie MoSCoW?",
+          answers: [
+            "Maybe - może być zaimplementowane",
+            "Must have - krytycznie ważne",
+            "Minor - mało istotne",
+            "Mandatory - obowiązkowe przez prawo",
+          ],
+          correct: 1,
+          explanation:
+            "W MoSCoW: M = Must have (krytycznie ważne), S = Should have (ważne ale może być pominięte), C = Could have (pożądane), W = Won't have this time.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'W' w metodzie MoSCoW?",
+          answers: [
+            "Want - chciane przez klienta",
+            "Won't have (this time) / Wish - nie będzie uwzględnione w tym Sprint",
+            "Will have - będzie na pewno zaimplementowane",
+            "Waiting - oczekuje na decyzję",
+          ],
+          correct: 1,
+          explanation:
+            "W = Won't have (this time) / Wish - oznacza że funkcjonalność nie będzie uwzględniona w tym Sprint.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "wymagania",
+          question: "Dobre wymaganie jest równocześnie:",
+          answers: [
+            "Planem marketingowym",
+            "Procedurą testowania",
+            "Kodem źródłowym",
+            "Umową prawną",
+          ],
+          correct: 1,
+          explanation:
+            "Dobre wymaganie jest procedurą testowania - jeśli jest testowalne, mierzalne, kompletne, zrozumiałe, jednoznaczne i niesprzeczne, to można na jego podstawie stworzyć test.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=8",
+        },
+
+        // ==================== PROJEKTOWANIE ====================
+        {
+          category: "projektowanie",
+          question: "Czym jest projektowanie w inżynierii oprogramowania?",
+          answers: [
+            "Tworzeniem interfejsu graficznego aplikacji",
+            "Systematyczną metodą rozłożenia problemu na prostsze elementy poprzez wzorce projektowe",
+            "Pisaniem dokumentacji technicznej",
+            "Planowaniem budżetu projektu",
+          ],
+          correct: 1,
+          explanation:
+            "Projektowanie to systematyczna metoda rozłożenia problemu na prostsze elementy poprzez zastosowanie ograniczonej liczby wzorców projektowych, aż do momentu gdy możliwe jest kodowanie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "projektowanie",
+          question: "Czym jest projekt (design) według materiałów?",
+          answers: [
+            "Listą funkcji do zaimplementowania",
+            "Udokumentowanym ciągiem uzasadnionych decyzji",
+            "Harmonogramem prac zespołu",
+            "Kodem źródłowym aplikacji",
+          ],
+          correct: 1,
+          explanation:
+            "Projekt to udokumentowany ciąg uzasadnionych decyzji projektowych.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "projektowanie",
+          question: "Jakie cechy muszą mieć decyzje projektowe?",
+          answers: [
+            "Szybkie, tanie, proste",
+            "Uzasadnione, udokumentowane, odwracalne",
+            "Jednomyślne, zatwierdzone przez klienta, niezmienne",
+            "Innowacyjne, unikalne, kreatywne",
+          ],
+          correct: 1,
+          explanation:
+            "Decyzje projektowe muszą być: uzasadnione (musi być powód), udokumentowane (powód zapisany), odwracalne (choć niektóre są bardzo kosztowne).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "projektowanie",
+          question: "Co oznacza ADR?",
+          answers: [
+            "Agile Development Record",
+            "Architecture Decision Record",
+            "Application Design Review",
+            "Automated Deployment Report",
+          ],
+          correct: 1,
+          explanation:
+            "ADR = Architecture Decision Record - sposób dokumentowania decyzji architektonicznych z kontekstem, problemem, decyzją, odrzuconymi opcjami, uzasadnieniem i zaakceptowanymi problemami.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "projektowanie",
+          question: "Co oznacza CIA w kontekście bezpieczeństwa?",
+          answers: [
+            "Central Intelligence Agency",
+            "Confidentiality, Integrity, Availability",
+            "Code, Implementation, Architecture",
+            "Customer, Interface, Application",
+          ],
+          correct: 1,
+          explanation:
+            "CIA to: Confidentiality (poufność), Integrity (spójność), Availability (dostępność) - trzy fundamentalne aspekty bezpieczeństwa.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Co oznacza Confidentiality (poufność) w CIA?",
+          answers: [
+            "Wszystkie dane są publicznie dostępne",
+            "Właściwy odczyt danych jest możliwy tylko dla autoryzowanych jednostek",
+            "Dane są automatycznie szyfrowane",
+            "System loguje wszystkie operacje",
+          ],
+          correct: 1,
+          explanation:
+            "Confidentiality (poufność) oznacza, że właściwy odczyt danych jest możliwy tylko dla autoryzowanych jednostek.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Co oznacza Integrity (spójność) w CIA?",
+          answers: [
+            "Dane są zawsze dostępne dla wszystkich",
+            "Manipulacje danymi i usuwanie dozwolone niezaprzeczalnie tylko dla autoryzowanych jednostek",
+            "System działa bez przerw",
+            "Wszystkie komponenty są zsynchronizowane",
+          ],
+          correct: 1,
+          explanation:
+            "Integrity (spójność) oznacza, że manipulacje danymi oraz ich usuwanie są dozwolone niezaprzeczalnie tylko dla autoryzowanych jednostek.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Co oznacza Availability (dostępność) w CIA?",
+          answers: [
+            "Dane są publicznie dostępne w Internecie",
+            "Autoryzowane jednostki mają szybki i wiarygodny dostęp do danych",
+            "System jest dostępny 24/7 bez przerw",
+            "Wszystkie funkcje są dostępne bez logowania",
+          ],
+          correct: 1,
+          explanation:
+            "Availability (dostępność) oznacza, że autoryzowane jednostki mają szybki i wiarygodny dostęp do danych.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Co mówi 'The CIA impossibility'?",
+          answers: [
+            "CIA jest przestarzałym modelem bezpieczeństwa",
+            "Nie jest możliwe kompletne spełnienie wszystkich trzech wymagań CIA",
+            "CIA wymaga specjalnego sprzętu",
+            "CIA dotyczy tylko systemów rządowych",
+          ],
+          correct: 1,
+          explanation:
+            "The CIA impossibility mówi, że nie jest możliwe kompletne spełnienie wszystkich trzech wymagań. Zatem: nie ma systemu kompletnie bezpiecznego.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Jak wygląda projektowanie w agile?",
+          answers: [
+            "Całe projektowanie na początku projektu",
+            "Przyrostowe: zaczynamy gdy możliwe, projektujemy tyle ile potrzebne, dokumentujemy tyle ile niezbędne",
+            "Brak projektowania - od razu kodowanie",
+            "Projektowanie tylko przez architekta systemu",
+          ],
+          correct: 1,
+          explanation:
+            "Projektowanie w agile jest przyrostowe: zaczynamy gdy tylko możliwe, projektujemy tyle ile potrzebne, dokumentujemy tyle ile niezbędne. Kończy się z końcem projektu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question:
+            "Jaki konflikt istnieje między agile a bezpieczeństwem w kontekście projektowania?",
+          answers: [
+            "Agile wymaga więcej testów bezpieczeństwa",
+            "Agile jest fragmentaryczne i krótkoterminowe, bezpieczeństwo wymaga wczesnego i długoterminowego projektowania",
+            "Agile nie pozwala na żadne zabezpieczenia",
+            "Bezpieczeństwo jest tańsze w agile",
+          ],
+          correct: 1,
+          explanation:
+            "Konflikt: Agile jest fragmentaryczne, przyrostowe, krótkoterminowe. Bezpieczeństwo wymaga projektowania wczesnego, długoterminowego, struktury całego systemu, z zachowaniem niezmienności rozwiązań.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Czym jest wzorzec projektowy (design pattern)?",
+          answers: [
+            "Gotowym kawałkiem kodu do skopiowania",
+            "Znanym powtarzalnym rozwiązaniem sytuacji, najlepszą praktyką",
+            "Szablonem dokumentacji",
+            "Narzędziem do generowania kodu",
+          ],
+          correct: 1,
+          explanation:
+            "Wzorzec projektowy to nie kawałek kodu, ale sposób podejścia do problemu. Jest znanym powtarzalnym rozwiązaniem sytuacji, najlepszą praktyką (best practice), skumulowaną wiedzą praktyków.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question:
+            "Który z poniższych NIE jest wzorcem projektowym bezpieczeństwa?",
+          answers: [
+            "Authentication Patterns",
+            "Input Validation Patterns",
+            "Singleton Pattern",
+            "Defense in Depth",
+          ],
+          correct: 2,
+          explanation:
+            "Singleton to ogólny wzorzec projektowy, nie związany z bezpieczeństwem. Wzorce bezpieczeństwa to m.in.: Authentication, Authorization, Secure Communication, Input Validation, Session Management, Audit and Logging, Error Handling, Data Protection, Defense in Depth.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "projektowanie",
+          question: "Co charakteryzuje Input Validation Pattern?",
+          answers: [
+            "Skomplikowany wzorzec wymagający specjalistycznej wiedzy",
+            "Prosty wzorzec, dobra praktyka, wszechstronne zastosowanie, prowadzi do programowania defensywnego",
+            "Wzorzec stosowany tylko w aplikacjach webowych",
+            "Wzorzec wymagający specjalnych bibliotek",
+          ],
+          correct: 1,
+          explanation:
+            "Input Validation Pattern to: prosty wzorzec, dobra praktyka, wszechstronne zastosowanie, dobre zabezpieczenie, prowadzi do programowania defensywnego oraz do 'defense in depth'.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=13",
+        },
+        {
+          category: "projektowanie",
+          question: "Jaka jest zasada Input validator?",
+          answers: [
+            "Ufać wszystkim danym wejściowym",
+            "To co chronimy nie powinno ufać temu, kto go wywołuje - weryfikować dane",
+            "Sprawdzać tylko dane od zewnętrznych użytkowników",
+            "Walidować tylko dane liczbowe",
+          ],
+          correct: 1,
+          explanation:
+            "Zasada: To co chronimy NIE powinno ufać temu, kto go wywołuje. Rozwiązanie: weryfikować to, czego żąda wywołujący.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=13",
+        },
+        {
+          category: "projektowanie",
+          question: "Czym jest UML?",
+          answers: [
+            "Językiem programowania",
+            "Unified Modeling Language - językiem modelowania",
+            "Narzędziem do testowania",
+            "Bazą danych",
+          ],
+          correct: 1,
+          explanation:
+            "UML = Unified Modeling Language - język modelowania używany do tworzenia różnych typów diagramów: klas, przypadków użycia, sekwencji, aktywności i innych.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=13",
+        },
+        {
+          category: "projektowanie",
+          question: "Co opisuje Use Case (przypadek użycia)?",
+          answers: [
+            "Strukturę bazy danych",
+            "Jeden wybrany przebieg interakcji z systemem",
+            "Architekturę systemu",
+            "Wymagania sprzętowe",
+          ],
+          correct: 1,
+          explanation:
+            "Use case (przypadek użycia) opisuje jeden, wybrany przebieg interakcji z systemem. Nie stara się generalizować, ale uchwycić aktorów.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=13",
+        },
+        {
+          category: "projektowanie",
+          question: "Czym są Mis-use cases (przypadki nadużycia)?",
+          answers: [
+            "Błędnie napisanymi przypadkami użycia",
+            "Opisem potencjalnych ataków i zagrożeń z perspektywy innych aktorów",
+            "Przypadkami użycia które nie przeszły testów",
+            "Przypadkami użycia odrzuconymi przez klienta",
+          ],
+          correct: 1,
+          explanation:
+            "Mis-use cases opisują potencjalne ataki, zagrożenia itp. Metoda jest taka sama jak dla nominalnych przypadków użycia, ale z innymi aktorami (atakującymi).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=13",
+        },
+        {
+          category: "projektowanie",
+          question:
+            "W przykładzie 'AI jako wektor ataku', co jest pierwszym krokiem atakującego?",
+          answers: [
+            "Włamanie się do systemu ofiary",
+            "Opracowanie użytecznego i nietypowego kodu, celowo ze złośliwym fragmentem",
+            "Przejęcie kontroli nad AI",
+            "Phishing skierowany do deweloperów",
+          ],
+          correct: 1,
+          explanation:
+            "Pierwszy krok: Atakujący opracowuje użyteczny i nietypowy kod, celowo ze złośliwym fragmentem, który następnie umieszcza w Internecie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=13",
+        },
+
+        // ==================== IMPLEMENTACJA ====================
+        {
+          category: "implementacja",
+          question:
+            "Jakie funkcje pełni zarządzanie wersjami (version control)?",
+          answers: [
+            "Tylko przechowywanie plików",
+            "Śledzenie zmian, powrót do poprzednich wersji, kontrola dostępu, pamięć kto co zrobił, statystyki",
+            "Tylko tworzenie kopii zapasowych",
+            "Tylko kompilowanie kodu",
+          ],
+          correct: 1,
+          explanation:
+            "Zarządzanie wersjami: śledzi zmiany, pozwala na powrót do poprzednich wersji, wprowadza kontrolę dostępu, pamięta kto co zrobił, utrzymuje dodatkowe informacje, dostarcza statystyk.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=14",
+        },
+        {
+          category: "implementacja",
+          question:
+            "Czym różni się scentralizowane od zdecentralizowanego zarządzania wersjami?",
+          answers: [
+            "Nie ma różnicy",
+            "Scentralizowane ma jedno centralne repozytorium, zdecentralizowane daje każdemu użytkownikowi pełną kopię",
+            "Scentralizowane jest nowsze",
+            "Zdecentralizowane wymaga stałego połączenia z internetem",
+          ],
+          correct: 1,
+          explanation:
+            "Scentralizowane: centralne repozytorium, pliki pożyczane/zwracane. Zdecentralizowane: każdy użytkownik ma kompletną kopię, zmiany są lokalne, scalanie wersji.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=14",
+        },
+        {
+          category: "implementacja",
+          question: "Jakie jest podejście Git do repozytoriów?",
+          answers: [
+            "Jedno centralne repozytorium jest wymagane",
+            "Świat składa się z rozproszonych repozytoriów, nie ma absolutnej prawdy o projekcie",
+            "Repozytorium musi być na serwerze firmy",
+            "Każdy projekt może mieć tylko jedno repozytorium",
+          ],
+          correct: 1,
+          explanation:
+            "Git: świat składa się z rozproszonych repozytoriów połączonych zgodnie z konwencjami. Każde repozytorium jest pełnym opisem historii. Nie ma centralnego repozytorium i absolutnej prawdy.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=14",
+        },
+        {
+          category: "implementacja",
+          question: "Co to jest repozytorium Git?",
+          answers: [
+            "Serwer w chmurze",
+            "Zbiór plików projektu w dowolnej kartotece, z ukrytymi plikami Git w podkartotece .git",
+            "Specjalna baza danych",
+            "Program do edycji kodu",
+          ],
+          correct: 1,
+          explanation:
+            "Repozytorium to zbiór plików projektu - dowolna kartoteka i jej podkartoteki (kartoteka robocza). Pliki specjalne Git są ukryte w podkartotece .git.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=14",
+        },
+        {
+          category: "implementacja",
+          question: "Co to jest zatwierdzenie (commit) w Git?",
+          answers: [
+            "Wysłanie plików na serwer",
+            "Zapisanie zmian w lokalnym repozytorium z możliwością późniejszego powrotu",
+            "Skompilowanie kodu",
+            "Zaakceptowanie przez kierownika",
+          ],
+          correct: 1,
+          explanation:
+            "Zatwierdzenie (commit) tworzy w repozytorium kopię wszystkich znanych plików (w rzeczywistości zachowuje tylko zmiany). Jest nazwane - można do niego wrócić.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "implementacja",
+          question: "Co to jest gałąź (branch) w Git?",
+          answers: [
+            "Kopia zapasowa repozytorium",
+            "Szereg kolejnych zatwierdzeń tworzących osobną historię zmian",
+            "Plik konfiguracyjny",
+            "Zewnętrzna biblioteka",
+          ],
+          correct: 1,
+          explanation:
+            "Gałąź (branch) to szereg kolejnych zatwierdzeń tworzący inną historię zmian w repozytorium. Każda gałąź ma nazwę, może ich być dowolna liczba.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "implementacja",
+          question: "Co to jest scalanie (merge) w Git?",
+          answers: [
+            "Usunięcie gałęzi",
+            "Połączenie dwóch gałęzi, gdzie jedna przestaje istnieć, a pliki z obu są dostępne",
+            "Kopiowanie plików między repozytoriami",
+            "Synchronizacja z serwerem",
+          ],
+          correct: 1,
+          explanation:
+            "Scalanie (merge): dowolna gałąź może być scalona z inną (przestaje wtedy istnieć). Pliki z obu gałęzi w najnowszych wersjach są dostępne. Może powodować konflikty.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "implementacja",
+          question: "Co to jest resetowanie w Git?",
+          answers: [
+            "Usunięcie repozytorium",
+            "Cofnięcie gałęzi do wcześniejszego zatwierdzenia ('cofnięcie historii')",
+            "Restart serwera Git",
+            "Zmiana nazwy repozytorium",
+          ],
+          correct: 1,
+          explanation:
+            "Resetowanie to 'cofnięcie historii' - daną gałąź można zresetować do dowolnego zatwierdzenia które do niej należy. Różne sposoby resetowania mogą powodować zapomnienie wycofanej historii.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "implementacja",
+          question: "Czym jest repozytorium zdalne w Git?",
+          answers: [
+            "Obowiązkowym elementem każdego projektu",
+            "Konwencją umożliwiającą współpracę - każdy ma lokalne repo, na serwerze jest zdalne",
+            "Kopią zapasową w chmurze",
+            "Repozytorium na innym kontynencie",
+          ],
+          correct: 1,
+          explanation:
+            "Repozytorium zdalne to konwencja (nie wymóg!) umożliwiająca współpracę. Każdy użytkownik ma lokalne repo, na serwerze jest zdalne. Można pobierać i aktualizować.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "implementacja",
+          question: "Co to jest buffer overflow?",
+          answers: [
+            "Przepełnienie pamięci RAM komputera",
+            "Nadpisanie pamięci poza zaalokowanym buforem przez dane wejściowe",
+            "Zbyt duża liczba otwartych plików",
+            "Błąd w transmisji sieciowej",
+          ],
+          correct: 1,
+          explanation:
+            "Buffer overflow występuje gdy dane wejściowe są dłuższe niż bufor docelowy i nadpisują sąsiadującą pamięć (np. zmienną salary w przykładzie z strcpy).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+        {
+          category: "implementacja",
+          question: "Dlaczego funkcja strcpy jest niebezpieczna?",
+          answers: [
+            "Jest zbyt wolna",
+            "Nie sprawdza rozmiaru bufora docelowego przed kopiowaniem",
+            "Nie obsługuje Unicode",
+            "Wymaga specjalnych uprawnień",
+          ],
+          correct: 1,
+          explanation:
+            "strcpy kopiuje ciąg znaków bez sprawdzania rozmiaru bufora docelowego, co może prowadzić do buffer overflow.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+        {
+          category: "implementacja",
+          question:
+            "Które języki programowania są zalecane zamiast C/C++ ze względów bezpieczeństwa?",
+          answers: [
+            "PHP, Perl, Ruby",
+            "Rust, Go, Python, Java, C#",
+            "COBOL, Fortran, Pascal",
+            "Assembly, Basic",
+          ],
+          correct: 1,
+          explanation:
+            "Aby zapobiec buffer overflow, zaleca się używanie języków: Rust, Go, Python, Java, C# zamiast C/C++ jeśli nie jest to konieczne.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+        {
+          category: "implementacja",
+          question: "Jakie są sposoby zapobiegania buffer overflow?",
+          answers: [
+            "Tylko uświadomienie programistów",
+            "Uświadomienie, strncpy zamiast strcpy, inne języki, analizatory kodu, izolacja",
+            "Tylko używanie antywirusów",
+            "Tylko szyfrowanie danych",
+          ],
+          correct: 1,
+          explanation:
+            "Zapobieganie: uświadomienie programistów, używanie strncpy, nie używanie C/C++ gdy niepotrzebne, analizatory kodu, izolowanie danych i kodu w pamięci, izolowanie programów.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+        {
+          category: "implementacja",
+          question:
+            "Co oznaczają terminy 'upstream' i 'downstream' w kontekście Git?",
+          answers: [
+            "Upload i download",
+            "Kierunek od źródła (główne repo) i kierunek do odbiorcy (kopie/forki)",
+            "Góra i dół strony",
+            "Wcześniejsza i późniejsza wersja",
+          ],
+          correct: 1,
+          explanation:
+            "Upstream = kierunek od źródła (repozytorium główne), Downstream = kierunek do odbiorcy (kopie/forki).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+
+        // ==================== TESTOWANIE ====================
+        {
+          category: "testowanie",
+          question: "Dlaczego testujemy oprogramowanie?",
+          answers: [
+            "Aby wykazać poprawność systemu",
+            "Aby zmniejszyć niepewność, wykryć błędy, zademonstrować staranność, uzyskać certyfikację",
+            "Tylko aby spełnić wymogi kontraktowe",
+            "Tylko aby zadowolić kierownictwo",
+          ],
+          correct: 1,
+          explanation:
+            "Testujemy aby: zmniejszyć niepewność, wykryć błędy, zademonstrować staranność, uzyskać certyfikację. NIE testujemy aby wykazać poprawność.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+        {
+          category: "testowanie",
+          question: "Czy testowanie może wykazać poprawność systemu?",
+          answers: [
+            "Tak, jeśli przeprowadzimy wystarczająco dużo testów",
+            "Nie, testowanie nie służy do wykazywania poprawności",
+            "Tak, ale tylko dla małych systemów",
+            "Tak, jeśli mamy certyfikację ISO",
+          ],
+          correct: 1,
+          explanation:
+            "NIE testujemy aby wykazać poprawność - testowanie może tylko wykryć błędy, nie może udowodnić ich braku.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=16",
+        },
+        {
+          category: "testowanie",
+          question: "Jak testowanie jest zorganizowane w agile?",
+          answers: [
+            "Testowanie jest osobną fazą po zakończeniu kodowania",
+            "Testowanie jest częścią działalności zespołu, zadania mogą dotyczyć testowania, na końcu Sprint jest faza testowania",
+            "Testowanie jest wykonywane tylko przez zewnętrzną firmę",
+            "Testowanie jest pomijane w agile",
+          ],
+          correct: 1,
+          explanation:
+            "W agile testowanie jest częścią działalności zespołu. Zadania mogą dotyczyć testowania, na końcu Sprint jest faza testowania, testerzy mogą pracować w ramach zespołu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=17",
+        },
+        {
+          category: "testowanie",
+          question: "Czym różni się testowanie statyczne od dynamicznego?",
+          answers: [
+            "Statyczne jest nowsze od dynamicznego",
+            "Statyczne wykorzystuje tekst bez uruchamiania systemu, dynamiczne wymaga uruchomienia systemu",
+            "Statyczne jest automatyczne, dynamiczne jest ręczne",
+            "Statyczne dotyczy interfejsu, dynamiczne dotyczy bazy danych",
+          ],
+          correct: 1,
+          explanation:
+            "Statyczne: wykorzystuje tekst (dokumenty, kod), nie uruchamia systemu, bazuje na przeczytaniu. Dynamiczne: wykorzystuje działający system, wymaga uruchomienia, wykonuje przypadki testowe.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=17",
+        },
+        {
+          category: "testowanie",
+          question: "Co to jest inspekcja kodu?",
+          answers: [
+            "Automatyczne testowanie kodu",
+            "Systematyczne sprawdzenie kodu przez innego dewelopera lub testera",
+            "Sprawdzenie czy kod się kompiluje",
+            "Testowanie wydajności kodu",
+          ],
+          correct: 1,
+          explanation:
+            "Inspekcja kodu to systematyczne sprawdzenie kodu przez innego dewelopera lub testera celem wykrycia błędów, nieprawidłowości i potencjalnych podatności.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=17",
+        },
+        {
+          category: "testowanie",
+          question: "Co to jest potencjalna podatność?",
+          answers: [
+            "Podatność która została już wykorzystana",
+            "Konstrukcja która potencjalnie może zostać podatnością",
+            "Podatność zgłoszona przez użytkownika",
+            "Podatność w zewnętrznej bibliotece",
+          ],
+          correct: 1,
+          explanation:
+            "Potencjalna podatność to konstrukcja która potencjalnie może zostać podatnością - wykrywana podczas inspekcji kodu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=17",
+        },
+        {
+          category: "testowanie",
+          question:
+            "Co mówi problem stopu (halting problem) o testowaniu statycznym?",
+          answers: [
+            "Testowanie statyczne jest zawsze dokładne",
+            "Dla nietrywialnego kodu nie można automatycznie określić na podstawie statycznej analizy czy kod się zatrzyma",
+            "Problem stopu dotyczy tylko starych komputerów",
+            "Problem stopu został rozwiązany w 2000 roku",
+          ],
+          correct: 1,
+          explanation:
+            "Problem stopu (Turing, 1936): dla nietrywialnego kodu nie jest możliwe automatyczne określenie na podstawie statycznej analizy czy kod się kiedykolwiek zatrzyma. Nie może istnieć analiza statyczna która udowodniłaby poprawność kodu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=17",
+        },
+        {
+          category: "testowanie",
+          question: "Co to jest przypadek testowy (test case)?",
+          answers: [
+            "Scenariusz użycia systemu",
+            "Minimalna jednostka testowania dynamicznego - jest spełniony (pass) lub nie (fail)",
+            "Dokument opisujący błąd",
+            "Zbiór testów dla modułu",
+          ],
+          correct: 1,
+          explanation:
+            "Przypadek testowy to minimalna jednostka testowania dynamicznego - jest spełniony ('pass') lub nie ('fail'). Nie ma 'częściowo spełnionego' przypadku testowego.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=18",
+        },
+        {
+          category: "testowanie",
+          question: "Co ogranicza użyteczność testowania dynamicznego?",
+          answers: [
+            "Brak narzędzi do automatyzacji",
+            "Praktycznie osiągalne pokrycie - liczba kombinacji jest zbyt duża",
+            "Koszty sprzętu do testowania",
+            "Brak wykwalifikowanych testerów",
+          ],
+          correct: 1,
+          explanation:
+            "Liczba możliwych kombinacji wejściowych jest na tyle duża, iż nie jest praktycznie możliwe przejście przez wszystkie. Użyteczność jest ograniczona przez praktycznie osiągalne pokrycie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=18",
+        },
+        {
+          category: "testowanie",
+          question: "Czym różnią się testy white box od black box?",
+          answers: [
+            "White box są ręczne, black box są automatyczne",
+            "W white box struktura systemu jest znana, w black box można obserwować tylko wejście i wyjście",
+            "White box są dla interfejsu, black box są dla bazy danych",
+            "White box są tańsze, black box są droższe",
+          ],
+          correct: 1,
+          explanation:
+            "White box: wewnętrzna struktura systemu jest znana, można projektować testy wykorzystując tę wiedzę. Black box: struktura nieznana, można obserwować tylko wejście i wyjście.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=18",
+        },
+        {
+          category: "testowanie",
+          question: "Czym są testy penetracji (pen testing)?",
+          answers: [
+            "Testami wydajności systemu",
+            "Ethical hacking - testy całego systemu z zewnątrz, black/grey box, celem wykrycia podatności",
+            "Testami interfejsu użytkownika",
+            "Testami dokumentacji",
+          ],
+          correct: 1,
+          explanation:
+            "Testy penetracji (pen testing) to 'ethical (white) hacking' - test całego systemu, black box (niekiedy grey box), dokonywane 'z zewnątrz', mają na celu wykrycie podatności.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=18",
+        },
+        {
+          category: "testowanie",
+          question: "Co oznacza 'grey box' testing?",
+          answers: [
+            "Testy przeprowadzane na starym sprzęcie",
+            "Testy gdzie struktura systemu jest częściowo znana",
+            "Testy przeprowadzane wieczorem",
+            "Testy dokumentacji",
+          ],
+          correct: 1,
+          explanation:
+            "Grey box to testy gdzie struktura systemu jest częściowo znana - pośrednie między white box (pełna znajomość) a black box (brak znajomości).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=18",
+        },
+
+        // ==================== UTRZYMANIE ====================
+        {
+          category: "utrzymanie",
+          question: "Kiedy rozpoczyna się faza utrzymania oprogramowania?",
+          answers: [
+            "Po pierwszym sprincie",
+            "Gdy oprogramowanie jest gotowe - po testach i zaakceptowane",
+            "Przed rozpoczęciem testowania",
+            "Po podpisaniu kontraktu",
+          ],
+          correct: 1,
+          explanation:
+            "Faza utrzymania rozpoczyna się gdy oprogramowanie jest gotowe: po testach, zaakceptowane.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+        {
+          category: "utrzymanie",
+          question: "Czym różni się utrzymanie od operacji (ops)?",
+          answers: [
+            "Są to synonimy tego samego procesu",
+            "Ops dba o ciągłość działania w bieżącej wersji, utrzymanie to dopasowanie do zmian i wytwarzanie nowych wersji",
+            "Utrzymanie jest tańsze od operacji",
+            "Operacje dotyczą tylko sprzętu",
+          ],
+          correct: 1,
+          explanation:
+            "Utrzymanie to nie operacja (ops). Ops dba o ciągłość działania w bieżącej wersji. Utrzymanie to dopasowanie oprogramowania do zmian: nowe wersje, patching.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+        {
+          category: "utrzymanie",
+          question:
+            "Jaki procent całkowitych kosztów stanowi utrzymanie dla typowego oprogramowania?",
+          answers: ["15%", "33%", "67%", "90%"],
+          correct: 2,
+          explanation:
+            "Dla typowego oprogramowania 67% kosztów to utrzymanie. Pozostałe fazy: Requirements 3%, Designing 8%, Implementation 7%, Testing 15%.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co oznacza 'tag' w kontekście wypuszczenia wersji?",
+          answers: [
+            "Nazwa pliku",
+            "Oznaczenie bieżącego zatwierdzenia jako kandydata do wydania",
+            "Komentarz w kodzie",
+            "Etykieta na dokumentacji",
+          ],
+          correct: 1,
+          explanation:
+            "Tag to oznaczenie (tag) bieżącego zatwierdzenia jako kandydata ('release candidate'). Praca może toczyć się dalej, Git pamięta dokładnie to, co oznaczyliśmy.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co to jest budowa (build)?",
+          answers: [
+            "Tworzenie dokumentacji",
+            "Przekształcenie zawartości repozytorium w artefakt gotowy do dystrybucji",
+            "Rekrutacja zespołu",
+            "Planowanie projektu",
+          ],
+          correct: 1,
+          explanation:
+            "Budowa (build) to przekształcenie zawartości repozytorium (i innych zasobów) w artefakt gotowy do dystrybucji. Jest wysoce zautomatyzowana.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co to jest artefakt w kontekście IT?",
+          answers: [
+            "Błąd w kodzie",
+            "Sztucznie wytworzony element będący wynikiem działalności człowieka - każdy element produktu informatycznego",
+            "Starożytny przedmiot",
+            "Dokumentacja projektu",
+          ],
+          correct: 1,
+          explanation:
+            "Artefakt to sztucznie wytworzony przedmiot lub element. Każdy element produktu informatycznego jest zwany artefaktem. Przechowywane zazwyczaj w osobnym repozytorium.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co to jest dystrybucja (distro)?",
+          answers: [
+            "Sposób reklamowania oprogramowania",
+            "Zestaw artefaktów stanowiący razem kompletny produkt",
+            "Metoda kompresji plików",
+            "Protokół sieciowy",
+          ],
+          correct: 1,
+          explanation:
+            "Dystrybucja (distro) to zestaw artefaktów stanowiący razem kompletny produkt. Ten sam produkt może mieć wiele dystrybucji (lokalizacje, duże vs małe wersje).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co to jest obraz (image) w kontekście konteneryzacji?",
+          answers: [
+            "Zdjęcie interfejsu użytkownika",
+            "Kompletny zestaw wszystkich plików potrzebnych do uruchomienia aplikacji",
+            "Logo produktu",
+            "Diagram architektury",
+          ],
+          correct: 1,
+          explanation:
+            "Obraz to kompletny zestaw wszystkich plików potrzebnych do uruchomienia aplikacji: pliki wykonywalne, biblioteki, pliki konfiguracyjne, parametry, dane.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question: "Dlaczego ataki na dystrybucję są szczególnie groźne?",
+          answers: [
+            "Są bardzo częste",
+            "Są rzadkie, ale można zainfekować wszystkie komputery na których działa zmodyfikowana dystrybucja",
+            "Są trudne do wykrycia",
+            "Wymagają dużych zasobów",
+          ],
+          correct: 1,
+          explanation:
+            "Ataki na dystrybucję są rzadkie, ale bardzo efektywne - można zainfekować wszystkie komputery na których działa zmodyfikowana dystrybucja.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question: "Jakie są minimalne reguły bezpieczeństwa dystrybucji?",
+          answers: [
+            "Tylko szyfrowanie",
+            "Podpis elektroniczny, bezpieczny transfer, kontrola dostępu, wydzielenie czułych danych",
+            "Tylko hasła",
+            "Tylko firewall",
+          ],
+          correct: 1,
+          explanation:
+            "Minimalne reguły bezpieczeństwa dystrybucji: podpis elektroniczny, bezpieczny transfer, kontrola dostępu, wydzielenie czułych danych.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question:
+            "Dlaczego dystrybucja powinna być podpisana elektronicznie?",
+          answers: [
+            "Ze względów prawnych",
+            "Aby zapewnić że nie będzie ona zmodyfikowana",
+            "Aby ładniej wyglądała",
+            "Ze względów marketingowych",
+          ],
+          correct: 1,
+          explanation:
+            "Dystrybucja powinna być podpisana elektronicznie aby zapewnić, że nie będzie ona zmodyfikowana. Podpis można sprawdzić kryptografią asymetryczną.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question:
+            "Gdzie powinny być przechowywane hasła, klucze i certyfikaty?",
+          answers: [
+            "W kodzie źródłowym dla łatwego dostępu",
+            "Osobno (np. Azure Key Vault, AWS Vault), nie w repozytorium ani w artefaktach",
+            "W pliku README projektu",
+            "W komentarzach kodu",
+          ],
+          correct: 1,
+          explanation:
+            "Czułe dane (hasła, klucze, certyfikaty) nie mogą być w repozytorium ani w artefaktach. Powinny być osobno przechowywane (Azure Key Vault, AWS Vault) i bezpiecznie przesyłane.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co to jest Zero Day Vulnerability (ZDV)?",
+          answers: [
+            "Podatność wykryta pierwszego dnia projektu",
+            "Podatność znana, ale jeszcze nie skorygowana",
+            "Podatność która nie istnieje",
+            "Podatność naprawiona tego samego dnia",
+          ],
+          correct: 1,
+          explanation:
+            "Zero Day Vulnerability (ZDV) to podatność znana, ale jeszcze nie skorygowana. Często nie wyłapywana przez ochronę, otwiera pole do ataków.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question: "Jak szybko powinno się korygować błędy bezpieczeństwa?",
+          answers: [
+            "W ciągu roku",
+            "Natychmiast jeżeli jest to możliwe (Windows: tydzień)",
+            "Tylko przy dużych aktualizacjach",
+            "Tylko gdy klient zgłosi problem",
+          ],
+          correct: 1,
+          explanation:
+            "Błędy bezpieczeństwa należy korygować natychmiast jeżeli jest to możliwe (Windows: tydzień). Im dłużej czekamy, tym mniej bezpiecznie.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=20",
+        },
+        {
+          category: "utrzymanie",
+          question: "Co wymaga bezpieczny koniec życia oprogramowania (EoL)?",
+          answers: [
+            "Tylko wyłączenie serwerów",
+            "Planowej migracji, zakończenia wsparcia, odinstalowania, skutecznego zniszczenia danych (w tym haseł)",
+            "Tylko archiwizacji kodu",
+            "Tylko informacji dla użytkowników",
+          ],
+          correct: 1,
+          explanation:
+            "Bezpieczny koniec życia wymaga: planowej migracji lub zaniechania użytkowania, zakończenia wsparcia, odinstalowania oprogramowania, skutecznego zniszczenia danych (w tym haseł!).",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=21",
+        },
+        {
+          category: "utrzymanie",
+          question: "Kiedy w CI/CD uruchamiana jest budowa?",
+          answers: [
+            "Raz dziennie o północy",
+            "Po każdej zaaprobowanej poprawce do repozytorium",
+            "Tylko przed wydaniem wersji",
+            "Tylko gdy kierownik zatwierdzi",
+          ],
+          correct: 1,
+          explanation:
+            "W CI/CD budowa jest uruchamiana po każdej zaaprobowanej poprawce do repozytorium - jest to część automatyzacji DevOps.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=19",
+        },
+
+        // ==================== DODATKOWE PYTANIA MIESZANE ====================
+        {
+          category: "podstawy",
+          question: "Program jest aktywnością mającą:",
+          answers: [
+            "Cel wytworzenia produktu-rezultatu",
+            "Cel biznesowy (np. wzrost sprzedaży)",
+            "Cel dokumentacyjny",
+            "Cel szkoleniowy",
+          ],
+          correct: 1,
+          explanation:
+            "Program jest aktywnością mającą cel biznesowy (np. wzrost sprzedaży). Projekt jest aktywnością mającą na cel wytworzenie produktu-rezultatu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=1",
+        },
+        {
+          category: "agile",
+          question: "Kto koordynuje codzienny scrum?",
+          answers: [
+            "Product Owner",
+            "Scrum Master",
+            "Kierownik projektu",
+            "Najstarszy programista",
+          ],
+          correct: 1,
+          explanation: "Scrum jest koordynowany przez Scrum Master.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=5",
+        },
+        {
+          category: "agile",
+          question: "Kogo reprezentuje Product Owner?",
+          answers: [
+            "Zespół deweloperski",
+            "Użytkownika",
+            "Kierownictwo firmy",
+            "Inwestorów",
+          ],
+          correct: 1,
+          explanation:
+            "Product Owner reprezentuje użytkownika i jest źródłem wymagań w Scrum.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=4",
+        },
+        {
+          category: "projektowanie",
+          question: "Kiedy kończy się projektowanie w agile?",
+          answers: [
+            "Przed rozpoczęciem kodowania",
+            "Z końcem projektu",
+            "Po pierwszym sprincie",
+            "Po zatwierdzeniu przez klienta",
+          ],
+          correct: 1,
+          explanation:
+            "Projektowanie w agile kończy się z końcem projektu - jest przyrostowe i ciągłe przez cały czas trwania projektu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=12",
+        },
+        {
+          category: "implementacja",
+          question: "Jak zmienia się bieżącą gałąź w Git?",
+          answers: [
+            "Instrukcją 'merge'",
+            "Instrukcją 'checkout'",
+            "Instrukcją 'commit'",
+            "Instrukcją 'push'",
+          ],
+          correct: 1,
+          explanation:
+            "W Git zmianę bieżącej gałęzi wykonuje się instrukcją 'checkout'.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "testowanie",
+          question: "Czy przypadek testowy może być 'częściowo spełniony'?",
+          answers: [
+            "Tak, w 25%, 50%, 75% lub 100%",
+            "Nie, jest tylko 'pass' lub 'fail'",
+            "Tak, jeśli część testów przeszła",
+            "Zależy od metodologii",
+          ],
+          correct: 1,
+          explanation:
+            "Nie ma 'częściowo spełnionego' przypadku testowego - jest tylko spełniony ('pass') lub nie ('fail'), choć niespełniony może dostarczyć dodatkowych informacji.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=18",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'NIE MOŻE' według RFC 2119?",
+          answers: [
+            "Cecha jest opcjonalna",
+            "Cecha absolutnie nie może wystąpić w produkcie; wystąpienie oznacza odrzucenie",
+            "Cecha nie jest zalecana",
+            "Cecha wymaga dodatkowej dyskusji",
+          ],
+          correct: 1,
+          explanation:
+            "NIE MOŻE oznacza że cecha absolutnie nie może wystąpić w produkcie; wystąpienie oznacza odrzucenie produktu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'MOŻE' według RFC 2119?",
+          answers: [
+            "Cecha jest wymagana",
+            "Cecha jest całkowicie opcjonalna, obecność mile widziana ale nie wpływa na odbiór",
+            "Cecha musi być przedyskutowana",
+            "Cecha jest zabroniona",
+          ],
+          correct: 1,
+          explanation:
+            "MOŻE oznacza że cecha jest całkowicie opcjonalna, jej obecność jest mile widziana ale nie wpływa na odbiór produktu.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "metodologie",
+          question:
+            "Jakie testy są powiązane z Projektem architektury w modelu V?",
+          answers: [
+            "Testy jednostkowe",
+            "Testy integracji",
+            "Testy systemu",
+            "Testy akceptacji",
+          ],
+          correct: 1,
+          explanation:
+            "W modelu V Projekt architektury jest powiązany z Testami integracji - przypadki testowe łączą odpowiadające sobie poziomy.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=7",
+        },
+        {
+          category: "metodologie",
+          question: "Jakie testy są powiązane z Wymaganiami w modelu V?",
+          answers: [
+            "Testy jednostkowe",
+            "Testy integracji",
+            "Testy systemu",
+            "Testy akceptacji",
+          ],
+          correct: 3,
+          explanation:
+            "W modelu V Wymagania są powiązane z Testami akceptacji - przypadki testowe łączą odpowiadające sobie poziomy.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=7",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'S' w metodzie MoSCoW?",
+          answers: [
+            "Simple - proste do implementacji",
+            "Should have - ważne, ale może być pominięte",
+            "Security - związane z bezpieczeństwem",
+            "Standard - standardowa funkcjonalność",
+          ],
+          correct: 1,
+          explanation:
+            "S = Should have - ważne funkcjonalności, ale mogą być pominięte jeśli jest taka konieczność.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "wymagania",
+          question: "Co oznacza 'C' w metodzie MoSCoW?",
+          answers: [
+            "Critical - krytyczne",
+            "Could have - pożądane, ale nie najlepsze wykorzystanie zasobów",
+            "Customer - wymagane przez klienta",
+            "Certified - wymagające certyfikacji",
+          ],
+          correct: 1,
+          explanation:
+            "C = Could have - pożądane funkcjonalności, ale obecnie nie jest to najlepsze wykorzystanie zasobów ludzkich.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=11",
+        },
+        {
+          category: "wymagania",
+          question: "Czym jest 'Temat' w procesie epickim?",
+          answers: [
+            "Jednostką pracy dla programisty",
+            "Ogólnym kierunkiem organizacji",
+            "Opisem pojedynczej funkcji",
+            "Nazwą sprintu",
+          ],
+          correct: 1,
+          explanation:
+            "Temat (Theme) to ogólny kierunek organizacji - najwyższy poziom w hierarchii procesu epickiego.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "wymagania",
+          question: "Czym jest 'Inicjatywa' w procesie epickim?",
+          answers: [
+            "Jednostką pracy",
+            "Biznesową potrzebą zmiany",
+            "Opisem interfejsu",
+            "Testem akceptacyjnym",
+          ],
+          correct: 1,
+          explanation:
+            "Inicjatywa (Initiative) to biznesowa potrzeba zmiany - poziom między Tematem a Epiką w hierarchii procesu epickiego.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=10",
+        },
+        {
+          category: "implementacja",
+          question: "Co się dzieje gdy Git wykryje konflikt podczas scalania?",
+          answers: [
+            "Automatycznie wybiera nowszą wersję",
+            "Zazwyczaj rozwiązuje automatycznie, niekiedy wymaga ingerencji człowieka",
+            "Zawsze przerywa operację",
+            "Usuwa obie wersje",
+          ],
+          correct: 1,
+          explanation:
+            "Konflikty przy scalaniu są zazwyczaj rozwiązywane automatycznie przez Git, niekiedy jednak wymagają ingerencji człowieka.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=15",
+        },
+        {
+          category: "testowanie",
+          question: "Kto sformułował problem stopu?",
+          answers: [
+            "Bill Gates",
+            "Alan Turing",
+            "Linus Torvalds",
+            "Donald Knuth",
+          ],
+          correct: 1,
+          explanation:
+            "Problem stopu (halting problem) został sformułowany przez Alana Turinga w 1936 roku.",
+          sourceLink:
+            "PBS_IO_NST_wyklad_cybersec_99_powtorka_202526.pdf#page=17",
+        },
+      ];
+
+      // Zmienne globalne
+      let currentQuestions = [];
+      let currentQuestionIndex = 0;
+      let userAnswers = [];
+      let score = 0;
+
+      // Funkcja startująca quiz
+      function startQuiz() {
+        const category = document.getElementById("categorySelect").value;
+        const countValue = document.getElementById("questionCount").value;
+
+        // Filtrowanie pytań według kategorii
+        let filteredQuestions =
+          category === "all"
+            ? [...questions]
+            : questions.filter((q) => q.category === category);
+
+        // Określenie liczby pytań
+        let count =
+          countValue === "all"
+            ? filteredQuestions.length
+            : parseInt(countValue);
+
+        // Losowanie pytań
+        currentQuestions = shuffleArray(filteredQuestions).slice(
+          0,
+          Math.min(count, filteredQuestions.length)
+        );
+
+        // Reset zmiennych
+        currentQuestionIndex = 0;
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        score = 0;
+
+        // Ukrycie ekranu startowego, pokazanie quizu
+        document.getElementById("startScreen").style.display = "none";
+        document.getElementById("quizScreen").style.display = "block";
+
+        // Wyświetlenie pierwszego pytania
+        displayQuestion();
+      }
+
+      // Funkcja mieszająca tablicę (Fisher-Yates shuffle)
+      function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      }
+
+      // Funkcja wyświetlająca pytanie
+      function displayQuestion() {
+        const question = currentQuestions[currentQuestionIndex];
+
+        // Aktualizacja paska postępu
+        const progress =
+          ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+        document.getElementById("progressBar").style.width = progress + "%";
+        document.getElementById("progressBar").textContent =
+          Math.round(progress) + "%";
+
+        // Aktualizacja numeru pytania
+        document.getElementById("questionNumber").textContent = `Pytanie ${
+          currentQuestionIndex + 1
+        }/${currentQuestions.length}`;
+
+        // Aktualizacja kategorii
+        const categoryNames = {
+          podstawy: "Podstawy IO",
+          metodologie: "Metodologie",
+          agile: "Agile/Scrum/DevOps",
+          wymagania: "Wymagania",
+          projektowanie: "Projektowanie",
+          implementacja: "Implementacja/Git",
+          testowanie: "Testowanie",
+          utrzymanie: "Utrzymanie",
+        };
+        document.getElementById("categoryBadge").textContent =
+          categoryNames[question.category] || question.category;
+
+        // Wyświetlenie treści pytania
+        document.getElementById("questionText").textContent = question.question;
+
+        // Wyświetlenie odpowiedzi
+        const answersContainer = document.getElementById("answersContainer");
+        answersContainer.innerHTML = "";
+
+        const letters = ["A", "B", "C", "D"];
+        question.answers.forEach((answer, index) => {
+          const answerDiv = document.createElement("div");
+          answerDiv.className = "answer";
+          if (userAnswers[currentQuestionIndex] === index) {
+            answerDiv.classList.add("selected");
+          }
+          answerDiv.onclick = () => selectAnswer(index);
+          answerDiv.innerHTML = `
+                    <span class="answer-letter">${letters[index]}</span>
+                    <span class="answer-text">${answer}</span>
+                `;
+          answersContainer.appendChild(answerDiv);
+        });
+
+        // Ukrycie feedbacku
+        document
+          .getElementById("feedback")
+          .classList.remove("show", "correct", "incorrect");
+
+        // Aktualizacja przycisków nawigacji
+        document.getElementById("prevBtn").style.display =
+          currentQuestionIndex === 0 ? "none" : "block";
+
+        if (currentQuestionIndex === currentQuestions.length - 1) {
+          document.getElementById("nextBtn").style.display = "none";
+          document.getElementById("finishBtn").classList.remove("hidden");
+        } else {
+          document.getElementById("nextBtn").style.display = "block";
+          document.getElementById("finishBtn").classList.add("hidden");
+        }
+      }
+
+      // Funkcja wyboru odpowiedzi
+      function selectAnswer(index) {
+        userAnswers[currentQuestionIndex] = index;
+
+        // Aktualizacja wizualna
+        const answers = document.querySelectorAll(".answer");
+        answers.forEach((answer, i) => {
+          answer.classList.remove("selected");
+          if (i === index) {
+            answer.classList.add("selected");
+          }
+        });
+
+        // Pokazanie feedbacku
+        showFeedback(index);
+      }
+
+      // Funkcja pokazująca feedback
+      function showFeedback(selectedIndex) {
+        const question = currentQuestions[currentQuestionIndex];
+        const feedback = document.getElementById("feedback");
+        const feedbackTitle = document.getElementById("feedbackTitle");
+        const explanation = document.getElementById("explanation");
+
+        const answers = document.querySelectorAll(".answer");
+
+        if (selectedIndex === question.correct) {
+          feedback.classList.add("show", "correct");
+          feedback.classList.remove("incorrect");
+          feedbackTitle.textContent = "✓ Poprawna odpowiedź!";
+          answers[selectedIndex].classList.add("correct");
+        } else {
+          feedback.classList.add("show", "incorrect");
+          feedback.classList.remove("correct");
+          feedbackTitle.textContent = "✗ Niepoprawna odpowiedź";
+          answers[selectedIndex].classList.add("incorrect");
+          answers[question.correct].classList.add("correct");
+        }
+
+        let explanationHTML = `<p>${question.explanation}</p>`;
+
+        if (question.sourceLink) {
+          const [fileName, pageInfo] = question.sourceLink.split("#");
+          const pageNumber = pageInfo ? pageInfo.replace("page=", "") : "";
+
+          explanationHTML += `
+            <div class="source-link">
+                <span class="pdf-icon">📄</span>
+                <span class="source-text">Źródło: <strong>Materiały IO</strong>, slajd ${pageNumber}</span>
+                <a href="${question.sourceLink}" target="_blank">Otwórz PDF</a>
+            </div>
+          `;
+        }
+
+        explanation.innerHTML = explanationHTML;
+      }
+
+      // Funkcja przejścia do następnego pytania
+      function nextQuestion() {
+        if (currentQuestionIndex < currentQuestions.length - 1) {
+          currentQuestionIndex++;
+          displayQuestion();
+          window.scrollTo(0, 0);
+        }
+      }
+
+      // Funkcja przejścia do poprzedniego pytania
+      function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+          displayQuestion();
+          window.scrollTo(0, 0);
+        }
+      }
+
+      // Funkcja kończąca quiz
+      function finishQuiz() {
+        score = 0;
+        currentQuestions.forEach((question, index) => {
+          if (userAnswers[index] === question.correct) {
+            score++;
+          }
+        });
+
+        const percentage = Math.round((score / currentQuestions.length) * 100);
+
+        document.getElementById("quizScreen").style.display = "none";
+        document.getElementById("resultScreen").style.display = "block";
+
+        document.getElementById("scorePercentage").textContent =
+          percentage + "%";
+        document.getElementById("correctCount").textContent =
+          score + "/" + currentQuestions.length;
+        document.getElementById("incorrectCount").textContent =
+          currentQuestions.length - score + "/" + currentQuestions.length;
+        document.getElementById("percentageText").textContent =
+          percentage + "%";
+
+        let grade, gradeClass;
+        if (percentage >= 90) {
+          grade = "Celujący (5.0)";
+          gradeClass = "excellent";
+        } else if (percentage >= 75) {
+          grade = "Bardzo dobry (4.0-4.5)";
+          gradeClass = "good";
+        } else if (percentage >= 51) {
+          grade = "Zaliczony (3.0-3.5)";
+          gradeClass = "pass";
+        } else {
+          grade = "Niezaliczony (2.0)";
+          gradeClass = "fail";
+        }
+
+        document.getElementById("grade").textContent = grade;
+        document.getElementById("scoreCircle").className =
+          "score-circle " + gradeClass;
+
+        window.scrollTo(0, 0);
+      }
+
+      // Funkcja restartu quizu
+      function restartQuiz() {
+        document.getElementById("resultScreen").style.display = "none";
+        document.getElementById("startScreen").style.display = "block";
+        window.scrollTo(0, 0);
+      }
+    </script>
+  </body>
+</html>
