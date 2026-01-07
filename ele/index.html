@@ -1,0 +1,4009 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz - Podstawy Elektroniki</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a5276 0%, #2e86ab 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        color: #1a5276;
+        margin-bottom: 10px;
+        font-size: 2em;
+      }
+
+      .header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .start-screen,
+      .quiz-screen,
+      .result-screen,
+      .review-screen {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .start-screen h2,
+      .result-screen h2,
+      .review-screen h2 {
+        color: #1a5276;
+        margin-bottom: 20px;
+        font-size: 1.8em;
+      }
+
+      .settings {
+        margin: 30px 0;
+      }
+
+      .settings label {
+        display: block;
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .settings select,
+      .settings input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        transition: border 0.3s;
+      }
+
+      .settings select:focus,
+      .settings input:focus {
+        outline: none;
+        border-color: #1a5276;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #1a5276 0%, #2e86ab 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+        font-weight: 600;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(26, 82, 118, 0.4);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .quiz-screen {
+        display: none;
+      }
+
+      .progress-bar {
+        background: #f0f0f0;
+        height: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-fill {
+        background: linear-gradient(135deg, #1a5276 0%, #2e86ab 100%);
+        height: 100%;
+        transition: width 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .question-container {
+        margin-bottom: 30px;
+      }
+
+      .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .question-number {
+        color: #1a5276;
+        font-weight: 600;
+        font-size: 1.1em;
+      }
+
+      .category-badge {
+        background: #e8f4f8;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        color: #1a5276;
+        font-weight: 500;
+      }
+
+      .question-text {
+        font-size: 1.3em;
+        color: #333;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        font-weight: 500;
+      }
+
+      .answers {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .answer {
+        padding: 20px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+        display: flex;
+        align-items: center;
+      }
+
+      .answer:hover {
+        border-color: #1a5276;
+        background: #f8fbfc;
+        transform: translateX(5px);
+      }
+
+      .answer.selected {
+        border-color: #1a5276;
+        background: #e8f4f8;
+      }
+
+      .answer.correct {
+        border-color: #27ae60;
+        background: #e8f8f0;
+      }
+
+      .answer.incorrect {
+        border-color: #e74c3c;
+        background: #fdf2f2;
+      }
+
+      .answer-letter {
+        display: inline-block;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #1a5276;
+        color: white;
+        text-align: center;
+        line-height: 35px;
+        margin-right: 15px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .answer.correct .answer-letter {
+        background: #27ae60;
+      }
+
+      .answer.incorrect .answer-letter {
+        background: #e74c3c;
+      }
+
+      .answer-text {
+        flex: 1;
+      }
+
+      .navigation {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        flex: 1;
+      }
+
+      .btn-primary {
+        flex: 2;
+      }
+
+      .result-screen {
+        display: none;
+        text-align: center;
+      }
+
+      .score-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin: 30px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3em;
+        font-weight: bold;
+        color: white;
+        position: relative;
+      }
+
+      .score-circle.excellent {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+      }
+
+      .score-circle.good {
+        background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+      }
+
+      .score-circle.pass {
+        background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+      }
+
+      .score-circle.fail {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      }
+
+      .result-details {
+        margin: 30px 0;
+        text-align: left;
+      }
+
+      .result-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        font-size: 1.1em;
+      }
+
+      .result-row:last-child {
+        border-bottom: none;
+      }
+
+      .result-label {
+        color: #666;
+      }
+
+      .result-value {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header,
+        .start-screen,
+        .quiz-screen,
+        .result-screen {
+          padding: 20px;
+        }
+
+        .question-text {
+          font-size: 1.1em;
+        }
+
+        .navigation {
+          flex-direction: column;
+        }
+      }
+
+      .feedback {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .feedback.show {
+        display: block;
+      }
+
+      .feedback.correct {
+        background: #e8f8f0;
+        border-left: 4px solid #27ae60;
+        color: #1e8449;
+      }
+
+      .feedback.incorrect {
+        background: #fdf2f2;
+        border-left: 4px solid #e74c3c;
+        color: #c0392b;
+      }
+
+      .explanation {
+        margin-top: 10px;
+        font-size: 0.95em;
+        line-height: 1.5;
+      }
+
+      .source-link {
+        margin-top: 15px;
+        padding: 12px 15px;
+        background: linear-gradient(135deg, #f8fbfc 0%, #e8f4f8 100%);
+        border-radius: 8px;
+        border-left: 4px solid #1a5276;
+        font-size: 0.95em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .source-link .pdf-icon {
+        font-size: 1.5em;
+      }
+
+      .source-link .source-text {
+        flex: 1;
+      }
+
+      .source-link a {
+        color: #1a5276;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 6px 12px;
+        background: white;
+        border-radius: 6px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 5px rgba(26, 82, 118, 0.2);
+      }
+
+      .source-link a:hover {
+        background: #1a5276;
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
+      }
+
+      .source-link a::after {
+        content: " →";
+        font-size: 0.9em;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .stat-card {
+        background: #f8fbfc;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid #e8f4f8;
+      }
+
+      .stat-card .stat-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #1a5276;
+      }
+
+      .stat-card .stat-label {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+
+      .category-stats {
+        margin-top: 30px;
+        text-align: left;
+      }
+
+      .category-stats h3 {
+        color: #1a5276;
+        margin-bottom: 15px;
+      }
+
+      .category-bar {
+        margin-bottom: 15px;
+      }
+
+      .category-bar-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+      }
+
+      .category-bar-fill {
+        height: 10px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      .category-bar-progress {
+        height: 100%;
+        background: linear-gradient(135deg, #1a5276 0%, #2e86ab 100%);
+        border-radius: 5px;
+        transition: width 0.5s ease;
+      }
+
+      .formula-box {
+        background: #f5f5f5;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        margin: 10px 0;
+        display: inline-block;
+      }
+
+      .review-screen {
+        display: none;
+      }
+
+      .review-question {
+        background: #f8fbfc;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #1a5276;
+      }
+
+      .review-question.incorrect {
+        border-left-color: #e74c3c;
+      }
+
+      .review-question.correct {
+        border-left-color: #27ae60;
+      }
+
+      .review-question-text {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .review-answers {
+        margin-left: 20px;
+      }
+
+      .review-answer {
+        padding: 5px 0;
+        color: #666;
+      }
+
+      .review-answer.correct {
+        color: #27ae60;
+        font-weight: 600;
+      }
+
+      .review-answer.user-incorrect {
+        color: #e74c3c;
+        text-decoration: line-through;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .btn-group .btn {
+        flex: 1;
+      }
+
+      .btn-review {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+      }
+
+      .mode-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .mode-btn {
+        flex: 1;
+        padding: 15px;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+      }
+
+      .mode-btn:hover {
+        border-color: #1a5276;
+      }
+
+      .mode-btn.active {
+        border-color: #1a5276;
+        background: #e8f4f8;
+      }
+
+      .mode-btn .mode-icon {
+        font-size: 2em;
+        margin-bottom: 5px;
+      }
+
+      .mode-btn .mode-title {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .mode-btn .mode-desc {
+        font-size: 0.85em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>⚡ Quiz - Podstawy Elektroniki</h1>
+        <p>dr inż. Monika Kosowska - Politechnika Bydgoska 2025/26</p>
+      </div>
+
+      <!-- Ekran startowy -->
+      <div class="start-screen" id="startScreen">
+        <h2>Witaj w quizie!</h2>
+        <p style="margin-bottom: 20px; color: #666">
+          Sprawdź swoją wiedzę z Podstaw Elektroniki. Quiz zawiera pytania
+          z materiałów wykładowych obejmujących obwody elektryczne, elementy pasywne,
+          prawa Kirchhoffa, dzielniki napięcia i prądu oraz półprzewodniki.
+        </p>
+
+        <div class="mode-toggle">
+          <div class="mode-btn active" onclick="setMode('learn')" id="modeLearn">
+            <div class="mode-icon">📚</div>
+            <div class="mode-title">Tryb nauki</div>
+            <div class="mode-desc">Natychmiastowa informacja zwrotna</div>
+          </div>
+          <div class="mode-btn" onclick="setMode('exam')" id="modeExam">
+            <div class="mode-icon">📝</div>
+            <div class="mode-title">Tryb egzaminu</div>
+            <div class="mode-desc">Wyniki dopiero na końcu</div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <label for="categorySelect">Wybierz kategorię pytań:</label>
+          <select id="categorySelect">
+            <option value="all">Wszystkie tematy (Mix)</option>
+            <option value="podstawy">1. Napięcie, prąd, rezystancja</option>
+            <option value="elementy">2. Rezystor, cewka, kondensator</option>
+            <option value="mierniki">3. Amperomierz i woltomierz</option>
+            <option value="ohm">4. Prawo Ohma</option>
+            <option value="kirchhoff">5. Prawa Kirchhoffa</option>
+            <option value="rezystory">6. Łączenie rezystorów</option>
+            <option value="dzielniki">7. Dzielniki napięcia i prądu</option>
+            <option value="pasma">8. Modele pasmowe</option>
+            <option value="polprzewodniki">9. Półprzewodniki</option>
+            <option value="dioda">10. Dioda i złącze p-n</option>
+            <option value="tranzystory">11. Tranzystory (BJT, JFET, MOSFET)</option>
+            <option value="punktpracy">12. Punkt pracy i układy pracy</option>
+            <option value="wzmacniacz">13-15. Wzmacniacz operacyjny</option>
+          </select>
+
+          <label for="questionCount">Liczba pytań:</label>
+          <select id="questionCount">
+            <option value="10">10 pytań</option>
+            <option value="15">15 pytań</option>
+            <option value="20" selected>20 pytań</option>
+            <option value="30">30 pytań</option>
+            <option value="50">50 pytań</option>
+            <option value="all">Wszystkie pytania</option>
+          </select>
+        </div>
+
+        <button class="btn" onclick="startQuiz()">Rozpocznij Quiz</button>
+      </div>
+
+      <!-- Ekran quizu -->
+      <div class="quiz-screen" id="quizScreen">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+
+        <div class="question-container">
+          <div class="question-header">
+            <span class="question-number" id="questionNumber">Pytanie 1/20</span>
+            <span class="category-badge" id="categoryBadge">Kategoria</span>
+          </div>
+
+          <div class="question-text" id="questionText">
+            Treść pytania pojawi się tutaj...
+          </div>
+
+          <div class="answers" id="answersContainer"></div>
+
+          <div class="feedback" id="feedback">
+            <strong id="feedbackTitle"></strong>
+            <div class="explanation" id="explanation"></div>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn">
+            ← Poprzednie
+          </button>
+          <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn">
+            Następne →
+          </button>
+          <button class="btn btn-primary hidden" onclick="finishQuiz()" id="finishBtn">
+            Zakończ Quiz
+          </button>
+        </div>
+      </div>
+
+      <!-- Ekran wyników -->
+      <div class="result-screen" id="resultScreen">
+        <h2>Wyniki Quizu</h2>
+
+        <div class="score-circle" id="scoreCircle">
+          <span id="scorePercentage">0%</span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="correctCount">0</div>
+            <div class="stat-label">Poprawne</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="incorrectCount">0</div>
+            <div class="stat-label">Błędne</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="percentageText">0%</div>
+            <div class="stat-label">Wynik</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="grade">-</div>
+            <div class="stat-label">Ocena</div>
+          </div>
+        </div>
+
+        <div class="category-stats" id="categoryStats">
+          <h3>Wyniki według kategorii:</h3>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-review" onclick="showReview()">Przejrzyj odpowiedzi</button>
+          <button class="btn" onclick="restartQuiz()">Nowy quiz</button>
+        </div>
+      </div>
+
+      <!-- Ekran przeglądu -->
+      <div class="review-screen" id="reviewScreen">
+        <h2>Przegląd odpowiedzi</h2>
+        <div id="reviewContainer"></div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="backToResults()">← Powrót do wyników</button>
+          <button class="btn" onclick="restartQuiz()">Nowy quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const questions = [
+        // ==================== 1. NAPIĘCIE, PRĄD, REZYSTANCJA ====================
+        {
+          category: "podstawy",
+          question: "Co to jest prąd elektryczny?",
+          answers: [
+            "różnica potencjałów między punktami obwodu",
+            "uporządkowany ruch ładunków elektrycznych",
+            "właściwość materiału hamująca przepływ",
+            "energia zmagazynowana w polu magnetycznym"
+          ],
+          correct: 1,
+          explanation: "Prąd elektryczny to uporządkowany ruch ładunków elektrycznych (elektronów lub jonów). Natężenie prądu mierzymy w amperach [A].",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=11"
+        },
+        {
+          category: "podstawy",
+          question: "Jaki jest wzór na natężenie prądu elektrycznego?",
+          answers: [
+            "I = U × R",
+            "I = Q / t",
+            "I = R / U",
+            "I = P / R"
+          ],
+          correct: 1,
+          explanation: "Natężenie prądu I = Q/t, gdzie Q to ładunek elektryczny [C], a t to czas [s]. Jednostką natężenia jest amper [A] = [C/s].",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=12"
+        },
+        {
+          category: "podstawy",
+          question: "W jakich jednostkach mierzymy natężenie prądu?",
+          answers: [
+            "w woltach [V]",
+            "w omach [Ω]",
+            "w amperach [A]",
+            "w watach [W]"
+          ],
+          correct: 2,
+          explanation: "Natężenie prądu elektrycznego mierzymy w amperach [A]. 1 A = 1 C/s (jeden kulomb na sekundę).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=12"
+        },
+        {
+          category: "podstawy",
+          question: "Co to jest napięcie elektryczne?",
+          answers: [
+            "uporządkowany ruch elektronów w przewodniku",
+            "różnica potencjałów między dwoma punktami",
+            "ilość ładunku przepływającego w czasie",
+            "stosunek mocy do natężenia prądu"
+          ],
+          correct: 1,
+          explanation: "Napięcie elektryczne (U) to różnica potencjałów między dwoma punktami. Określa pracę potrzebną do przeniesienia jednostkowego ładunku. U = W/q.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=15"
+        },
+        {
+          category: "podstawy",
+          question: "W jakich jednostkach mierzymy napięcie elektryczne?",
+          answers: [
+            "w amperach [A]",
+            "w woltach [V]",
+            "w omach [Ω]",
+            "w faradach [F]"
+          ],
+          correct: 1,
+          explanation: "Napięcie elektryczne mierzymy w woltach [V]. 1 V = 1 J/C (jeden dżul na kulomb).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=15"
+        },
+        {
+          category: "podstawy",
+          question: "Jaki jest wzór na napięcie wyrażone przez pracę?",
+          answers: [
+            "U = I × R",
+            "U = W / q",
+            "U = P × t",
+            "U = Q × R"
+          ],
+          correct: 1,
+          explanation: "Napięcie U = W/q, gdzie W to praca [J], a q to ładunek [C]. Napięcie określa pracę potrzebną do przeniesienia jednostkowego ładunku.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=15"
+        },
+        {
+          category: "podstawy",
+          question: "Co to jest rezystancja (opór elektryczny)?",
+          answers: [
+            "zdolność materiału do gromadzenia ładunku",
+            "właściwość hamująca przepływ prądu",
+            "prędkość przepływu elektronów w przewodniku",
+            "energia kinetyczna swobodnych elektronów"
+          ],
+          correct: 1,
+          explanation: "Rezystancja (opór) to właściwość materiału polegająca na hamowaniu przepływu prądu elektrycznego. Mierzymy ją w omach [Ω].",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=17"
+        },
+        {
+          category: "podstawy",
+          question: "Jaki jest wzór na opór elektryczny przewodnika?",
+          answers: [
+            "R = ρ × l / A",
+            "R = ρ × A / l",
+            "R = l × A / ρ",
+            "R = A / (ρ × l)"
+          ],
+          correct: 0,
+          explanation: "R = ρl/A, gdzie ρ to rezystywność materiału [Ω·m], l to długość przewodnika [m], A to pole przekroju poprzecznego [m²].",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=17"
+        },
+        {
+          category: "podstawy",
+          question: "W jakich jednostkach mierzymy opór elektryczny?",
+          answers: [
+            "w woltach [V]",
+            "w amperach [A]",
+            "w omach [Ω]",
+            "w siemensach [S]"
+          ],
+          correct: 2,
+          explanation: "Opór elektryczny mierzymy w omach [Ω]. 1 Ω = 1 V/A.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=17"
+        },
+        {
+          category: "podstawy",
+          question: "W analogii hydraulicznej, czemu odpowiada napięcie?",
+          answers: [
+            "średnicy rury wodociągowej",
+            "ciśnieniu wody w instalacji",
+            "natężeniu przepływu wody",
+            "długości rury wodociągowej"
+          ],
+          correct: 1,
+          explanation: "W analogii hydraulicznej napięcie odpowiada ciśnieniu wody, prąd odpowiada przepływowi wody, a rezystancja przeszkodzie/zwężeniu w rurze.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=20"
+        },
+        {
+          category: "podstawy",
+          question: "Co opisuje prawo Coulomba?",
+          answers: [
+            "zależność prądu od napięcia w obwodzie",
+            "siłę oddziaływania między ładunkami",
+            "zasadę zachowania ładunku w węźle",
+            "indukcję elektromagnetyczną w cewce"
+          ],
+          correct: 1,
+          explanation: "Prawo Coulomba opisuje siłę oddziaływania między ładunkami: F = k(q₁q₂)/r², gdzie k to stała Coulomba, q₁ i q₂ to ładunki, r to odległość.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=13"
+        },
+        {
+          category: "podstawy",
+          question: "Jak zmienia się opór przewodnika przy wzroście długości?",
+          answers: [
+            "maleje proporcjonalnie do długości",
+            "nie zmienia się wcale",
+            "rośnie proporcjonalnie do długości",
+            "rośnie z kwadratem długości"
+          ],
+          correct: 2,
+          explanation: "Zgodnie ze wzorem R = ρl/A, opór jest wprost proporcjonalny do długości przewodnika. Dłuższy przewodnik ma większy opór.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=17"
+        },
+        {
+          category: "podstawy",
+          question: "Jak zmienia się opór przy wzroście pola przekroju?",
+          answers: [
+            "rośnie proporcjonalnie do przekroju",
+            "maleje proporcjonalnie do przekroju",
+            "nie zmienia się wcale",
+            "rośnie z kwadratem przekroju"
+          ],
+          correct: 1,
+          explanation: "Zgodnie ze wzorem R = ρl/A, opór jest odwrotnie proporcjonalny do pola przekroju. Grubszy przewodnik ma mniejszy opór.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=17"
+        },
+        {
+          category: "podstawy",
+          question: "Co to jest węzeł w obwodzie elektrycznym?",
+          answers: [
+            "punkt połączenia minimum trzech gałęzi",
+            "dowolny punkt na przewodniku",
+            "miejsce podłączenia źródła napięcia",
+            "element o szczególnie dużym oporze"
+          ],
+          correct: 0,
+          explanation: "Węzeł to punkt w obwodzie, gdzie spotykają się co najmniej trzy gałęzie (przewody). W węźle suma prądów wpływających równa się sumie wypływających.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=25"
+        },
+        {
+          category: "podstawy",
+          question: "Co to jest gałąź w obwodzie elektrycznym?",
+          answers: [
+            "zamknięta pętla zawierająca źródło",
+            "fragment obwodu między węzłami",
+            "punkt połączenia wielu przewodów",
+            "miejsce pomiaru napięcia w układzie"
+          ],
+          correct: 1,
+          explanation: "Gałąź to fragment obwodu między dwoma sąsiednimi węzłami, zawierający elementy połączone szeregowo. Przez gałąź płynie ten sam prąd.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=25"
+        },
+        {
+          category: "podstawy",
+          question: "Co to jest oczko w obwodzie elektrycznym?",
+          answers: [
+            "punkt połączenia trzech przewodów",
+            "aktywny element obwodu elektrycznego",
+            "zamknięta pętla w obwodzie",
+            "rezystor o bardzo małej wartości"
+          ],
+          correct: 2,
+          explanation: "Oczko to zamknięta pętla (droga) w obwodzie elektrycznym. Suma napięć w oczku wynosi zero (II prawo Kirchhoffa).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=25"
+        },
+        {
+          category: "podstawy",
+          question: "Co oznacza symbol GND w schematach?",
+          answers: [
+            "generator napięcia w obwodzie",
+            "masa - punkt odniesienia zerowego",
+            "główny węzeł dystrybucyjny",
+            "gniazdo napięcia dodatniego"
+          ],
+          correct: 1,
+          explanation: "GND (Ground) oznacza masę - punkt odniesienia w obwodzie, któremu przypisujemy potencjał zerowy. Wszystkie napięcia mierzymy względem masy.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=27"
+        },
+        {
+          category: "podstawy",
+          question: "Czemu w analogii hydraulicznej odpowiada prąd?",
+          answers: [
+            "ciśnieniu wody w rurze",
+            "natężeniu przepływu wody",
+            "średnicy rury wodociągowej",
+            "wysokości zbiornika z wodą"
+          ],
+          correct: 1,
+          explanation: "W analogii hydraulicznej prąd elektryczny odpowiada natężeniu przepływu wody (ile wody przepływa w jednostce czasu).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=20"
+        },
+        {
+          category: "podstawy",
+          question: "Co to jest rezystywność materiału (ρ)?",
+          answers: [
+            "opór jednostkowej długości przewodnika",
+            "właściwość materiału określająca opór",
+            "przewodność elektryczna materiału",
+            "gęstość prądu w przewodniku"
+          ],
+          correct: 1,
+          explanation: "Rezystywność ρ to właściwość materiału określająca jego zdolność do stawiania oporu przepływowi prądu. Jednostka: [Ω·m].",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=17"
+        },
+
+        // ==================== 2. REZYSTOR, CEWKA, KONDENSATOR ====================
+        {
+          category: "elementy",
+          question: "Jaka jest zależność między U a I w rezystorze?",
+          answers: [
+            "prąd zależy od szybkości zmian napięcia",
+            "napięcie zależy od szybkości zmian prądu",
+            "prąd jest wprost proporcjonalny do napięcia",
+            "prąd jest odwrotnie proporcjonalny do napięcia"
+          ],
+          correct: 2,
+          explanation: "W rezystorze zachodzi zależność U = IR (prawo Ohma). Prąd jest wprost proporcjonalny do napięcia przy stałym oporze.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=15"
+        },
+        {
+          category: "elementy",
+          question: "Co określa kod kolorów na rezystorze?",
+          answers: [
+            "maksymalną moc i temperaturę pracy",
+            "wartość rezystancji i tolerancję",
+            "materiał wykonania i producenta",
+            "napięcie maksymalne i prąd znamionowy"
+          ],
+          correct: 1,
+          explanation: "Kod kolorów (4-5 pasków) na rezystorze określa jego wartość nominalną rezystancji oraz tolerancję. Kolory odpowiadają cyfrom i mnożnikom.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=17"
+        },
+        {
+          category: "elementy",
+          question: "Jakie są podstawowe parametry rezystora?",
+          answers: [
+            "rezystancja nominalna, tolerancja, moc",
+            "pojemność, napięcie maksymalne, prąd",
+            "indukcyjność, dobroć, częstotliwość",
+            "przewodność, reaktancja, susceptancja"
+          ],
+          correct: 0,
+          explanation: "Podstawowe parametry rezystora to: rezystancja nominalna [Ω], tolerancja [%], moc znamionowa [W], maksymalne napięcie pracy, współczynnik temperaturowy.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=18"
+        },
+        {
+          category: "elementy",
+          question: "Jaki jest wzór na pojemność kondensatora płaskiego?",
+          answers: [
+            "C = ε₀εᵣ × S / d",
+            "C = ε₀εᵣ × d / S",
+            "C = S × d / ε₀εᵣ",
+            "C = ε₀ × S × d / εᵣ"
+          ],
+          correct: 0,
+          explanation: "Pojemność kondensatora płaskiego C = ε₀εᵣS/d, gdzie ε₀ = 8,85×10⁻¹² F/m, εᵣ to przenikalność względna dielektryka, S to powierzchnia okładek, d to odległość między nimi.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=20"
+        },
+        {
+          category: "elementy",
+          question: "W jakich jednostkach mierzymy pojemność?",
+          answers: [
+            "w henrach [H]",
+            "w omach [Ω]",
+            "w faradach [F]",
+            "w kulombach [C]"
+          ],
+          correct: 2,
+          explanation: "Pojemność kondensatora mierzymy w faradach [F]. Typowe wartości to pF (10⁻¹²), nF (10⁻⁹), μF (10⁻⁶).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=19"
+        },
+        {
+          category: "elementy",
+          question: "Jaka jest zależność prądu od napięcia w kondensatorze?",
+          answers: [
+            "i = C × U",
+            "i = C × dU/dt",
+            "i = U / C",
+            "i = L × dI/dt"
+          ],
+          correct: 1,
+          explanation: "W kondensatorze prąd jest proporcjonalny do szybkości zmian napięcia: i = C × dU/dt. Przy stałym napięciu DC prąd przez kondensator wynosi zero.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=20"
+        },
+        {
+          category: "elementy",
+          question: "Jak zachowuje się kondensator przy napięciu stałym DC?",
+          answers: [
+            "przewodzi prąd bez żadnego oporu",
+            "zachowuje się jak idealne zwarcie",
+            "zachowuje się jak rozwarcie (przerwa)",
+            "zachowuje się identycznie jak rezystor"
+          ],
+          correct: 2,
+          explanation: "Przy stałym napięciu DC dU/dt = 0, więc i = C × dU/dt = 0. Kondensator w stanie ustalonym DC zachowuje się jak rozwarcie (nie przepuszcza prądu stałego).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=20"
+        },
+        {
+          category: "elementy",
+          question: "Do czego służy kondensator w obwodach?",
+          answers: [
+            "tylko do wzmacniania sygnałów AC",
+            "blokowanie DC, filtrowanie, rezonans",
+            "tylko do prostowania prądu zmiennego",
+            "wyłącznie do stabilizacji napięcia DC"
+          ],
+          correct: 1,
+          explanation: "Kondensator stosuje się do: blokowania prądu DC, filtrowania tętnień, obwodów czasowych (RC), filtrów częstotliwościowych, rezonansu z cewkami.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=21"
+        },
+        {
+          category: "elementy",
+          question: "Ile nanofaradów [nF] to 1 mikrofarad [μF]?",
+          answers: [
+            "100 nF",
+            "1000 nF",
+            "10000 nF",
+            "0,001 nF"
+          ],
+          correct: 1,
+          explanation: "1 μF = 1000 nF. Przelicznik: 1 μF = 10³ nF = 10⁶ pF.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=21"
+        },
+        {
+          category: "elementy",
+          question: "W jakich jednostkach mierzymy indukcyjność?",
+          answers: [
+            "w faradach [F]",
+            "w omach [Ω]",
+            "w henrach [H]",
+            "w amperach [A]"
+          ],
+          correct: 2,
+          explanation: "Indukcyjność cewki mierzymy w henrach [H]. Typowe wartości to nH, μH, mH.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=22"
+        },
+        {
+          category: "elementy",
+          question: "Jaki jest wzór na indukcyjność cewki?",
+          answers: [
+            "L = μ × z² × S / l",
+            "L = μ × z × S × l",
+            "L = z² / (μ × S × l)",
+            "L = μ × l / (z² × S)"
+          ],
+          correct: 0,
+          explanation: "Indukcyjność cewki L = μz²S/l, gdzie μ to przenikalność magnetyczna, z to liczba zwojów, S to pole przekroju, l to długość cewki.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=23"
+        },
+        {
+          category: "elementy",
+          question: "Jaka jest zależność napięcia od prądu w cewce?",
+          answers: [
+            "u = L × I",
+            "u = L × dI/dt",
+            "u = I / L",
+            "u = C × dU/dt"
+          ],
+          correct: 1,
+          explanation: "W cewce napięcie jest proporcjonalne do szybkości zmian prądu: u = L × dI/dt. Cewka przeciwstawia się zmianom prądu.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=23"
+        },
+        {
+          category: "elementy",
+          question: "Jakie są podstawowe parametry cewki (induktora)?",
+          answers: [
+            "pojemność, napięcie znamionowe, prąd",
+            "rezystancja, tolerancja, moc strat",
+            "indukcyjność, dobroć, maksymalny prąd",
+            "częstotliwość rezonansowa, faza, amplituda"
+          ],
+          correct: 2,
+          explanation: "Podstawowe parametry cewki to: indukcyjność [H], dobroć (współczynnik jakości), maksymalny prąd, maksymalne napięcie, współczynnik temperaturowy.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=24"
+        },
+        {
+          category: "elementy",
+          question: "Która z zależności jest poprawna?",
+          answers: [
+            "Rezystor: I zależy od dU/dt",
+            "Kondensator: I jest proporcjonalne do U",
+            "Cewka: U jest proporcjonalne do dI/dt",
+            "Cewka: I jest proporcjonalne do dU/dt"
+          ],
+          correct: 2,
+          explanation: "Poprawne zależności: Rezystor: I ∝ U, Kondensator: I ∝ dU/dt, Cewka: U ∝ dI/dt.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=24"
+        },
+        {
+          category: "elementy",
+          question: "Jaka jest relacja między 1 mH a μH?",
+          answers: [
+            "1 mH = 100 μH",
+            "1 mH = 1000 μH",
+            "1 mH = 0,001 μH",
+            "1 mH = 10000 μH"
+          ],
+          correct: 1,
+          explanation: "1 mH = 1000 μH. Przelicznik: 1 mH = 10³ μH = 10⁶ nH.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=24"
+        },
+        {
+          category: "elementy",
+          question: "Co to jest dielektryk w kondensatorze?",
+          answers: [
+            "materiał przewodzący między okładkami",
+            "materiał izolacyjny między okładkami",
+            "zewnętrzna obudowa ochronna kondensatora",
+            "metalowe wyprowadzenia kondensatora"
+          ],
+          correct: 1,
+          explanation: "Dielektryk to materiał izolacyjny umieszczony między okładkami kondensatora. Jego przenikalność elektryczna wpływa na pojemność kondensatora.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=19"
+        },
+        {
+          category: "elementy",
+          question: "Co określa wartość ε₀ = 8,85 × 10⁻¹² F/m?",
+          answers: [
+            "przenikalność magnetyczną próżni",
+            "przenikalność elektryczną próżni",
+            "rezystywność czystej miedzi",
+            "konduktancję właściwą srebra"
+          ],
+          correct: 1,
+          explanation: "ε₀ = 8,85 × 10⁻¹² F/m to przenikalność elektryczna próżni, stała fizyczna używana we wzorze na pojemność kondensatora.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=20"
+        },
+        {
+          category: "elementy",
+          question: "Ile pikofaradów [pF] to 1 nanofarad [nF]?",
+          answers: [
+            "10 pF",
+            "100 pF",
+            "1000 pF",
+            "10000 pF"
+          ],
+          correct: 2,
+          explanation: "1 nF = 1000 pF. Przelicznik: 1 μF = 1000 nF = 1 000 000 pF.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=21"
+        },
+        {
+          category: "elementy",
+          question: "Co wpływa na indukcyjność cewki?",
+          answers: [
+            "tylko materiał rdzenia magnetycznego",
+            "liczba zwojów, przekrój, długość, rdzeń",
+            "tylko długość i średnica drutu",
+            "wyłącznie częstotliwość prądu AC"
+          ],
+          correct: 1,
+          explanation: "Na indukcyjność cewki wpływa: liczba zwojów (z²), pole przekroju (S), długość cewki (l) oraz przenikalność magnetyczna rdzenia (μ). L = μz²S/l.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=23"
+        },
+
+        // ==================== 3. AMPEROMIERZ I WOLTOMIERZ ====================
+        {
+          category: "mierniki",
+          question: "Jak należy włączyć amperomierz do obwodu?",
+          answers: [
+            "równolegle do mierzonego elementu",
+            "szeregowo w obwód z mierzonym prądem",
+            "między masą a zasilaniem obwodu",
+            "równolegle do źródła napięcia"
+          ],
+          correct: 1,
+          explanation: "Amperomierz włącza się SZEREGOWO w obwód, ponieważ musi przez niego przepływać cały mierzony prąd. Amperomierz powinien mieć bardzo mały opór wewnętrzny.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+        {
+          category: "mierniki",
+          question: "Jak należy włączyć woltomierz do obwodu?",
+          answers: [
+            "szeregowo z mierzonym elementem",
+            "równolegle do mierzonego elementu",
+            "zamiast mierzonego elementu w obwodzie",
+            "w przerwę przewodu zasilającego"
+          ],
+          correct: 1,
+          explanation: "Woltomierz włącza się RÓWNOLEGLE do elementu, na którym chcemy zmierzyć napięcie. Woltomierz powinien mieć bardzo duży opór wewnętrzny.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+        {
+          category: "mierniki",
+          question: "Jaki opór powinien mieć idealny amperomierz?",
+          answers: [
+            "nieskończenie duży (maksymalny)",
+            "zerowy (jak najmniejszy)",
+            "dokładnie 1 Ω (jednostkowy)",
+            "równy oporowi mierzonego elementu"
+          ],
+          correct: 1,
+          explanation: "Idealny amperomierz powinien mieć zerowy opór wewnętrzny, aby nie wpływać na mierzony prąd w obwodzie (nie powodować spadku napięcia).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+        {
+          category: "mierniki",
+          question: "Jaki opór powinien mieć idealny woltomierz?",
+          answers: [
+            "zerowy (jak najmniejszy)",
+            "nieskończenie duży (maksymalny)",
+            "dokładnie 1 MΩ (megaom)",
+            "równy oporowi mierzonego elementu"
+          ],
+          correct: 1,
+          explanation: "Idealny woltomierz powinien mieć nieskończenie duży opór wewnętrzny, aby nie pobierać prądu z obwodu i nie wpływać na mierzone napięcie.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+        {
+          category: "mierniki",
+          question: "Co się stanie przy równoległym podłączeniu amperomierza?",
+          answers: [
+            "zmierzymy prawidłową wartość prądu",
+            "zmierzymy napięcie zamiast prądu",
+            "może dojść do zwarcia i uszkodzenia",
+            "nic się nie stanie, pomiar będzie poprawny"
+          ],
+          correct: 2,
+          explanation: "Amperomierz ma bardzo mały opór wewnętrzny. Podłączenie go równolegle spowoduje praktycznie zwarcie - popłynie bardzo duży prąd, co może uszkodzić miernik i obwód.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+        {
+          category: "mierniki",
+          question: "Dlaczego woltomierz powinien mieć duży opór?",
+          answers: [
+            "aby wytrzymać wysokie napięcie",
+            "aby nie pobierać prądu z obwodu",
+            "aby mógł mierzyć bardzo małe napięcia",
+            "aby chronić się przed zwarciem"
+          ],
+          correct: 1,
+          explanation: "Woltomierz o dużym oporze wewnętrznym pobiera minimalny prąd z obwodu, dzięki czemu nie wpływa znacząco na mierzone napięcie (nie obciąża układu).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+        {
+          category: "mierniki",
+          question: "Dlaczego amperomierz powinien mieć mały opór?",
+          answers: [
+            "aby mógł mierzyć duże prądy",
+            "aby nie powodować spadku napięcia",
+            "aby chronić się przed przegrzaniem",
+            "aby zwiększyć dokładność pomiaru"
+          ],
+          correct: 1,
+          explanation: "Amperomierz o małym oporze wewnętrznym nie powoduje znaczącego spadku napięcia w obwodzie, więc nie wpływa na mierzony prąd.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=28"
+        },
+
+        // ==================== 4. PRAWO OHMA ====================
+        {
+          category: "ohm",
+          question: "Jak brzmi prawo Ohma?",
+          answers: [
+            "napięcie jest wprost proporcjonalne do oporu",
+            "prąd jest proporcjonalny do U i odwrotnie do R",
+            "suma prądów w węźle równa się zero",
+            "suma napięć w oczku równa się zero"
+          ],
+          correct: 1,
+          explanation: "Prawo Ohma: I = U/R. Prąd jest wprost proporcjonalny do napięcia i odwrotnie proporcjonalny do oporu. Można też zapisać: U = IR lub R = U/I.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Który wzór jest poprawną formą prawa Ohma?",
+          answers: [
+            "I = U × R",
+            "I = R / U",
+            "I = U / R",
+            "I = U + R"
+          ],
+          correct: 2,
+          explanation: "Prawo Ohma: I = U/R, co oznacza, że prąd jest równy napięciu podzielonemu przez opór. Inne formy: U = IR, R = U/I.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Napięcie na rezystorze 100 Ω wynosi 10 V. Jaki prąd płynie?",
+          answers: [
+            "1000 A",
+            "10 A",
+            "1 A",
+            "0,1 A"
+          ],
+          correct: 3,
+          explanation: "Z prawa Ohma: I = U/R = 10 V / 100 Ω = 0,1 A = 100 mA.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=30"
+        },
+        {
+          category: "ohm",
+          question: "Przez rezystor 50 Ω płynie prąd 2 A. Jakie jest napięcie?",
+          answers: [
+            "25 V",
+            "52 V",
+            "100 V",
+            "0,04 V"
+          ],
+          correct: 2,
+          explanation: "Z prawa Ohma: U = I × R = 2 A × 50 Ω = 100 V.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Napięcie wynosi 12 V, prąd 3 A. Jaki jest opór?",
+          answers: [
+            "36 Ω",
+            "15 Ω",
+            "4 Ω",
+            "0,25 Ω"
+          ],
+          correct: 2,
+          explanation: "Z prawa Ohma: R = U/I = 12 V / 3 A = 4 Ω.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Co się stanie z prądem przy podwojeniu napięcia (R=const)?",
+          answers: [
+            "prąd spadnie o połowę",
+            "prąd się podwoi",
+            "prąd się nie zmieni",
+            "prąd wzrośnie czterokrotnie"
+          ],
+          correct: 1,
+          explanation: "Zgodnie z prawem Ohma I = U/R, prąd jest wprost proporcjonalny do napięcia. Podwojenie napięcia przy stałym oporze powoduje podwojenie prądu.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Co się stanie z prądem przy podwojeniu oporu (U=const)?",
+          answers: [
+            "prąd wzrośnie dwukrotnie",
+            "prąd spadnie o połowę",
+            "prąd się nie zmieni",
+            "prąd spadnie do zera"
+          ],
+          correct: 1,
+          explanation: "Zgodnie z prawem Ohma I = U/R, prąd jest odwrotnie proporcjonalny do oporu. Podwojenie oporu przy stałym napięciu zmniejszy prąd o połowę.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Jaka jest jednostka ilorazu U/I?",
+          answers: [
+            "amper [A]",
+            "wolt [V]",
+            "om [Ω]",
+            "wat [W]"
+          ],
+          correct: 2,
+          explanation: "U/I = R, więc jednostką jest om [Ω]. 1 Ω = 1 V / 1 A.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+        {
+          category: "ohm",
+          question: "Przez rezystor 200 Ω płynie prąd 50 mA. Jakie jest napięcie?",
+          answers: [
+            "4 V",
+            "10 V",
+            "25 V",
+            "0,25 V"
+          ],
+          correct: 1,
+          explanation: "U = I × R = 0,05 A × 200 Ω = 10 V. Uwaga: 50 mA = 0,05 A.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=29"
+        },
+
+        // ==================== 5. PRAWA KIRCHHOFFA ====================
+        {
+          category: "kirchhoff",
+          question: "Co mówi pierwsze prawo Kirchhoffa (PPK)?",
+          answers: [
+            "suma napięć w pętli równa się zero",
+            "suma algebraiczna prądów w węźle = 0",
+            "prąd jest proporcjonalny do napięcia",
+            "opór zastępczy równa się sumie oporów"
+          ],
+          correct: 1,
+          explanation: "I prawo Kirchhoffa (PPK): Suma algebraiczna prądów wpływających do węzła równa się sumie prądów wypływających. Inaczej: ΣI = 0 (bilans prądów w węźle).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=31"
+        },
+        {
+          category: "kirchhoff",
+          question: "Co mówi drugie prawo Kirchhoffa (NPK)?",
+          answers: [
+            "suma prądów w węźle równa się zero",
+            "suma napięć w zamkniętym oczku = 0",
+            "napięcie jest proporcjonalne do prądu",
+            "opór rośnie proporcjonalnie do długości"
+          ],
+          correct: 1,
+          explanation: "II prawo Kirchhoffa (NPK): Suma algebraiczna napięć wzdłuż zamkniętej pętli (oczka) równa się zero. ΣU = 0.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=33"
+        },
+        {
+          category: "kirchhoff",
+          question: "Do węzła wpływają prądy 3 A i 5 A. Ile wypływa?",
+          answers: [
+            "2 A",
+            "8 A",
+            "15 A",
+            "1,67 A"
+          ],
+          correct: 1,
+          explanation: "Z I prawa Kirchhoffa: suma prądów wpływających = suma wypływających. 3 A + 5 A = 8 A wypływa z węzła.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=32"
+        },
+        {
+          category: "kirchhoff",
+          question: "Z węzła wypływają prądy 2 A, 3 A i 4 A. Ile wpływa?",
+          answers: [
+            "5 A",
+            "9 A",
+            "1 A",
+            "24 A"
+          ],
+          correct: 1,
+          explanation: "Z I prawa Kirchhoffa: suma prądów wpływających = suma wypływających. Wpływający prąd = 2 + 3 + 4 = 9 A.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=31"
+        },
+        {
+          category: "kirchhoff",
+          question: "Źródło 12 V, spadek na R₁ = 5 V. Jaki spadek na R₂?",
+          answers: [
+            "17 V",
+            "7 V",
+            "5 V",
+            "60 V"
+          ],
+          correct: 1,
+          explanation: "Z II prawa Kirchhoffa: suma napięć w oczku = 0. Więc: 12 V - 5 V - U₂ = 0, stąd U₂ = 7 V.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=34"
+        },
+        {
+          category: "kirchhoff",
+          question: "Które prawo wynika z zasady zachowania ładunku?",
+          answers: [
+            "drugie prawo Kirchhoffa (napięciowe)",
+            "pierwsze prawo Kirchhoffa (prądowe)",
+            "prawo Ohma dla obwodu",
+            "prawo Coulomba dla ładunków"
+          ],
+          correct: 1,
+          explanation: "Pierwsze prawo Kirchhoffa (prądowe) wynika z zasady zachowania ładunku - ładunek nie może gromadzić się w węźle, więc ile wpływa, tyle musi wypływać.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=31"
+        },
+        {
+          category: "kirchhoff",
+          question: "Które prawo wynika z zasady zachowania energii?",
+          answers: [
+            "pierwsze prawo Kirchhoffa (prądowe)",
+            "drugie prawo Kirchhoffa (napięciowe)",
+            "prawo Ohma dla rezystora",
+            "prawo Coulomba dla ładunków"
+          ],
+          correct: 1,
+          explanation: "Drugie prawo Kirchhoffa (napięciowe) wynika z zasady zachowania energii - ładunek obiegający zamkniętą pętlę wraca z tą samą energią, z jaką wystartował.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=33"
+        },
+        {
+          category: "kirchhoff",
+          question: "Jak zapisuje się I prawo Kirchhoffa matematycznie?",
+          answers: [
+            "ΣU = 0",
+            "ΣI = 0",
+            "U = I × R",
+            "P = U × I"
+          ],
+          correct: 1,
+          explanation: "I prawo Kirchhoffa zapisujemy jako ΣI = 0, co oznacza, że algebraiczna suma wszystkich prądów w węźle równa się zero.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=31"
+        },
+        {
+          category: "kirchhoff",
+          question: "Wpływa 10 A, wypływają: 3 A, 4 A. Jaki jest I₃?",
+          answers: [
+            "17 A",
+            "7 A",
+            "3 A",
+            "1 A"
+          ],
+          correct: 2,
+          explanation: "Z I prawa Kirchhoffa: 10 A = 3 A + 4 A + I₃, więc I₃ = 10 - 3 - 4 = 3 A.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=32"
+        },
+        {
+          category: "kirchhoff",
+          question: "Jak zapisuje się II prawo Kirchhoffa matematycznie?",
+          answers: [
+            "ΣI = 0",
+            "ΣU = 0",
+            "I = U / R",
+            "R = ρl / A"
+          ],
+          correct: 1,
+          explanation: "II prawo Kirchhoffa zapisujemy jako ΣU = 0, co oznacza, że suma napięć w zamkniętej pętli równa się zero.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=33"
+        },
+
+        // ==================== 6. ŁĄCZENIE REZYSTORÓW ====================
+        {
+          category: "rezystory",
+          question: "Jaki jest wzór na rezystancję szeregową?",
+          answers: [
+            "1/Rz = 1/R₁ + 1/R₂ + ... + 1/Rn",
+            "Rz = R₁ + R₂ + ... + Rn",
+            "Rz = R₁ × R₂ / (R₁ + R₂)",
+            "Rz = √(R₁² + R₂²)"
+          ],
+          correct: 1,
+          explanation: "Rezystory szeregowo: Rz = R₁ + R₂ + ... + Rn. Rezystancja zastępcza jest sumą wszystkich rezystancji.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=36"
+        },
+        {
+          category: "rezystory",
+          question: "Jaki jest wzór na rezystancję równoległą?",
+          answers: [
+            "Rz = R₁ + R₂ + ... + Rn",
+            "1/Rz = 1/R₁ + 1/R₂ + ... + 1/Rn",
+            "Rz = R₁ × R₂ × ... × Rn",
+            "Rz = (R₁ + R₂) / 2"
+          ],
+          correct: 1,
+          explanation: "Rezystory równolegle: 1/Rz = 1/R₁ + 1/R₂ + ... + 1/Rn. Dla dwóch rezystorów: Rz = R₁×R₂/(R₁+R₂).",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=36"
+        },
+        {
+          category: "rezystory",
+          question: "10 Ω, 20 Ω i 30 Ω szeregowo. Jaka rezystancja zastępcza?",
+          answers: [
+            "5,45 Ω",
+            "60 Ω",
+            "20 Ω",
+            "6000 Ω"
+          ],
+          correct: 1,
+          explanation: "Szeregowo: Rz = R₁ + R₂ + R₃ = 10 + 20 + 30 = 60 Ω.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=36"
+        },
+        {
+          category: "rezystory",
+          question: "Dwa rezystory po 100 Ω równolegle. Jaka rezystancja?",
+          answers: [
+            "200 Ω",
+            "100 Ω",
+            "50 Ω",
+            "10000 Ω"
+          ],
+          correct: 2,
+          explanation: "Równolegle dla dwóch jednakowych: Rz = R/2 = 100/2 = 50 Ω. Lub: 1/Rz = 1/100 + 1/100 = 2/100, więc Rz = 50 Ω.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=3"
+        },
+        {
+          category: "rezystory",
+          question: "Co jest stałe dla rezystorów szeregowych?",
+          answers: [
+            "napięcie na każdym rezystorze",
+            "prąd płynący przez każdy rezystor",
+            "moc wydzielana na każdym rezystorze",
+            "rezystancja każdego z rezystorów"
+          ],
+          correct: 1,
+          explanation: "W połączeniu szeregowym przez wszystkie rezystory płynie ten sam prąd. Napięcie rozkłada się proporcjonalnie do oporów.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=36"
+        },
+        {
+          category: "rezystory",
+          question: "Co jest stałe dla rezystorów równoległych?",
+          answers: [
+            "prąd przez każdy rezystor",
+            "napięcie na każdym rezystorze",
+            "rezystancja każdego rezystora",
+            "moc na każdym rezystorze"
+          ],
+          correct: 1,
+          explanation: "W połączeniu równoległym na wszystkich rezystorach jest to samo napięcie. Prąd rozdziela się odwrotnie proporcjonalnie do oporów.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=36"
+        },
+        {
+          category: "rezystory",
+          question: "30 Ω i 60 Ω równolegle. Jaka rezystancja zastępcza?",
+          answers: [
+            "90 Ω",
+            "45 Ω",
+            "20 Ω",
+            "15 Ω"
+          ],
+          correct: 2,
+          explanation: "Rz = R₁×R₂/(R₁+R₂) = 30×60/(30+60) = 1800/90 = 20 Ω.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=3"
+        },
+        {
+          category: "rezystory",
+          question: "Rezystancja równoległa względem najmniejszego rezystora jest:",
+          answers: [
+            "zawsze większa",
+            "zawsze mniejsza",
+            "zawsze równa",
+            "czasem większa, czasem mniejsza"
+          ],
+          correct: 1,
+          explanation: "Rezystancja zastępcza połączenia równoległego jest ZAWSZE mniejsza od najmniejszego rezystora w tym połączeniu.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=3"
+        },
+        {
+          category: "rezystory",
+          question: "Co to jest konduktancja i jaka jest jej jednostka?",
+          answers: [
+            "odwrotność napięcia, mierzona w woltach",
+            "odwrotność rezystancji, mierzona w siemensach",
+            "iloczyn prądu i napięcia, mierzona w watach",
+            "stosunek ładunku do czasu, mierzona w amperach"
+          ],
+          correct: 1,
+          explanation: "Konduktancja G = 1/R to odwrotność rezystancji. Jednostką jest siemens [S]. 1 S = 1/Ω.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=9"
+        },
+        {
+          category: "rezystory",
+          question: "Trzy rezystory 30 Ω równolegle. Jaka rezystancja?",
+          answers: [
+            "90 Ω",
+            "30 Ω",
+            "10 Ω",
+            "15 Ω"
+          ],
+          correct: 2,
+          explanation: "Dla n jednakowych rezystorów równolegle: Rz = R/n = 30/3 = 10 Ω.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=3"
+        },
+        {
+          category: "rezystory",
+          question: "Rezystancja szeregowa względem największego rezystora jest:",
+          answers: [
+            "zawsze mniejsza",
+            "zawsze większa",
+            "zawsze równa",
+            "czasem większa, czasem mniejsza"
+          ],
+          correct: 1,
+          explanation: "Rezystancja zastępcza połączenia szeregowego jest ZAWSZE większa od największego rezystora, bo jest sumą wszystkich rezystancji.",
+          sourceLink: "PodstawyElektroniki_W1.pdf#page=36"
+        },
+
+        // ==================== 7. DZIELNIKI NAPIĘCIA I PRĄDU ====================
+        {
+          category: "dzielniki",
+          question: "Jaki jest wzór na napięcie wyjściowe dzielnika?",
+          answers: [
+            "U₂ = Uwe × R₁ / (R₁ + R₂)",
+            "U₂ = Uwe × R₂ / (R₁ + R₂)",
+            "U₂ = Uwe × (R₁ + R₂) / R₂",
+            "U₂ = Uwe × (R₁ - R₂) / R₁"
+          ],
+          correct: 1,
+          explanation: "Dzielnik napięcia: U₂ = Uwe × R₂/(R₁+R₂). Napięcie na dolnym rezystorze jest proporcjonalne do jego udziału w całkowitym oporze.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=6"
+        },
+        {
+          category: "dzielniki",
+          question: "Uwe = 10 V, R₁ = 3 kΩ, R₂ = 2 kΩ. Jakie jest U₂?",
+          answers: [
+            "6 V",
+            "4 V",
+            "5 V",
+            "2 V"
+          ],
+          correct: 1,
+          explanation: "U₂ = Uwe × R₂/(R₁+R₂) = 10 V × 2000/(3000+2000) = 10 × 2/5 = 4 V.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=7"
+        },
+        {
+          category: "dzielniki",
+          question: "Jaki jest wzór na prąd I₁ w dzielniku prądu?",
+          answers: [
+            "I₁ = I × R₁ / (R₁ + R₂)",
+            "I₁ = I × R₂ / (R₁ + R₂)",
+            "I₁ = I × (R₁ + R₂) / R₁",
+            "I₁ = I / (R₁ + R₂)"
+          ],
+          correct: 1,
+          explanation: "Dzielnik prądu: I₁ = I × R₂/(R₁+R₂). Prąd przez rezystor jest proporcjonalny do oporu DRUGIEGO rezystora (odwrotnie do własnego).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=9"
+        },
+        {
+          category: "dzielniki",
+          question: "I = 12 mA, R₁ = 4 kΩ, R₂ = 8 kΩ. Jaki prąd przez R₁?",
+          answers: [
+            "4 mA",
+            "8 mA",
+            "6 mA",
+            "3 mA"
+          ],
+          correct: 1,
+          explanation: "I₁ = I × R₂/(R₁+R₂) = 12 mA × 8/(4+8) = 12 × 8/12 = 8 mA. Większy prąd płynie przez mniejszy opór.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=10"
+        },
+        {
+          category: "dzielniki",
+          question: "W dzielniku napięcia R₁ = R₂. Jakie jest U₂?",
+          answers: [
+            "równe Uwe",
+            "równe Uwe / 2",
+            "równe 2 × Uwe",
+            "równe 0 V"
+          ],
+          correct: 1,
+          explanation: "Gdy R₁ = R₂: U₂ = Uwe × R₂/(R₁+R₂) = Uwe × R/(2R) = Uwe/2. Napięcie dzieli się równo.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=6"
+        },
+        {
+          category: "dzielniki",
+          question: "Przez który rezystor w dzielniku prądu płynie większy prąd?",
+          answers: [
+            "przez rezystor o większym oporze",
+            "przez rezystor o mniejszym oporze",
+            "przez oba płynie taki sam prąd",
+            "zależy od napięcia zasilania"
+          ],
+          correct: 1,
+          explanation: "W dzielniku prądu większy prąd płynie przez mniejszy opór. Prąd \"wybiera\" łatwiejszą drogę (mniejszy opór).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=9"
+        },
+        {
+          category: "dzielniki",
+          question: "Do czego służy dzielnik napięcia?",
+          answers: [
+            "do zwiększania napięcia wejściowego",
+            "do uzyskania niższego napięcia niż wejściowe",
+            "do zwiększania prądu w obwodzie",
+            "do magazynowania energii elektrycznej"
+          ],
+          correct: 1,
+          explanation: "Dzielnik napięcia służy do uzyskania napięcia wyjściowego niższego niż napięcie wejściowe (zasilania). Jest stosowany np. w czujnikach, regulacji.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=6"
+        },
+        {
+          category: "dzielniki",
+          question: "R₁ = 1 kΩ, R₂ = 9 kΩ. Jaki % napięcia na R₂?",
+          answers: [
+            "10%",
+            "50%",
+            "90%",
+            "100%"
+          ],
+          correct: 2,
+          explanation: "U₂/Uwe = R₂/(R₁+R₂) = 9/(1+9) = 9/10 = 0,9 = 90%.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=6"
+        },
+        {
+          category: "dzielniki",
+          question: "I = 10 mA, R₁ = R₂ = 5 kΩ. Jaki prąd przez R₁?",
+          answers: [
+            "2,5 mA",
+            "5 mA",
+            "10 mA",
+            "20 mA"
+          ],
+          correct: 1,
+          explanation: "Gdy R₁ = R₂, prąd dzieli się równo: I₁ = I/2 = 10 mA / 2 = 5 mA.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=9"
+        },
+
+        // ==================== 8. MODELE PASMOWE ====================
+        {
+          category: "pasma",
+          question: "Co to jest pasmo walencyjne?",
+          answers: [
+            "pasmo puste, do którego przeskakują elektrony",
+            "pasmo zapełnione elektronami walencyjnymi",
+            "przerwa energetyczna między pasmami",
+            "pasmo o najwyższej możliwej energii"
+          ],
+          correct: 1,
+          explanation: "Pasmo walencyjne to pasmo energetyczne zapełnione elektronami walencyjnymi w stanie podstawowym (w temperaturze 0 K). Elektrony te tworzą wiązania chemiczne.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=32"
+        },
+        {
+          category: "pasma",
+          question: "Co to jest pasmo przewodnictwa?",
+          answers: [
+            "pasmo zapełnione elektronami walencyjnymi",
+            "pasmo puste lub częściowo zapełnione",
+            "pasmo zabronione dla wszystkich elektronów",
+            "pasmo o najniższej możliwej energii"
+          ],
+          correct: 1,
+          explanation: "Pasmo przewodnictwa to pasmo energetyczne powyżej pasma walencyjnego. Elektrony w tym paśmie są swobodne i mogą przewodzić prąd elektryczny.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=32"
+        },
+        {
+          category: "pasma",
+          question: "Co to jest pasmo zabronione (przerwa energetyczna)?",
+          answers: [
+            "pasmo, w którym znajdują się wszystkie elektrony",
+            "obszar energii bez dozwolonych stanów",
+            "pasmo przewodnictwa prądu elektrycznego",
+            "pasmo związane z polem magnetycznym"
+          ],
+          correct: 1,
+          explanation: "Pasmo zabronione (przerwa energetyczna ΔE) to zakres energii między pasmem walencyjnym a przewodnictwa, w którym nie ma dozwolonych stanów dla elektronów.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=32"
+        },
+        {
+          category: "pasma",
+          question: "Jak wyglądają pasma energetyczne w metalu?",
+          answers: [
+            "duża przerwa między pasmami (~10 eV)",
+            "pasma zachodzą na siebie lub stykają się",
+            "pasmo przewodnictwa jest całkowicie puste",
+            "pasmo walencyjne jest całkowicie puste"
+          ],
+          correct: 1,
+          explanation: "W przewodnikach (metalach) pasmo walencyjne i przewodnictwa zachodzą na siebie lub się stykają (ΔE = 0). Elektrony mogą swobodnie przewodzić prąd.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=33"
+        },
+        {
+          category: "pasma",
+          question: "Jaka jest przerwa energetyczna w izolatorze?",
+          answers: [
+            "około 0 eV (brak przerwy)",
+            "0,1-2 eV (mała przerwa)",
+            "około 10 eV lub więcej (duża przerwa)",
+            "dokładnie 5 eV (średnia przerwa)"
+          ],
+          correct: 2,
+          explanation: "W izolatorach przerwa energetyczna jest bardzo duża, rzędu 10 eV. Elektrony nie mogą łatwo przeskoczyć do pasma przewodnictwa.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=33"
+        },
+        {
+          category: "pasma",
+          question: "Jaka jest przerwa energetyczna w półprzewodniku?",
+          answers: [
+            "0 eV (brak przerwy)",
+            "0,1 - 2 eV (mała przerwa)",
+            "10 eV lub więcej (duża przerwa)",
+            "100 eV (bardzo duża przerwa)"
+          ],
+          correct: 1,
+          explanation: "W półprzewodnikach przerwa energetyczna wynosi 0,1-2 eV. Jest na tyle mała, że elektrony mogą ją pokonać przy dostarczeniu niewielkiej energii (ciepło, światło).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=34"
+        },
+        {
+          category: "pasma",
+          question: "Co powstaje przy przeskoku elektronu do pasma przewodnictwa?",
+          answers: [
+            "powstaje jon dodatni",
+            "powstaje para elektron-dziura",
+            "atom ulega rozpadowi",
+            "rezystancja spada do zera"
+          ],
+          correct: 1,
+          explanation: "Gdy elektron przeskakuje do pasma przewodnictwa, w paśmie walencyjnym pozostaje dziura (brak elektronu). Powstaje para elektron-dziura zdolna do przenoszenia prądu.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=35"
+        },
+        {
+          category: "pasma",
+          question: "Co to jest generacja par elektron-dziura?",
+          answers: [
+            "proces łączenia elektronów z dziurami",
+            "powstawanie swobodnych nośników pod wpływem energii",
+            "proces wytwarzania energii elektrycznej",
+            "proces niszczenia struktury krystalicznej"
+          ],
+          correct: 1,
+          explanation: "Generacja to proces, w którym elektron otrzymuje energię (cieplną, świetlną) i przeskakuje z pasma walencyjnego do przewodnictwa, tworząc parę elektron-dziura.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=35"
+        },
+        {
+          category: "pasma",
+          question: "Co to jest rekombinacja?",
+          answers: [
+            "powstawanie nowych elektronów swobodnych",
+            "łączenie elektronu z dziurą i zanik pary",
+            "rozdzielanie elektronów od dziur",
+            "zwiększanie liczby nośników prądu"
+          ],
+          correct: 1,
+          explanation: "Rekombinacja to proces odwrotny do generacji - elektron z pasma przewodnictwa zajmuje miejsce dziury w paśmie walencyjnym. Para elektron-dziura zanika.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=35"
+        },
+        {
+          category: "pasma",
+          question: "Co dzieje się z oporem półprzewodnika przy wzroście temperatury?",
+          answers: [
+            "rośnie (jak w metalach)",
+            "maleje (więcej nośników)",
+            "nie zmienia się wcale",
+            "najpierw maleje, potem rośnie"
+          ],
+          correct: 1,
+          explanation: "W półprzewodnikach wzrost temperatury powoduje spadek oporu, bo generuje więcej par elektron-dziura. Jest to odwrotnie niż w metalach, gdzie opór rośnie z temperaturą.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=36"
+        },
+        {
+          category: "pasma",
+          question: "Czym charakteryzuje się przewodnik w modelu pasmowym?",
+          answers: [
+            "dużą przerwą energetyczną (~10 eV)",
+            "brakiem lub bardzo małą przerwą (0 eV)",
+            "przerwą energetyczną 0,1-2 eV",
+            "całkowicie pustym pasmem przewodnictwa"
+          ],
+          correct: 1,
+          explanation: "W przewodnikach pasmo walencyjne i przewodnictwa zachodzą na siebie lub stykają się - przerwa energetyczna wynosi praktycznie 0 eV.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=33"
+        },
+
+        // ==================== 9. PÓŁPRZEWODNIKI ====================
+        {
+          category: "polprzewodniki",
+          question: "Jaka jest typowa konduktywność półprzewodników?",
+          answers: [
+            "10⁶ - 10⁸ S/m (jak metale)",
+            "10⁻⁸ - 10⁻⁴ S/m (pośrednia)",
+            "10⁻¹⁵ - 10⁻¹⁰ S/m (jak izolatory)",
+            "dokładnie 0 S/m (brak przewodnictwa)"
+          ],
+          correct: 1,
+          explanation: "Półprzewodniki mają konduktywność 10⁻⁸ - 10⁻⁴ S/m, co plasuje je między metalami (dobrymi przewodnikami) a izolatorami.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=34"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Ile elektronów walencyjnych ma krzem (Si)?",
+          answers: [
+            "1 elektron",
+            "2 elektrony",
+            "4 elektrony",
+            "8 elektronów"
+          ],
+          correct: 2,
+          explanation: "Krzem ma 4 elektrony walencyjne. Tworzy 4 wiązania kowalencyjne z sąsiednimi atomami w sieci krystalicznej.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=29"
+        },
+        {
+          category: "polprzewodniki",
+          question: "W jakim kierunku poruszają się elektrony w polu elektrycznym?",
+          answers: [
+            "w kierunku elektrody dodatniej",
+            "w kierunku elektrody ujemnej",
+            "nie poruszają się wcale",
+            "prostopadle do kierunku pola"
+          ],
+          correct: 1,
+          explanation: "Elektrony (ładunek ujemny) w polu elektrycznym poruszają się w kierunku elektrody dodatniej (w kierunku przeciwnym do pola elektrycznego).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=37"
+        },
+        {
+          category: "polprzewodniki",
+          question: "W jakim kierunku poruszają się dziury w polu elektrycznym?",
+          answers: [
+            "w kierunku elektrody ujemnej",
+            "w kierunku elektrody dodatniej",
+            "w tym samym kierunku co elektrony",
+            "dziury się nie poruszają"
+          ],
+          correct: 0,
+          explanation: "Dziury (efektywny ładunek dodatni) w polu elektrycznym poruszają się w kierunku elektrody ujemnej (w kierunku pola elektrycznego).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=37"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Co to jest prąd dziurowy?",
+          answers: [
+            "prąd płynący przez fizyczne otwory",
+            "prąd wynikający z ruchu dziur w paśmie walencyjnym",
+            "prąd przepływający przez próżnię",
+            "prąd o zerowej wartości natężenia"
+          ],
+          correct: 1,
+          explanation: "Prąd dziurowy to prąd wynikający z ruchu dziur w paśmie walencyjnym. Dziury poruszają się w kierunku elektrody ujemnej i przenoszą ładunek dodatni.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=37"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Jaki wpływ na przewodnictwo półprzewodnika ma światło?",
+          answers: [
+            "zmniejsza przewodnictwo materiału",
+            "nie ma żadnego wpływu",
+            "zwiększa przewodnictwo (fotoprzewodnictwo)",
+            "całkowicie blokuje przepływ prądu"
+          ],
+          correct: 2,
+          explanation: "Światło dostarcza energię elektronom, powodując generację par elektron-dziura. Zwiększa to liczbę nośników i przewodnictwo półprzewodnika (efekt fotoprzewodnictwa).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=36"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Czym różni się półprzewodnik od izolatora?",
+          answers: [
+            "półprzewodnik nie ma pasma zabronionego",
+            "półprzewodnik ma mniejszą przerwę energetyczną",
+            "izolator ma mniejszą przerwę energetyczną",
+            "nie różnią się w modelu pasmowym"
+          ],
+          correct: 1,
+          explanation: "Półprzewodnik ma znacznie mniejszą przerwę energetyczną (0,1-2 eV) niż izolator (~10 eV), co pozwala elektronom łatwiej przeskakiwać do pasma przewodnictwa.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=34"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Co to jest wiązanie kowalencyjne w krysztale krzemu?",
+          answers: [
+            "wiązanie jonowe między atomami",
+            "uwspólnianie elektronów między atomami",
+            "wiązanie metaliczne w sieci",
+            "wiązanie wodorowe między cząsteczkami"
+          ],
+          correct: 1,
+          explanation: "Wiązanie kowalencyjne to uwspólnianie elektronów walencyjnych. W krysztale krzemu każdy atom dzieli swoje 4 elektrony z 4 sąsiadami.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=29"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Co może powodować generację par elektron-dziura?",
+          answers: [
+            "tylko temperatura materiału",
+            "tylko światło padające na materiał",
+            "temperatura, światło, pole elektryczne",
+            "tylko pole elektryczne zewnętrzne"
+          ],
+          correct: 2,
+          explanation: "Generację par elektron-dziura mogą powodować różne formy energii: cieplna (temperatura), świetlna (fotony), elektryczna (pole elektryczne), magnetyczna.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=36"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Jak zmienia się opór metalu przy wzroście temperatury?",
+          answers: [
+            "maleje (jak w półprzewodnikach)",
+            "rośnie (więcej drgań sieci)",
+            "nie zmienia się wcale",
+            "najpierw rośnie, potem maleje"
+          ],
+          correct: 1,
+          explanation: "W metalach wzrost temperatury powoduje wzrost oporu (więcej drgań sieci utrudnia ruch elektronów). Jest odwrotnie niż w półprzewodnikach.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=36"
+        },
+        {
+          category: "polprzewodniki",
+          question: "Co to jest dziura w półprzewodniku?",
+          answers: [
+            "fizyczny otwór w strukturze kryształu",
+            "brak elektronu w paśmie walencyjnym",
+            "nadmiarowy elektron w paśmie przewodnictwa",
+            "atom domieszki w sieci krystalicznej"
+          ],
+          correct: 1,
+          explanation: "Dziura to brak elektronu w paśmie walencyjnym, który zachowuje się jak cząstka o dodatnim ładunku. Powstaje gdy elektron przeskakuje do pasma przewodnictwa.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=35"
+        },
+
+        // ==================== DODATKOWE - ŹRÓDŁA NAPIĘCIA I PRĄDU ====================
+        {
+          category: "podstawy",
+          question: "Jakie są cechy idealnego źródła napięcia?",
+          answers: [
+            "nieskończona rezystancja, stały prąd",
+            "zerowa rezystancja, stałe napięcie",
+            "zmienna rezystancja wewnętrzna",
+            "stała moc wyjściowa niezależna od obciążenia"
+          ],
+          correct: 1,
+          explanation: "Idealne źródło napięcia ma zerową rezystancję wewnętrzną i utrzymuje stałe napięcie na zaciskach niezależnie od pobieranego prądu.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=11"
+        },
+        {
+          category: "podstawy",
+          question: "Jakie są cechy idealnego źródła prądu?",
+          answers: [
+            "zerowa rezystancja, stałe napięcie",
+            "nieskończona rezystancja, stały prąd",
+            "zmienny prąd zależny od obciążenia",
+            "stała moc wyjściowa niezależna od obciążenia"
+          ],
+          correct: 1,
+          explanation: "Idealne źródło prądu ma nieskończenie dużą rezystancję wewnętrzną i dostarcza stały prąd niezależnie od napięcia na zaciskach (obciążenia).",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=12"
+        },
+        {
+          category: "podstawy",
+          question: "Jak jest połączona Rw w rzeczywistym źródle napięcia?",
+          answers: [
+            "równolegle do źródła EMF",
+            "szeregowo ze źródłem EMF",
+            "nie ma rezystancji wewnętrznej",
+            "zewnętrznie do całego obwodu"
+          ],
+          correct: 1,
+          explanation: "W rzeczywistym źródle napięcia rezystancja wewnętrzna Rw jest połączona szeregowo z idealnym źródłem EMF. Powoduje ona spadek napięcia przy pobieraniu prądu.",
+          sourceLink: "PodstawyElektroniki_W2.pdf#page=13"
+        },
+
+        // ==================== 10. DIODA I ZŁĄCZE P-N ====================
+        {
+          category: "dioda",
+          question: "Co to jest złącze p-n?",
+          answers: [
+            "połączenie dwóch metali o różnej przewodności",
+            "granica między półprzewodnikiem typu p i typu n",
+            "miejsce podłączenia zasilania do układu",
+            "złącze między izolatorem a przewodnikiem"
+          ],
+          correct: 1,
+          explanation: "Złącze p-n to granica między obszarem półprzewodnika typu p (z nadmiarem dziur) a obszarem typu n (z nadmiarem elektronów). Na złączu powstaje warstwa zubożona.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=8"
+        },
+        {
+          category: "dioda",
+          question: "Co to jest warstwa zubożona (zaporowa) w złączu p-n?",
+          answers: [
+            "obszar z nadmiarem swobodnych elektronów",
+            "obszar pozbawiony ruchomych nośników ładunku",
+            "warstwa metalu na powierzchni półprzewodnika",
+            "miejsce gromadzenia się dziur"
+          ],
+          correct: 1,
+          explanation: "Warstwa zubożona (zaporowa) to obszar przy złączu p-n pozbawiony ruchomych nośników ładunku. Powstaje w wyniku dyfuzji i rekombinacji nośników większościowych.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=8"
+        },
+        {
+          category: "dioda",
+          question: "Co powstaje na złączu p-n w stanie równowagi?",
+          answers: [
+            "prąd stały płynący przez złącze",
+            "bariera potencjału (napięcie dyfuzyjne U_D)",
+            "zwarcie między obszarami p i n",
+            "nieskończona rezystancja złącza"
+          ],
+          correct: 1,
+          explanation: "Na złączu p-n w stanie równowagi powstaje bariera potencjału (napięcie dyfuzyjne U_D), która przeciwdziała dalszej dyfuzji nośników.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=9"
+        },
+        {
+          category: "dioda",
+          question: "Co powoduje dyfuzja nośników większościowych na złączu p-n?",
+          answers: [
+            "powstanie ładunku przestrzennego i bariery potencjału",
+            "całkowite zneutralizowanie złącza",
+            "zwiększenie koncentracji nośników w całym krysztale",
+            "zanik półprzewodnika i powstanie metalu"
+          ],
+          correct: 0,
+          explanation: "Dyfuzja nośników większościowych (elektrony z n do p, dziury z p do n) powoduje powstanie ładunku przestrzennego i bariery potencjału w warstwie zubożonej.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=9"
+        },
+        {
+          category: "dioda",
+          question: "Co oznacza polaryzacja diody w kierunku przewodzenia?",
+          answers: [
+            "podłączenie + do katody i - do anody",
+            "podłączenie + do anody i - do katody",
+            "podłączenie obu końcówek do masy",
+            "brak podłączenia zewnętrznego napięcia"
+          ],
+          correct: 1,
+          explanation: "Polaryzacja w kierunku przewodzenia oznacza podłączenie napięcia + do anody (strona p) i - do katody (strona n). Wtedy bariera potencjału maleje i dioda przewodzi.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=12"
+        },
+        {
+          category: "dioda",
+          question: "Co dzieje się z warstwą zubożoną przy polaryzacji w kierunku przewodzenia?",
+          answers: [
+            "poszerza się znacznie",
+            "zawęża się, umożliwiając przepływ prądu",
+            "nie zmienia się wcale",
+            "całkowicie zanika i nigdy nie wraca"
+          ],
+          correct: 1,
+          explanation: "Przy polaryzacji w kierunku przewodzenia warstwa zubożona zawęża się, bariera potencjału maleje i dioda zaczyna przewodzić prąd.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=12"
+        },
+        {
+          category: "dioda",
+          question: "Co dzieje się z warstwą zubożoną przy polaryzacji zaporowej?",
+          answers: [
+            "zawęża się do zera",
+            "poszerza się, blokując przepływ prądu",
+            "nie zmienia się wcale",
+            "całkowicie zanika"
+          ],
+          correct: 1,
+          explanation: "Przy polaryzacji zaporowej (+ do katody, - do anody) warstwa zubożona poszerza się, bariera potencjału rośnie i dioda nie przewodzi prądu (poza minimalnym prądem wstecznym).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=12"
+        },
+        {
+          category: "dioda",
+          question: "Jak nazywa się równanie opisujące charakterystykę I-V diody?",
+          answers: [
+            "równanie Ohma",
+            "równanie Shockleya",
+            "równanie Kirchhoffa",
+            "równanie Coulomba"
+          ],
+          correct: 1,
+          explanation: "Równanie Shockleya opisuje zależność prądu od napięcia w diodzie: I = I_S × (e^(U_D/c) - 1), gdzie I_S to prąd nasycenia, c to stała zależna od temperatury.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=11"
+        },
+        {
+          category: "dioda",
+          question: "Co to jest prąd nasycenia (I_S) w diodzie?",
+          answers: [
+            "maksymalny prąd przewodzenia diody",
+            "minimalny prąd wsteczny płynący przy polaryzacji zaporowej",
+            "prąd przy którym dioda się przegrzewa",
+            "prąd znamionowy producenta"
+          ],
+          correct: 1,
+          explanation: "Prąd nasycenia I_S to bardzo mały prąd (rzędu nA-pA) płynący przez diodę przy polaryzacji zaporowej. Jest spowodowany nośnikami mniejszościowymi.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=11"
+        },
+        {
+          category: "dioda",
+          question: "Jakie są główne parametry diody?",
+          answers: [
+            "indukcyjność, pojemność, rezystancja",
+            "max napięcie wsteczne, max prąd, napięcie przewodzenia",
+            "wzmocnienie, pasmo, impedancja",
+            "częstotliwość, faza, amplituda"
+          ],
+          correct: 1,
+          explanation: "Główne parametry diody to: maksymalne napięcie wsteczne (U_Rmax), maksymalny prąd przewodzenia (I_Fmax), napięcie przewodzenia (U_F), maksymalna moc strat.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=13"
+        },
+        {
+          category: "dioda",
+          question: "Która elektroda diody to anoda?",
+          answers: [
+            "elektroda po stronie półprzewodnika typu n",
+            "elektroda po stronie półprzewodnika typu p",
+            "elektroda środkowa diody",
+            "elektroda podłączona do masy"
+          ],
+          correct: 1,
+          explanation: "Anoda to elektroda po stronie półprzewodnika typu p (oznaczana +). Katoda jest po stronie typu n (oznaczana -).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=11"
+        },
+        {
+          category: "dioda",
+          question: "Jak wygląda charakterystyka prądowo-napięciowa diody?",
+          answers: [
+            "linia prosta przechodząca przez początek układu",
+            "krzywa wykładnicza w kierunku przewodzenia, prawie płaska wstecznie",
+            "okrąg na płaszczyźnie I-U",
+            "sinusoida symetryczna względem osi"
+          ],
+          correct: 1,
+          explanation: "Charakterystyka diody jest nieliniowa: w kierunku przewodzenia prąd rośnie wykładniczo po przekroczeniu napięcia progowego, w kierunku zaporowym płynie tylko minimalny prąd wsteczny.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=13"
+        },
+        {
+          category: "dioda",
+          question: "Jakie są rodzaje diód według zastosowania?",
+          answers: [
+            "małe, średnie i duże",
+            "prostownicze, stabilizacyjne, impulsowe, elektroluminescencyjne",
+            "czerwone, zielone, niebieskie",
+            "jednokierunkowe i dwukierunkowe"
+          ],
+          correct: 1,
+          explanation: "Rodzaje diód według zastosowania: prostownicze (do prostowania AC), stabilizacyjne (Zenera), impulsowe (szybkie przełączanie), elektroluminescencyjne (LED - świecące).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=11"
+        },
+        {
+          category: "dioda",
+          question: "Co oznacza symbol U_F na charakterystyce diody?",
+          answers: [
+            "maksymalne napięcie wsteczne",
+            "napięcie przewodzenia (Forward voltage)",
+            "napięcie przebicia",
+            "napięcie zasilania układu"
+          ],
+          correct: 1,
+          explanation: "U_F (Forward voltage) to napięcie przewodzenia - napięcie na diodzie przy określonym prądzie przewodzenia. Dla diody krzemowej wynosi ok. 0,6-0,7 V.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=13"
+        },
+        {
+          category: "dioda",
+          question: "Jakiego rzędu jest napięcie przewodzenia typowej diody krzemowej?",
+          answers: [
+            "około 0,1 V",
+            "około 0,6-0,7 V",
+            "około 5 V",
+            "około 12 V"
+          ],
+          correct: 1,
+          explanation: "Typowa dioda krzemowa ma napięcie przewodzenia około 0,6-0,7 V. Diody germanowe mają niższe (ok. 0,3 V), a LED wyższe (1,5-3,5 V zależnie od koloru).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=13"
+        },
+
+        // ==================== 11. TRANZYSTORY (BJT, JFET, MOSFET) ====================
+        // --- TRANZYSTOR BIPOLARNY (BJT) ---
+        {
+          category: "tranzystory",
+          question: "Jakie są trzy końcówki tranzystora bipolarnego?",
+          answers: [
+            "dren, źródło, bramka",
+            "baza, kolektor, emiter",
+            "anoda, katoda, bramka",
+            "wejście, wyjście, masa"
+          ],
+          correct: 1,
+          explanation: "Tranzystor bipolarny ma trzy końcówki: B - baza (sterująca), C - kolektor (zbierający nośniki), E - emiter (emitujący nośniki).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=15"
+        },
+        {
+          category: "tranzystory",
+          question: "Jakie są dwa typy tranzystorów bipolarnych?",
+          answers: [
+            "JFET i MOSFET",
+            "NPN i PNP",
+            "z kanałem n i z kanałem p",
+            "normalnie włączony i normalnie wyłączony"
+          ],
+          correct: 1,
+          explanation: "Tranzystory bipolarne dzielą się na NPN (kolektor i emiter typu n, baza typu p) oraz PNP (kolektor i emiter typu p, baza typu n).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=16"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest wzmocnienie prądowe β (beta) tranzystora?",
+          answers: [
+            "stosunek napięcia kolektora do napięcia bazy",
+            "stosunek prądu kolektora do prądu bazy (I_C/I_B)",
+            "stosunek prądu emitera do prądu kolektora",
+            "stosunek mocy wyjściowej do wejściowej"
+          ],
+          correct: 1,
+          explanation: "Wzmocnienie prądowe β = I_C/I_B określa ile razy prąd kolektora jest większy od prądu bazy. Typowe wartości β wynoszą od kilkudziesięciu do kilkuset.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=15"
+        },
+        {
+          category: "tranzystory",
+          question: "Jaka jest zależność między prądami w tranzystorze bipolarnym?",
+          answers: [
+            "I_E = I_C - I_B",
+            "I_E = I_B + I_C",
+            "I_C = I_E + I_B",
+            "I_B = I_C + I_E"
+          ],
+          correct: 1,
+          explanation: "W tranzystorze bipolarnym prąd emitera jest sumą prądu bazy i kolektora: I_E = I_B + I_C. Wynika to z I prawa Kirchhoffa.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=15"
+        },
+        {
+          category: "tranzystory",
+          question: "Jak oblicza się prąd kolektora znając β i I_B?",
+          answers: [
+            "I_C = β / I_B",
+            "I_C = β + I_B",
+            "I_C = β × I_B",
+            "I_C = I_B / β"
+          ],
+          correct: 2,
+          explanation: "Prąd kolektora obliczamy ze wzoru I_C = β × I_B. Mała zmiana prądu bazy powoduje dużą zmianę prądu kolektora (wzmocnienie).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=15"
+        },
+        {
+          category: "tranzystory",
+          question: "Jak musi być spolaryzowane złącze baza-emiter w stanie aktywnym?",
+          answers: [
+            "w kierunku zaporowym",
+            "w kierunku przewodzenia",
+            "bez polaryzacji (0 V)",
+            "zależy od typu tranzystora"
+          ],
+          correct: 1,
+          explanation: "W stanie aktywnym złącze baza-emiter musi być spolaryzowane w kierunku przewodzenia (dla NPN: U_BE > 0), a złącze baza-kolektor w kierunku zaporowym.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=16"
+        },
+        {
+          category: "tranzystory",
+          question: "Jak musi być spolaryzowane złącze baza-kolektor w stanie aktywnym?",
+          answers: [
+            "w kierunku przewodzenia",
+            "w kierunku zaporowym",
+            "bez polaryzacji (0 V)",
+            "dowolnie"
+          ],
+          correct: 1,
+          explanation: "W stanie aktywnym złącze baza-kolektor musi być spolaryzowane w kierunku zaporowym (dla NPN: U_CB > 0), co pozwala kolektorowi zbierać nośniki z bazy.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=17"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest stan nasycenia tranzystora?",
+          answers: [
+            "stan gdy prąd bazy wynosi zero",
+            "stan gdy prąd kolektora jest ograniczony przez obwód zewnętrzny",
+            "stan gdy tranzystor jest uszkodzony",
+            "stan pracy przy bardzo wysokich częstotliwościach"
+          ],
+          correct: 1,
+          explanation: "Stan nasycenia występuje gdy prąd bazy jest na tyle duży, że obwód kolektora nie jest w stanie dostarczyć prądu β razy większego. Tranzystor działa jak zamknięty wyłącznik.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=20"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest stan zatkania (odcięcia) tranzystora?",
+          answers: [
+            "stan gdy prąd kolektora jest maksymalny",
+            "stan gdy złącze B-E nie przewodzi (I_B ≈ 0, I_C ≈ 0)",
+            "stan pracy liniowej tranzystora",
+            "stan przegrzania tranzystora"
+          ],
+          correct: 1,
+          explanation: "Stan zatkania (odcięcia) występuje gdy złącze baza-emiter nie jest spolaryzowane lub jest spolaryzowane zaporowo. Prądy I_B i I_C są praktycznie zerowe.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=20"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest stan aktywny tranzystora?",
+          answers: [
+            "stan gdy oba złącza są spolaryzowane zaporowo",
+            "stan gdy prąd kolektora jest β razy większy od prądu bazy",
+            "stan gdy tranzystor nie działa",
+            "stan zwarcia między kolektorem a emiterem"
+          ],
+          correct: 1,
+          explanation: "Stan aktywny (normalny) to stan pracy wzmacniającej, w którym prąd kolektora jest β razy większy od prądu bazy. Złącze B-E przewodzi, B-C jest zaporowe.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=20"
+        },
+        {
+          category: "tranzystory",
+          question: "Czy tranzystor bipolarny jest sterowany prądowo czy napięciowo?",
+          answers: [
+            "napięciowo - sterowany napięciem bramki",
+            "prądowo - sterowany prądem bazy",
+            "oboma sposób równocześnie",
+            "nie wymaga sterowania"
+          ],
+          correct: 1,
+          explanation: "Tranzystor bipolarny jest elementem sterowanym prądowo - prąd bazy steruje prądem kolektora. W przeciwieństwie do tranzystorów polowych, które są sterowane napięciowo.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=37"
+        },
+        {
+          category: "tranzystory",
+          question: "Czy tranzystor bipolarny jest elementem normalnie włączonym czy wyłączonym?",
+          answers: [
+            "normalnie włączony - przewodzi bez polaryzacji",
+            "normalnie wyłączony - nie przewodzi bez prądu bazy",
+            "zależy od temperatury otoczenia",
+            "zależy od napięcia zasilania"
+          ],
+          correct: 1,
+          explanation: "Tranzystor bipolarny jest elementem normalnie wyłączonym - w przypadku braku prądu bazy nie płynie prąd kolektora (stan zatkania).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=37"
+        },
+        // --- TRANZYSTOR JFET ---
+        {
+          category: "tranzystory",
+          question: "Jakie są trzy końcówki tranzystora JFET?",
+          answers: [
+            "baza, kolektor, emiter",
+            "dren, bramka, źródło (D, G, S)",
+            "anoda, katoda, bramka",
+            "wejście, wyjście, masa"
+          ],
+          correct: 1,
+          explanation: "Tranzystor JFET ma trzy końcówki: D - dren (Drain), G - bramka (Gate), S - źródło (Source). Odpowiadają one kolektorowi, bazie i emiterowi w BJT.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=26"
+        },
+        {
+          category: "tranzystory",
+          question: "Co oznacza skrót JFET?",
+          answers: [
+            "Junction Field Effect Transistor",
+            "Joint Field Electric Transistor",
+            "Japanese Field Effect Technology",
+            "Junction Fast Electron Transfer"
+          ],
+          correct: 0,
+          explanation: "JFET to Junction Field Effect Transistor - tranzystor polowy złączowy. Sterowanie odbywa się przez zmianę szerokości warstwy zubożonej złącza p-n.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=26"
+        },
+        {
+          category: "tranzystory",
+          question: "Czy tranzystor JFET jest sterowany prądowo czy napięciowo?",
+          answers: [
+            "prądowo - sterowany prądem bramki",
+            "napięciowo - sterowany napięciem bramka-źródło",
+            "oboma sposobami równocześnie",
+            "nie wymaga sterowania"
+          ],
+          correct: 1,
+          explanation: "Tranzystor JFET jest elementem sterowanym napięciowo - napięcie bramka-źródło (V_GS) steruje przepływem prądu drenu. Prąd bramki jest praktycznie zerowy.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=37"
+        },
+        {
+          category: "tranzystory",
+          question: "Czy tranzystor JFET jest elementem normalnie włączonym czy wyłączonym?",
+          answers: [
+            "normalnie wyłączony - nie przewodzi bez polaryzacji",
+            "normalnie włączony - przewodzi przy V_GS = 0",
+            "zależy od temperatury",
+            "zależy od rodzaju kanału"
+          ],
+          correct: 1,
+          explanation: "Tranzystor JFET jest elementem normalnie włączonym - przy braku napięcia sterującego (V_GS = 0) przez kanał płynie maksymalny prąd (I_DSS).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=37"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest napięcie odcięcia (V_P lub U_GS(off)) w JFET?",
+          answers: [
+            "napięcie przy którym płynie maksymalny prąd",
+            "napięcie V_GS przy którym kanał zostaje zamknięty (I_D ≈ 0)",
+            "maksymalne dopuszczalne napięcie zasilania",
+            "napięcie przebicia złącza bramki"
+          ],
+          correct: 1,
+          explanation: "Napięcie odcięcia V_P (pinch-off) to napięcie V_GS, przy którym kanał przewodzący zostaje całkowicie zamknięty i prąd drenu spada praktycznie do zera.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=33"
+        },
+        {
+          category: "tranzystory",
+          question: "Jaka jest typowa polaryzacja robocza JFET z kanałem n?",
+          answers: [
+            "V_GS > 0, V_DS < 0",
+            "V_GS < 0, V_DS > 0",
+            "V_GS = 0, V_DS = 0",
+            "V_GS > 0, V_DS > 0"
+          ],
+          correct: 1,
+          explanation: "Dla JFET z kanałem n typowa polaryzacja to: V_GS < 0 (ujemne napięcie bramki zawęża kanał) i V_DS > 0 (dodatnie napięcie dren-źródło).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=27"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest prąd I_DSS w tranzystorze JFET?",
+          answers: [
+            "prąd drenu przy zamkniętym kanale",
+            "maksymalny prąd drenu przy V_GS = 0",
+            "prąd upływu bramki",
+            "prąd zwarciowy układu"
+          ],
+          correct: 1,
+          explanation: "I_DSS to maksymalny prąd drenu płynący gdy napięcie bramka-źródło wynosi zero (V_GS = 0). Jest to parametr katalogowy JFET.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=35"
+        },
+        {
+          category: "tranzystory",
+          question: "Jak zmienia się prąd drenu JFET (kanał n) gdy V_GS staje się bardziej ujemne?",
+          answers: [
+            "prąd drenu rośnie",
+            "prąd drenu maleje",
+            "prąd drenu nie zmienia się",
+            "prąd drenu zmienia kierunek"
+          ],
+          correct: 1,
+          explanation: "W JFET z kanałem n bardziej ujemne V_GS powoduje poszerzenie warstwy zubożonej, zawężenie kanału i zmniejszenie prądu drenu.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=34"
+        },
+        // --- TRANZYSTOR MOSFET ---
+        {
+          category: "tranzystory",
+          question: "Co oznacza skrót MOSFET?",
+          answers: [
+            "Metal Oxide Silicon Field Effect Transistor",
+            "Metal-Oxide-Semiconductor Field-Effect Transistor",
+            "Magnetic Oscillating Signal Field Effect Transistor",
+            "Multi-Output Semiconductor Field Effect Technology"
+          ],
+          correct: 1,
+          explanation: "MOSFET to Metal-Oxide-Semiconductor Field-Effect Transistor - tranzystor polowy z izolowana bramką. Bramka jest odizolowana od kanału warstwą tlenku (SiO₂).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=39"
+        },
+        {
+          category: "tranzystory",
+          question: "Czym różni się MOSFET od JFET pod względem budowy bramki?",
+          answers: [
+            "MOSFET nie ma bramki",
+            "w MOSFET bramka jest odizolowana tlenkiem od kanału",
+            "w JFET bramka jest odizolowana tlenkiem",
+            "nie ma różnicy w budowie bramki"
+          ],
+          correct: 1,
+          explanation: "W MOSFET bramka jest odizolowana od kanału cienką warstwą tlenku (SiO₂), co daje bardzo dużą impedancję wejściową. W JFET bramka tworzy złącze p-n z kanałem.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=40"
+        },
+        {
+          category: "tranzystory",
+          question: "Jakie są dwa podstawowe typy MOSFET ze względu na sposób pracy?",
+          answers: [
+            "NPN i PNP",
+            "z kanałem wbudowanym (zubożanym) i indukowanym (wzbogacanym)",
+            "małej i dużej mocy",
+            "szybki i wolny"
+          ],
+          correct: 1,
+          explanation: "MOSFET dzielimy na: z kanałem wbudowanym (zubożanym) - normalnie włączony, oraz z kanałem indukowanym (wzbogacanym) - normalnie wyłączony.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=41"
+        },
+        {
+          category: "tranzystory",
+          question: "Czy MOSFET z kanałem wzbogacanym jest normalnie włączony czy wyłączony?",
+          answers: [
+            "normalnie włączony - przewodzi przy V_GS = 0",
+            "normalnie wyłączony - nie przewodzi przy V_GS = 0",
+            "zależy od napięcia V_DS",
+            "zawsze przewodzi niezależnie od polaryzacji"
+          ],
+          correct: 1,
+          explanation: "MOSFET z kanałem wzbogacanym (indukowanym) jest normalnie wyłączony - kanał nie istnieje przy V_GS = 0 i trzeba przyłożyć napięcie progowe, aby go utworzyć.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=42"
+        },
+        {
+          category: "tranzystory",
+          question: "Czy MOSFET z kanałem zubożanym jest normalnie włączony czy wyłączony?",
+          answers: [
+            "normalnie wyłączony - nie przewodzi przy V_GS = 0",
+            "normalnie włączony - przewodzi przy V_GS = 0",
+            "zależy od temperatury",
+            "nigdy nie przewodzi"
+          ],
+          correct: 1,
+          explanation: "MOSFET z kanałem zubożanym (wbudowanym) jest normalnie włączony - kanał istnieje przy V_GS = 0 i przewodzi prąd. Podobnie jak JFET.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=41"
+        },
+        {
+          category: "tranzystory",
+          question: "Co to jest napięcie progowe U_T w MOSFET z kanałem wzbogacanym?",
+          answers: [
+            "maksymalne dopuszczalne napięcie bramki",
+            "napięcie V_GS przy którym kanał zaczyna się tworzyć",
+            "napięcie przebicia tranzystora",
+            "napięcie zasilania układu"
+          ],
+          correct: 1,
+          explanation: "Napięcie progowe U_T (threshold voltage) to minimalne napięcie V_GS potrzebne do utworzenia kanału przewodzącego w MOSFET z kanałem wzbogacanym.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=44"
+        },
+        {
+          category: "tranzystory",
+          question: "Jakie są zakresy pracy tranzystora MOSFET?",
+          answers: [
+            "aktywny, nasycenia, zatkania",
+            "liniowy (triodowy) i nasycenia (pentodowy)",
+            "przewodzenia i zaporowy",
+            "małosygnałowy i wielkosygnałowy"
+          ],
+          correct: 1,
+          explanation: "MOSFET pracuje w dwóch głównych zakresach: liniowym (triodowym) - gdzie działa jak rezystor sterowany, i nasycenia (pentodowym) - gdzie prąd jest prawie stały.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=45"
+        },
+        {
+          category: "tranzystory",
+          question: "Jakie końcówki ma tranzystor MOSFET?",
+          answers: [
+            "baza, kolektor, emiter",
+            "dren, bramka, źródło (oraz często podłoże)",
+            "anoda, katoda, bramka",
+            "wejście, wyjście, zasilanie"
+          ],
+          correct: 1,
+          explanation: "MOSFET ma końcówki: D - dren, G - bramka, S - źródło, oraz często B - podłoże (Body/Bulk). W wielu układach podłoże jest połączone ze źródłem.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=40"
+        },
+        {
+          category: "tranzystory",
+          question: "Który tranzystor ma najwyższą impedancję wejściową?",
+          answers: [
+            "tranzystor bipolarny NPN",
+            "tranzystor JFET",
+            "tranzystor MOSFET",
+            "wszystkie mają taką samą"
+          ],
+          correct: 2,
+          explanation: "MOSFET ma najwyższą impedancję wejściową (10^12 - 10^15 Ω) dzięki izolacji bramki tlenkiem. JFET ma też wysoką (10^9 Ω), a BJT najniższą.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=40"
+        },
+
+        // ==================== 12. PUNKT PRACY I UKŁADY PRACY ====================
+        {
+          category: "punktpracy",
+          question: "Co to jest punkt pracy tranzystora?",
+          answers: [
+            "miejsce fizycznego montażu tranzystora",
+            "stałe wartości prądów i napięć przy braku sygnału wejściowego",
+            "maksymalna moc jaką może wydzielić tranzystor",
+            "częstotliwość graniczna pracy tranzystora"
+          ],
+          correct: 1,
+          explanation: "Punkt pracy to zestaw stałych wartości prądów (I_C, I_B) i napięć (U_CE, U_BE) określających stan tranzystora przy braku sygnału zmiennego (AC).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=21"
+        },
+        {
+          category: "punktpracy",
+          question: "Gdzie znajduje się optymalny punkt pracy tranzystora we wzmacniaczu?",
+          answers: [
+            "przy maksymalnym prądzie kolektora",
+            "przy napięciu U_CE równym połowie napięcia zasilania",
+            "przy zerowym prądzie kolektora",
+            "przy maksymalnym napięciu U_CE"
+          ],
+          correct: 1,
+          explanation: "Optymalny punkt pracy we wzmacniaczu jest wyznaczony przez taki prąd kolektora, przy którym na kolektorze panuje napięcie równe połowie napięcia zasilania (U_CE = U_CC/2).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=21"
+        },
+        {
+          category: "punktpracy",
+          question: "Co to jest prosta obciążenia?",
+          answers: [
+            "charakterystyka rezystora obciążającego",
+            "linia na charakterystyce wyjściowej wyznaczona przez obwód zewnętrzny",
+            "maksymalna moc tranzystora",
+            "zależność wzmocnienia od częstotliwości"
+          ],
+          correct: 1,
+          explanation: "Prosta obciążenia to linia na charakterystyce wyjściowej tranzystora, wyznaczona równaniem obwodu: U_CC = I_C × R_C + U_CE. Punkt pracy leży na przecięciu tej prostej z charakterystyką.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=22"
+        },
+        {
+          category: "punktpracy",
+          question: "Jaki jest wzór na prostą obciążenia?",
+          answers: [
+            "I_C = U_CC × R_C",
+            "I_C = U_CC/R_C - U_CE/R_C",
+            "I_C = β × I_B",
+            "U_CE = U_CC + I_C × R_C"
+          ],
+          correct: 1,
+          explanation: "Prosta obciążenia: I_C = U_CC/R_C - U_CE/R_C, czyli I_C = (U_CC - U_CE)/R_C. Wynika z równania: U_CC = U_RC + U_CE = I_C×R_C + U_CE.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=22"
+        },
+        {
+          category: "punktpracy",
+          question: "Jaka jest wartość I_C gdy U_CE = 0 na prostej obciążenia?",
+          answers: [
+            "I_C = 0",
+            "I_C = U_CC / R_C",
+            "I_C = β × I_B",
+            "I_C = nieskończoność"
+          ],
+          correct: 1,
+          explanation: "Gdy U_CE = 0, z równania prostej obciążenia: I_C = U_CC/R_C. Jest to maksymalny teoretyczny prąd kolektora (punkt na osi Y).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=23"
+        },
+        {
+          category: "punktpracy",
+          question: "Jaka jest wartość U_CE gdy I_C = 0 na prostej obciążenia?",
+          answers: [
+            "U_CE = 0",
+            "U_CE = U_CC",
+            "U_CE = U_CC / 2",
+            "U_CE = nieskończoność"
+          ],
+          correct: 1,
+          explanation: "Gdy I_C = 0, z równania prostej obciążenia: U_CE = U_CC. Jest to stan zatkania tranzystora (punkt na osi X).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=23"
+        },
+        {
+          category: "punktpracy",
+          question: "Co wyznacza punkt pracy na charakterystyce wyjściowej?",
+          answers: [
+            "tylko wartość wzmocnienia β",
+            "przecięcie prostej obciążenia z charakterystyką dla danego I_B",
+            "maksymalną częstotliwość pracy",
+            "temperaturę pracy tranzystora"
+          ],
+          correct: 1,
+          explanation: "Punkt pracy jest wyznaczony przez przecięcie prostej obciążenia z charakterystyką wyjściową dla danej wartości prądu bazy I_B0.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=23"
+        },
+        {
+          category: "punktpracy",
+          question: "Jakie są trzy podstawowe układy pracy tranzystora bipolarnego?",
+          answers: [
+            "OA, OB, OC",
+            "OB (wspólna baza), OE (wspólny emiter), OC (wspólny kolektor)",
+            "szeregowy, równoległy, mieszany",
+            "aktywny, nasycenia, zatkania"
+          ],
+          correct: 1,
+          explanation: "Trzy podstawowe układy pracy to: OB - ze wspólną bazą, OE - ze wspólnym emiterem, OC - ze wspólnym kolektorem. Różnią się parametrami wzmocnienia i impedancji.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+        {
+          category: "punktpracy",
+          question: "Który układ pracy ma największe wzmocnienie mocy?",
+          answers: [
+            "OB - ze wspólną bazą",
+            "OE - ze wspólnym emiterem",
+            "OC - ze wspólnym kolektorem",
+            "wszystkie mają takie samo"
+          ],
+          correct: 1,
+          explanation: "Układ OE (wspólny emiter) ma największe wzmocnienie mocy (kilka do kilkudziesięciu tysięcy). Ma też duże wzmocnienie prądowe i napięciowe.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+        {
+          category: "punktpracy",
+          question: "Jaka jest cecha układu OE dotycząca fazy sygnału?",
+          answers: [
+            "sygnał wyjściowy jest w fazie z wejściowym",
+            "sygnał wyjściowy jest odwrócony o 180° względem wejściowego",
+            "faza zależy od częstotliwości",
+            "brak związku fazowego"
+          ],
+          correct: 1,
+          explanation: "W układzie OE (wspólny emiter) sygnał wyjściowy jest odwrócony w fazie o 180° względem sygnału wejściowego (inwersja fazy).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+        {
+          category: "punktpracy",
+          question: "Który układ pracy ma najwyższą rezystancję wejściową?",
+          answers: [
+            "OB - ze wspólną bazą (kilkadziesiąt omów)",
+            "OE - ze wspólnym emiterem (kilkaset omów)",
+            "OC - ze wspólnym kolektorem (kilkaset kiloomów)",
+            "wszystkie mają taką samą"
+          ],
+          correct: 2,
+          explanation: "Układ OC (wspólny kolektor, wtórnik emiterowy) ma najwyższą rezystancję wejściową (kilkaset kiloomów), ale najniższe wzmocnienie napięciowe (około 1).",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+        {
+          category: "punktpracy",
+          question: "Który układ pracy ma najniższą rezystancję wejściową?",
+          answers: [
+            "OB - ze wspólną bazą (kilkadziesiąt omów)",
+            "OE - ze wspólnym emiterem (kilkaset omów)",
+            "OC - ze wspólnym kolektorem (kilkaset kiloomów)",
+            "wszystkie mają taką samą"
+          ],
+          correct: 0,
+          explanation: "Układ OB (wspólna baza) ma najniższą rezystancję wejściową (kilkadziesiąt omów), ale najwyższą rezystancję wyjściową i najlepsze właściwości częstotliwościowe.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+        {
+          category: "punktpracy",
+          question: "Jaka jest faza sygnału w układzie OB i OC?",
+          answers: [
+            "oba odwracają fazę o 180°",
+            "oba zachowują fazę (sygnał w fazie)",
+            "OB odwraca, OC nie",
+            "OC odwraca, OB nie"
+          ],
+          correct: 1,
+          explanation: "W układach OB (wspólna baza) i OC (wspólny kolektor) sygnał wyjściowy jest w fazie z sygnałem wejściowym (brak inwersji). Tylko OE odwraca fazę.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+        {
+          category: "punktpracy",
+          question: "Co wpływa na wybór punktu pracy?",
+          answers: [
+            "tylko wartość wzmocnienia β",
+            "wzmocnienie, moc, zniekształcenia, szumy, impedancje",
+            "tylko częstotliwość pracy",
+            "tylko napięcie zasilania"
+          ],
+          correct: 1,
+          explanation: "Wybór punktu pracy wpływa na: wielkość wzmocnienia, moc wydzielaną w tranzystorze, zniekształcenia nieliniowe, poziom szumów, impedancje wejściową i wyjściową, pasmo pracy.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=21"
+        },
+        {
+          category: "punktpracy",
+          question: "Co to jest hiperbola mocy na charakterystyce wyjściowej?",
+          answers: [
+            "linia stałego prądu kolektora",
+            "krzywa P_MAX = I_C × U_CE określająca maksymalną moc",
+            "prosta obciążenia dla rezystora",
+            "charakterystyka wejściowa tranzystora"
+          ],
+          correct: 1,
+          explanation: "Hiperbola mocy to krzywa P_MAX = I_C × U_CE = const, która określa maksymalną dopuszczalną moc wydzielaną w tranzystorze. Punkt pracy musi leżeć poniżej tej krzywej.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=21"
+        },
+        {
+          category: "punktpracy",
+          question: "Jakie wzmocnienie prądowe ma układ OB?",
+          answers: [
+            "kilka do kilkuset (jak OE)",
+            "nieco mniejsze od jedności (α < 1)",
+            "dokładnie równe 1",
+            "nieco mniejsze od jedności"
+          ],
+          correct: 1,
+          explanation: "Układ OB ma wzmocnienie prądowe α nieco mniejsze od jedności (typowo 0,95-0,99), bo I_C < I_E. Jednak ma duże wzmocnienie napięciowe.",
+          sourceLink: "PodstawyElektroniki_W3.pdf#page=24"
+        },
+
+        // ==================== 13-15. WZMACNIACZ OPERACYJNY ====================
+        // --- ZAGADNIENIE 13: WZMOCNIENIE, PASMO 3dB, SYGNAŁ WYJŚCIOWY ---
+        {
+          category: "wzmacniacz",
+          question: "Jaki jest wzór na wzmocnienie napięciowe wzmacniacza?",
+          answers: [
+            "ku = Uin / Uout",
+            "ku = Uout / Uin",
+            "ku = Uout × Uin",
+            "ku = Uout + Uin"
+          ],
+          correct: 1,
+          explanation: "Wzmocnienie napięciowe ku = Uout/Uin, czyli stosunek napięcia wyjściowego do wejściowego. Może być wyrażone jako liczba lub w decybelach.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=21"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jak wyraża się wzmocnienie w decybelach [dB]?",
+          answers: [
+            "ku[dB] = 10 × log₁₀(Uout/Uin)",
+            "ku[dB] = 20 × log₁₀(Uout/Uin)",
+            "ku[dB] = ln(Uout/Uin)",
+            "ku[dB] = Uout/Uin × 100"
+          ],
+          correct: 1,
+          explanation: "Wzmocnienie w decybelach: ku[dB] = 20 × log₁₀(Uout/Uin). Współczynnik 20 wynika z faktu, że moc jest proporcjonalna do kwadratu napięcia.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=21"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co oznacza punkt -3dB na charakterystyce częstotliwościowej?",
+          answers: [
+            "wzmocnienie spada do zera",
+            "wzmocnienie spada do około 70,7% wartości maksymalnej",
+            "wzmocnienie wzrasta dwukrotnie",
+            "wzmocnienie osiąga wartość maksymalną"
+          ],
+          correct: 1,
+          explanation: "Punkt -3dB oznacza spadek wzmocnienia do 1/√2 ≈ 0,707 (70,7%) wartości maksymalnej. Odpowiada to spadkowi mocy do 50%.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=23"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co to jest pasmo przenoszenia (pasmo 3dB) wzmacniacza?",
+          answers: [
+            "maksymalna częstotliwość sygnału wejściowego",
+            "zakres częstotliwości gdzie wzmocnienie nie spada więcej niż 3dB od maksimum",
+            "częstotliwość przy której wzmocnienie wynosi zero",
+            "różnica między maksymalnym a minimalnym wzmocnieniem"
+          ],
+          correct: 1,
+          explanation: "Pasmo przenoszenia to zakres częstotliwości od fL do fH, w którym wzmocnienie nie spada więcej niż 3dB od wartości maksymalnej (kumax).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=24"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Dlaczego punkt -3dB odpowiada spadkowi mocy o połowę?",
+          answers: [
+            "bo moc jest proporcjonalna do napięcia",
+            "bo P ∝ U², więc gdy U spada do 1/√2, P spada do 1/2",
+            "bo tak zdefiniowano jednostkę decybel",
+            "bo impedancja wyjściowa maleje o połowę"
+          ],
+          correct: 1,
+          explanation: "Moc jest proporcjonalna do kwadratu napięcia (P ∝ U²). Gdy napięcie spada do 1/√2 ≈ 0,707, moc spada do (1/√2)² = 1/2 = 50%.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=23"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaki jest wzór na napięcie wyjściowe wzmacniacza operacyjnego?",
+          answers: [
+            "Uout = kd × (Uin+ + Uin-)",
+            "Uout = kd × (Uin+ - Uin-)",
+            "Uout = kd × Uin+ / Uin-",
+            "Uout = kd / (Uin+ - Uin-)"
+          ],
+          correct: 1,
+          explanation: "Napięcie wyjściowe Uout = kd × (Uin+ - Uin-) = kd × Ud, gdzie kd to wzmocnienie różnicowe, a Ud to napięcie różnicowe między wejściami.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=25"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co to jest sygnał różnicowy we wzmacniaczu operacyjnym?",
+          answers: [
+            "suma sygnałów na obu wejściach",
+            "różnica sygnałów między wejściem nieodwracającym a odwracającym",
+            "sygnał na wyjściu wzmacniacza",
+            "sygnał sprzężenia zwrotnego"
+          ],
+          correct: 1,
+          explanation: "Sygnał różnicowy Ud = Uin+ - Uin- to różnica napięć między wejściem nieodwracającym (+) a odwracającym (-). Wzmacniacz wzmacnia właśnie ten sygnał.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=25"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co to jest sygnał sumacyjny (wspólny) we wzmacniaczu operacyjnym?",
+          answers: [
+            "różnica napięć między wejściami",
+            "średnia arytmetyczna napięć na obu wejściach",
+            "napięcie na wyjściu wzmacniacza",
+            "napięcie zasilania wzmacniacza"
+          ],
+          correct: 1,
+          explanation: "Sygnał sumacyjny (wspólny) Ucm = (Uin+ + Uin-)/2 to średnia napięć na obu wejściach. Idealny wzmacniacz operacyjny ma zerowe wzmocnienie dla tego sygnału.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jak reaguje idealny wzmacniacz operacyjny na sygnał sumacyjny?",
+          answers: [
+            "wzmacnia go tak samo jak różnicowy",
+            "wzmacnia go z większym wzmocnieniem niż różnicowy",
+            "nie wzmacnia go wcale (wzmocnienie = 0)",
+            "odwraca jego fazę o 180°"
+          ],
+          correct: 2,
+          explanation: "Idealny wzmacniacz operacyjny ma zerowe wzmocnienie sumacyjne (common-mode gain = 0). Reaguje tylko na różnicę napięć między wejściami.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co oznacza fL w charakterystyce częstotliwościowej?",
+          answers: [
+            "częstotliwość maksymalnego wzmocnienia",
+            "dolna częstotliwość graniczna pasma przenoszenia",
+            "górna częstotliwość graniczna pasma",
+            "częstotliwość rezonansowa"
+          ],
+          correct: 1,
+          explanation: "fL (frequency Low) to dolna częstotliwość graniczna pasma przenoszenia, przy której wzmocnienie spada o 3dB względem wartości maksymalnej.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=24"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co oznacza fH w charakterystyce częstotliwościowej?",
+          answers: [
+            "dolna częstotliwość graniczna",
+            "częstotliwość rezonansowa układu",
+            "górna częstotliwość graniczna pasma przenoszenia",
+            "częstotliwość jednostkowego wzmocnienia"
+          ],
+          correct: 2,
+          explanation: "fH (frequency High) to górna częstotliwość graniczna pasma przenoszenia, przy której wzmocnienie spada o 3dB względem wartości maksymalnej.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=24"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Ile wynosi stosunek V/V₀ w punkcie -3dB?",
+          answers: [
+            "0,5 (50%)",
+            "1/√2 ≈ 0,707 (70,7%)",
+            "1,0 (100%)",
+            "√2 ≈ 1,414 (141,4%)"
+          ],
+          correct: 1,
+          explanation: "W punkcie -3dB stosunek napięć V/V₀ = 1/√2 ≈ 0,707 (70,7%). Odpowiada to spadkowi mocy do 50%.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=23"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest zależność między mocą a napięciem we wzmacniaczu?",
+          answers: [
+            "P jest proporcjonalne do U",
+            "P jest proporcjonalne do U²",
+            "P jest proporcjonalne do √U",
+            "P jest odwrotnie proporcjonalne do U"
+          ],
+          correct: 1,
+          explanation: "Moc jest proporcjonalna do kwadratu napięcia: P = U²/R. Dlatego spadek napięcia do 1/√2 oznacza spadek mocy do 1/2.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=23"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Ile wynosi -3dB wyrażone jako stosunek mocy?",
+          answers: [
+            "P/P₀ = 0,25 (25%)",
+            "P/P₀ = 0,5 (50%)",
+            "P/P₀ = 0,707 (70,7%)",
+            "P/P₀ = 1,0 (100%)"
+          ],
+          correct: 1,
+          explanation: "-3dB odpowiada stosunkowi mocy P/P₀ = 0,5 (50%). Obliczenie: 10^(-3/10) ≈ 0,5.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=23"
+        },
+
+        // --- ZAGADNIENIE 14: WŁAŚCIWOŚCI IDEALNEGO WZMACNIACZA OPERACYJNEGO ---
+        {
+          category: "wzmacniacz",
+          question: "Jakie wzmocnienie różnicowe ma idealny wzmacniacz operacyjny?",
+          answers: [
+            "dokładnie 1 (jedność)",
+            "około 100 000",
+            "nieskończone (kd → ∞)",
+            "zero"
+          ],
+          correct: 2,
+          explanation: "Idealny wzmacniacz operacyjny ma nieskończone wzmocnienie różnicowe (kd → ∞). Rzeczywiste wzmacniacze mają wzmocnienie rzędu 10⁵-10⁶.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest impedancja wejściowa idealnego wzmacniacza operacyjnego?",
+          answers: [
+            "zerowa (Zin = 0)",
+            "około 1 MΩ",
+            "nieskończona (Zin → ∞)",
+            "równa impedancji wyjściowej"
+          ],
+          correct: 2,
+          explanation: "Idealny wzmacniacz operacyjny ma nieskończoną impedancję wejściową (Zin → ∞), co oznacza że nie pobiera prądu ze źródła sygnału.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest impedancja wyjściowa idealnego wzmacniacza operacyjnego?",
+          answers: [
+            "nieskończona (Zout → ∞)",
+            "zerowa (Zout → 0)",
+            "około 1 kΩ",
+            "równa impedancji wejściowej"
+          ],
+          correct: 1,
+          explanation: "Idealny wzmacniacz operacyjny ma zerową impedancję wyjściową (Zout → 0), dzięki czemu może dostarczać prąd do obciążenia bez spadku napięcia.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Ile wynoszą prądy wejściowe idealnego wzmacniacza operacyjnego?",
+          answers: [
+            "są równe prądowi wyjściowemu",
+            "wynoszą zero (Iin = 0)",
+            "wynoszą około 1 mA",
+            "zależą od napięcia zasilania"
+          ],
+          correct: 1,
+          explanation: "Idealny wzmacniacz operacyjny ma zerowe prądy wejściowe (Iin+ = Iin- = 0), co wynika z nieskończonej impedancji wejściowej.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest różnica napięć między wejściami idealnego wzmacniacza operacyjnego w układzie ze sprzężeniem zwrotnym?",
+          answers: [
+            "równa napięciu zasilania",
+            "praktycznie zero (Ud → 0)",
+            "równa napięciu wyjściowemu",
+            "nieskończona"
+          ],
+          correct: 1,
+          explanation: "W układzie ze sprzężeniem zwrotnym różnica napięć między wejściami jest praktycznie zerowa (Ud → 0), ponieważ kd → ∞ i Uout = kd × Ud.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jakie pasmo przenoszenia ma idealny wzmacniacz operacyjny?",
+          answers: [
+            "ograniczone do kilku kHz",
+            "ograniczone do 1 MHz",
+            "nieskończone (od 0 do ∞)",
+            "tylko dla sygnałów stałych DC"
+          ],
+          correct: 2,
+          explanation: "Idealny wzmacniacz operacyjny ma nieskończone pasmo przenoszenia - wzmacnia sygnały o dowolnej częstotliwości bez tłumienia.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jakie wzmocnienie sumacyjne ma idealny wzmacniacz operacyjny?",
+          answers: [
+            "takie samo jak różnicowe",
+            "połowę wzmocnienia różnicowego",
+            "zero",
+            "nieskończone"
+          ],
+          correct: 2,
+          explanation: "Idealny wzmacniacz operacyjny ma zerowe wzmocnienie sumacyjne (common-mode gain = 0). Wzmacnia tylko różnicę napięć między wejściami.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co to jest wirtualne zwarcie we wzmacniaczu operacyjnym?",
+          answers: [
+            "fizyczne połączenie wejść wzmacniacza",
+            "sytuacja gdy Uin+ ≈ Uin- przy nieskończonym wzmocnieniu",
+            "zwarcie na wyjściu wzmacniacza",
+            "uszkodzenie wzmacniacza"
+          ],
+          correct: 1,
+          explanation: "Wirtualne zwarcie oznacza, że napięcia na obu wejściach są praktycznie równe (Uin+ ≈ Uin-), mimo że nie są fizycznie połączone. Wynika to z nieskończonego wzmocnienia.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=27"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Które właściwości są cechami idealnego wzmacniacza operacyjnego?",
+          answers: [
+            "kd = 1, Zin = 0, Zout = ∞",
+            "kd → ∞, Zin → ∞, Zout → 0",
+            "kd = 100, Zin = 1MΩ, Zout = 100Ω",
+            "kd → 0, Zin → 0, Zout → ∞"
+          ],
+          correct: 1,
+          explanation: "Idealny wzmacniacz operacyjny: nieskończone wzmocnienie różnicowe (kd → ∞), nieskończona impedancja wejściowa (Zin → ∞), zerowa impedancja wyjściowa (Zout → 0).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co oznacza że Ud → 0 przy kd → ∞?",
+          answers: [
+            "wzmacniacz nie działa",
+            "napięcie wyjściowe wynosi zero",
+            "napięcia na wejściach są praktycznie równe",
+            "wzmacniacz jest w stanie nasycenia"
+          ],
+          correct: 2,
+          explanation: "Ponieważ Uout = kd × Ud, a Uout jest skończone, to przy kd → ∞ musi być Ud → 0, czyli napięcia na obu wejściach są praktycznie równe.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Dlaczego idealny wzmacniacz operacyjny nie pobiera prądu z wejść?",
+          answers: [
+            "bo ma zerową impedancję wejściową",
+            "bo ma nieskończoną impedancję wejściową",
+            "bo jest zasilany prądem stałym",
+            "bo ma ujemne sprzężenie zwrotne"
+          ],
+          correct: 1,
+          explanation: "Nieskończona impedancja wejściowa (Zin → ∞) oznacza, że wzmacniacz nie pobiera żadnego prądu ze źródła sygnału (I = U/Z = U/∞ = 0).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=26"
+        },
+
+        // --- ZAGADNIENIE 15: WZMACNIACZ ODWRACAJĄCY, NIEODWRACAJĄCY, WTÓRNIK ---
+        {
+          category: "wzmacniacz",
+          question: "Jaki jest wzór na wzmocnienie wzmacniacza odwracającego?",
+          answers: [
+            "ku = R2 / R1",
+            "ku = -R2 / R1",
+            "ku = 1 + R2 / R1",
+            "ku = R1 / R2"
+          ],
+          correct: 1,
+          explanation: "Wzmocnienie wzmacniacza odwracającego: ku = -R2/R1. Znak minus oznacza odwrócenie fazy sygnału o 180°.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaki jest wzór na wzmocnienie wzmacniacza nieodwracającego?",
+          answers: [
+            "ku = -R2 / R1",
+            "ku = R2 / R1",
+            "ku = 1 + R2 / R1",
+            "ku = 1 - R2 / R1"
+          ],
+          correct: 2,
+          explanation: "Wzmocnienie wzmacniacza nieodwracającego: ku = 1 + R2/R1. Sygnał wyjściowy jest w fazie z wejściowym (brak inwersji).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Gdzie podaje się sygnał wejściowy we wzmacniaczu odwracającym?",
+          answers: [
+            "na wejście nieodwracające (+)",
+            "na wejście odwracające (-) przez rezystor R1",
+            "bezpośrednio na wyjście",
+            "na oba wejścia jednocześnie"
+          ],
+          correct: 1,
+          explanation: "We wzmacniaczu odwracającym sygnał podawany jest na wejście odwracające (-) przez rezystor R1. Wejście nieodwracające (+) jest podłączone do masy.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Gdzie podaje się sygnał wejściowy we wzmacniaczu nieodwracającym?",
+          answers: [
+            "na wejście odwracające (-)",
+            "na wejście nieodwracające (+)",
+            "przez rezystor R2 na wyjście",
+            "na masę układu"
+          ],
+          correct: 1,
+          explanation: "We wzmacniaczu nieodwracającym sygnał podawany jest na wejście nieodwracające (+). Sprzężenie zwrotne jest podłączone do wejścia odwracającego (-).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co łączy rezystor R2 we wzmacniaczu odwracającym?",
+          answers: [
+            "wejście z masą",
+            "wyjście z wejściem odwracającym (-)",
+            "oba wejścia wzmacniacza",
+            "zasilanie z masą"
+          ],
+          correct: 1,
+          explanation: "Rezystor R2 (rezystor sprzężenia zwrotnego) łączy wyjście wzmacniacza z wejściem odwracającym (-), tworząc ujemne sprzężenie zwrotne.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest faza sygnału wyjściowego we wzmacniaczu odwracającym?",
+          answers: [
+            "taka sama jak wejściowego (0°)",
+            "odwrócona o 180° względem wejściowego",
+            "przesunięta o 90°",
+            "zależy od częstotliwości"
+          ],
+          correct: 1,
+          explanation: "We wzmacniaczu odwracającym sygnał wyjściowy jest odwrócony w fazie o 180° względem wejściowego. Stąd nazwa 'odwracający' i znak minus we wzorze.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest faza sygnału wyjściowego we wzmacniaczu nieodwracającym?",
+          answers: [
+            "odwrócona o 180°",
+            "taka sama jak wejściowego (w fazie)",
+            "przesunięta o 90°",
+            "przesunięta o 270°"
+          ],
+          correct: 1,
+          explanation: "We wzmacniaczu nieodwracającym sygnał wyjściowy jest w fazie z sygnałem wejściowym (brak inwersji). Wzmocnienie jest zawsze dodatnie.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co to jest wtórnik napięciowy (voltage follower)?",
+          answers: [
+            "wzmacniacz o wzmocnieniu 100",
+            "wzmacniacz nieodwracający o wzmocnieniu ku = 1",
+            "wzmacniacz odwracający o wzmocnieniu ku = -1",
+            "wzmacniacz różnicowy o dwóch wyjściach"
+          ],
+          correct: 1,
+          explanation: "Wtórnik napięciowy to wzmacniacz nieodwracający o wzmocnieniu ku = 1. Napięcie wyjściowe równa się napięciu wejściowemu (Uwy = Uwe).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=32"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jakie są wartości R1 i R2 we wtórniku napięciowym?",
+          answers: [
+            "R1 = R2 = 10 kΩ",
+            "R1 → ∞ (brak), R2 = 0 (zwarcie)",
+            "R1 = 0, R2 → ∞",
+            "R1 = R2 = 0"
+          ],
+          correct: 1,
+          explanation: "We wtórniku napięciowym R1 → ∞ (brak rezystora) i R2 = 0 (bezpośrednie połączenie wyjścia z wejściem odwracającym). Wtedy ku = 1 + 0/∞ = 1.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=32"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Do czego służy wtórnik napięciowy?",
+          answers: [
+            "do wzmacniania sygnału o 100 razy",
+            "do separacji impedancji (buforowanie sygnału)",
+            "do odwracania fazy sygnału",
+            "do generowania sygnału prostokątnego"
+          ],
+          correct: 1,
+          explanation: "Wtórnik napięciowy służy do separacji impedancji - ma bardzo dużą impedancję wejściową i małą wyjściową. Nie obciąża źródła sygnału i może zasilać niskoimpedancyjne obciążenie.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=32"
+        },
+        {
+          category: "wzmacniacz",
+          question: "R1 = 10 kΩ, R2 = 100 kΩ. Jakie jest wzmocnienie wzmacniacza odwracającego?",
+          answers: [
+            "ku = 10",
+            "ku = -10",
+            "ku = 11",
+            "ku = -11"
+          ],
+          correct: 1,
+          explanation: "Wzmocnienie odwracającego: ku = -R2/R1 = -100kΩ/10kΩ = -10. Sygnał jest wzmacniany 10-krotnie i odwracany w fazie.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "R1 = 10 kΩ, R2 = 100 kΩ. Jakie jest wzmocnienie wzmacniacza nieodwracającego?",
+          answers: [
+            "ku = 10",
+            "ku = -10",
+            "ku = 11",
+            "ku = -11"
+          ],
+          correct: 2,
+          explanation: "Wzmocnienie nieodwracającego: ku = 1 + R2/R1 = 1 + 100kΩ/10kΩ = 1 + 10 = 11. Sygnał jest wzmacniany 11-krotnie bez inwersji.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co to jest ujemne sprzężenie zwrotne we wzmacniaczu operacyjnym?",
+          answers: [
+            "połączenie wyjścia z wejściem nieodwracającym (+)",
+            "połączenie wyjścia z wejściem odwracającym (-)",
+            "połączenie obu wejść ze sobą",
+            "odłączenie wyjścia od obwodu"
+          ],
+          correct: 1,
+          explanation: "Ujemne sprzężenie zwrotne to połączenie wyjścia wzmacniacza z wejściem odwracającym (-). Stabilizuje wzmocnienie i zmniejsza zniekształcenia.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=28"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Dlaczego stosuje się ujemne sprzężenie zwrotne?",
+          answers: [
+            "aby zwiększyć wzmocnienie do nieskończoności",
+            "aby ustabilizować wzmocnienie i zmniejszyć zniekształcenia",
+            "aby odwrócić fazę sygnału",
+            "aby zwiększyć pobór mocy"
+          ],
+          correct: 1,
+          explanation: "Ujemne sprzężenie zwrotne stabilizuje wzmocnienie (uniezależnia od kd), zwiększa pasmo przenoszenia, zmniejsza zniekształcenia nieliniowe i szumy.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=28"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Ile wynosi minimalne wzmocnienie wzmacniacza nieodwracającego?",
+          answers: [
+            "0",
+            "1",
+            "-1",
+            "może być dowolnie małe"
+          ],
+          correct: 1,
+          explanation: "Minimalne wzmocnienie wzmacniacza nieodwracającego wynosi 1 (gdy R2 = 0). Wynika to ze wzoru ku = 1 + R2/R1 ≥ 1.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jakie wzmocnienie ma wzmacniacz odwracający gdy R1 = R2?",
+          answers: [
+            "ku = 0",
+            "ku = 1",
+            "ku = -1",
+            "ku = 2"
+          ],
+          correct: 2,
+          explanation: "Gdy R1 = R2, wzmocnienie odwracającego ku = -R2/R1 = -1. Układ odwraca fazę sygnału bez zmiany amplitudy.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jakie wzmocnienie ma wzmacniacz nieodwracający gdy R1 = R2?",
+          answers: [
+            "ku = 1",
+            "ku = 2",
+            "ku = -1",
+            "ku = 0"
+          ],
+          correct: 1,
+          explanation: "Gdy R1 = R2, wzmocnienie nieodwracającego ku = 1 + R2/R1 = 1 + 1 = 2. Sygnał jest wzmacniany dwukrotnie bez inwersji.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Co oznacza symbol β we wzmacniaczach ze sprzężeniem zwrotnym?",
+          answers: [
+            "wzmocnienie prądowe tranzystora",
+            "współczynnik sprzężenia zwrotnego (część sygnału zwracanego)",
+            "pasmo przenoszenia wzmacniacza",
+            "impedancję wyjściową"
+          ],
+          correct: 1,
+          explanation: "Symbol β we wzmacniaczach ze sprzężeniem zwrotnym oznacza współczynnik sprzężenia zwrotnego - określa jaką część sygnału wyjściowego zwracamy na wejście.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=28"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Gdzie jest podłączone wejście nieodwracające (+) we wzmacniaczu odwracającym?",
+          answers: [
+            "do sygnału wejściowego",
+            "do masy (0V)",
+            "do wyjścia przez R2",
+            "do zasilania dodatniego"
+          ],
+          correct: 1,
+          explanation: "We wzmacniaczu odwracającym wejście nieodwracające (+) jest podłączone do masy (potencjał odniesienia 0V). Sygnał wejściowy podaje się na wejście odwracające (-) przez R1.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Skąd pochodzi nazwa 'wzmacniacz odwracający'?",
+          answers: [
+            "od odwróconej budowy układu",
+            "od odwrócenia fazy sygnału o 180°",
+            "od odwrotnej proporcjonalności wzmocnienia",
+            "od odwróconego zasilania"
+          ],
+          correct: 1,
+          explanation: "Nazwa 'wzmacniacz odwracający' pochodzi od faktu, że sygnał wyjściowy jest odwrócony w fazie o 180° względem sygnału wejściowego (znak minus we wzmocnieniu).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest impedancja wejściowa wzmacniacza odwracającego?",
+          answers: [
+            "nieskończona (jak idealny wzmacniacz)",
+            "równa R1",
+            "równa R2",
+            "równa R1 + R2"
+          ],
+          correct: 1,
+          explanation: "Impedancja wejściowa wzmacniacza odwracającego jest równa R1, ponieważ wejście odwracające jest na potencjale wirtualnej masy (≈ 0V).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaka jest impedancja wejściowa wzmacniacza nieodwracającego?",
+          answers: [
+            "równa R1",
+            "równa R2",
+            "bardzo wysoka (praktycznie nieskończona)",
+            "równa R1 || R2"
+          ],
+          correct: 2,
+          explanation: "Wzmacniacz nieodwracający ma bardzo wysoką impedancję wejściową (bliską nieskończoności), ponieważ sygnał podawany jest bezpośrednio na wejście (+) wzmacniacza operacyjnego.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Uin = 0,5V we wzmacniaczu odwracającym z ku = -10. Ile wynosi Uout?",
+          answers: [
+            "+5 V",
+            "-5 V",
+            "+0,05 V",
+            "-0,05 V"
+          ],
+          correct: 1,
+          explanation: "Uout = ku × Uin = (-10) × 0,5V = -5V. Napięcie wyjściowe jest 10 razy większe i ma przeciwny znak (odwrócona faza).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=30"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Uin = 0,5V we wzmacniaczu nieodwracającym z ku = 11. Ile wynosi Uout?",
+          answers: [
+            "+5,5 V",
+            "-5,5 V",
+            "+0,045 V",
+            "-0,045 V"
+          ],
+          correct: 0,
+          explanation: "Uout = ku × Uin = 11 × 0,5V = +5,5V. Napięcie wyjściowe jest 11 razy większe i ma ten sam znak (brak inwersji fazy).",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        },
+        {
+          category: "wzmacniacz",
+          question: "Jaki jest związek między wzmocnieniami wzmacniacza odwracającego i nieodwracającego dla tych samych R1 i R2?",
+          answers: [
+            "są identyczne",
+            "nieodwracający ma wzmocnienie większe o 1",
+            "odwracający ma wzmocnienie większe o 1",
+            "nie ma żadnego związku"
+          ],
+          correct: 1,
+          explanation: "Dla tych samych R1 i R2: odwracający ma ku = -R2/R1, nieodwracający ma ku = 1 + R2/R1. Różnica wartości bezwzględnych wynosi 1.",
+          sourceLink: "PodstawyElektroniki_W4.pdf#page=31"
+        }
+      ];
+
+      // Zmienne globalne
+      let currentQuestions = [];
+      let currentQuestionIndex = 0;
+      let userAnswers = [];
+      let score = 0;
+      let quizMode = 'learn'; // 'learn' lub 'exam'
+
+      // Ustawienie trybu
+      function setMode(mode) {
+        quizMode = mode;
+        document.getElementById('modeLearn').classList.toggle('active', mode === 'learn');
+        document.getElementById('modeExam').classList.toggle('active', mode === 'exam');
+      }
+
+      // Funkcja startująca quiz
+      function startQuiz() {
+        const category = document.getElementById("categorySelect").value;
+        const countValue = document.getElementById("questionCount").value;
+
+        // Filtrowanie pytań według kategorii
+        let filteredQuestions =
+          category === "all"
+            ? [...questions]
+            : questions.filter((q) => q.category === category);
+
+        // Określenie liczby pytań
+        let count =
+          countValue === "all"
+            ? filteredQuestions.length
+            : parseInt(countValue);
+
+        // Losowanie pytań
+        currentQuestions = shuffleArray(filteredQuestions).slice(
+          0,
+          Math.min(count, filteredQuestions.length)
+        );
+
+        // Reset zmiennych
+        currentQuestionIndex = 0;
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        score = 0;
+
+        // Ukrycie ekranu startowego, pokazanie quizu
+        document.getElementById("startScreen").style.display = "none";
+        document.getElementById("quizScreen").style.display = "block";
+        document.getElementById("resultScreen").style.display = "none";
+        document.getElementById("reviewScreen").style.display = "none";
+
+        // Wyświetlenie pierwszego pytania
+        displayQuestion();
+      }
+
+      // Funkcja mieszająca tablicę (Fisher-Yates shuffle)
+      function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+      }
+
+      // Funkcja wyświetlająca pytanie
+      function displayQuestion() {
+        const question = currentQuestions[currentQuestionIndex];
+
+        // Aktualizacja paska postępu
+        const progress =
+          ((currentQuestionIndex + 1) / currentQuestions.length) * 100;
+        document.getElementById("progressBar").style.width = progress + "%";
+        document.getElementById("progressBar").textContent =
+          Math.round(progress) + "%";
+
+        // Aktualizacja numeru pytania
+        document.getElementById("questionNumber").textContent = `Pytanie ${
+          currentQuestionIndex + 1
+        }/${currentQuestions.length}`;
+
+        // Aktualizacja kategorii
+        const categoryNames = {
+          podstawy: "Napięcie, prąd, opór",
+          elementy: "Rezystor, cewka, kondensator",
+          mierniki: "Amperomierz i woltomierz",
+          ohm: "Prawo Ohma",
+          kirchhoff: "Prawa Kirchhoffa",
+          rezystory: "Łączenie rezystorów",
+          dzielniki: "Dzielniki U i I",
+          pasma: "Modele pasmowe",
+          polprzewodniki: "Półprzewodniki",
+          dioda: "Dioda i złącze p-n",
+          tranzystory: "Tranzystory",
+          punktpracy: "Punkt pracy",
+          wzmacniacz: "Wzmacniacz operacyjny"
+        };
+        document.getElementById("categoryBadge").textContent =
+          categoryNames[question.category] || question.category;
+
+        // Wyświetlenie treści pytania
+        document.getElementById("questionText").textContent = question.question;
+
+        // Wyświetlenie odpowiedzi
+        const answersContainer = document.getElementById("answersContainer");
+        answersContainer.innerHTML = "";
+
+        const letters = ["A", "B", "C", "D"];
+        question.answers.forEach((answer, index) => {
+          const answerDiv = document.createElement("div");
+          answerDiv.className = "answer";
+          if (userAnswers[currentQuestionIndex] === index) {
+            answerDiv.classList.add("selected");
+            // W trybie nauki pokazujemy też poprawność
+            if (quizMode === 'learn') {
+              if (index === question.correct) {
+                answerDiv.classList.add("correct");
+              } else {
+                answerDiv.classList.add("incorrect");
+              }
+            }
+          }
+          // W trybie nauki zaznacz też poprawną odpowiedź jeśli użytkownik już odpowiedział
+          if (quizMode === 'learn' && userAnswers[currentQuestionIndex] !== null && index === question.correct) {
+            answerDiv.classList.add("correct");
+          }
+          
+          answerDiv.onclick = () => selectAnswer(index);
+          answerDiv.innerHTML = `
+                    <span class="answer-letter">${letters[index]}</span>
+                    <span class="answer-text">${answer}</span>
+                `;
+          answersContainer.appendChild(answerDiv);
+        });
+
+        // Ukrycie/pokazanie feedbacku
+        const feedback = document.getElementById("feedback");
+        if (quizMode === 'learn' && userAnswers[currentQuestionIndex] !== null) {
+          showFeedback(userAnswers[currentQuestionIndex]);
+        } else {
+          feedback.classList.remove("show", "correct", "incorrect");
+        }
+
+        // Aktualizacja przycisków nawigacji
+        document.getElementById("prevBtn").style.display =
+          currentQuestionIndex === 0 ? "none" : "block";
+
+        if (currentQuestionIndex === currentQuestions.length - 1) {
+          document.getElementById("nextBtn").style.display = "none";
+          document.getElementById("finishBtn").classList.remove("hidden");
+        } else {
+          document.getElementById("nextBtn").style.display = "block";
+          document.getElementById("finishBtn").classList.add("hidden");
+        }
+      }
+
+      // Funkcja wyboru odpowiedzi
+      function selectAnswer(index) {
+        // Jeśli już odpowiedziano w trybie nauki, nie pozwól zmienić
+        if (quizMode === 'learn' && userAnswers[currentQuestionIndex] !== null) {
+          return;
+        }
+        
+        userAnswers[currentQuestionIndex] = index;
+
+        // Aktualizacja wizualna
+        const answers = document.querySelectorAll(".answer");
+        const question = currentQuestions[currentQuestionIndex];
+        
+        answers.forEach((answer, i) => {
+          answer.classList.remove("selected", "correct", "incorrect");
+          if (i === index) {
+            answer.classList.add("selected");
+            if (quizMode === 'learn') {
+              if (i === question.correct) {
+                answer.classList.add("correct");
+              } else {
+                answer.classList.add("incorrect");
+              }
+            }
+          }
+          // W trybie nauki zaznacz poprawną odpowiedź
+          if (quizMode === 'learn' && i === question.correct) {
+            answer.classList.add("correct");
+          }
+        });
+
+        // Pokazanie feedbacku tylko w trybie nauki
+        if (quizMode === 'learn') {
+          showFeedback(index);
+        }
+      }
+
+      // Funkcja pokazująca feedback
+      function showFeedback(selectedIndex) {
+        const question = currentQuestions[currentQuestionIndex];
+        const feedback = document.getElementById("feedback");
+        const feedbackTitle = document.getElementById("feedbackTitle");
+        const explanation = document.getElementById("explanation");
+
+        if (selectedIndex === question.correct) {
+          feedback.classList.add("show", "correct");
+          feedback.classList.remove("incorrect");
+          feedbackTitle.textContent = "✓ Poprawna odpowiedź!";
+        } else {
+          feedback.classList.add("show", "incorrect");
+          feedback.classList.remove("correct");
+          feedbackTitle.textContent = "✗ Niepoprawna odpowiedź";
+        }
+
+        let explanationHTML = `<p>${question.explanation}</p>`;
+
+        if (question.sourceLink) {
+          const [fileName, pageInfo] = question.sourceLink.split("#");
+          const pageNumber = pageInfo ? pageInfo.replace("page=", "") : "";
+          const lectureNum = fileName.includes("W1") ? "1" : "2";
+
+          explanationHTML += `
+            <div class="source-link">
+                <span class="pdf-icon">📄</span>
+                <span class="source-text">Źródło: <strong>Wykład ${lectureNum}</strong>, slajd ${pageNumber}</span>
+                <a href="${question.sourceLink}" target="_blank">Otwórz PDF</a>
+            </div>
+          `;
+        }
+
+        explanation.innerHTML = explanationHTML;
+      }
+
+      // Funkcja przejścia do następnego pytania
+      function nextQuestion() {
+        if (currentQuestionIndex < currentQuestions.length - 1) {
+          currentQuestionIndex++;
+          displayQuestion();
+          window.scrollTo(0, 0);
+        }
+      }
+
+      // Funkcja przejścia do poprzedniego pytania
+      function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+          displayQuestion();
+          window.scrollTo(0, 0);
+        }
+      }
+
+      // Funkcja kończąca quiz
+      function finishQuiz() {
+        score = 0;
+        const categoryScores = {};
+        
+        currentQuestions.forEach((question, index) => {
+          const isCorrect = userAnswers[index] === question.correct;
+          if (isCorrect) score++;
+          
+          // Zliczanie wyników według kategorii
+          if (!categoryScores[question.category]) {
+            categoryScores[question.category] = { correct: 0, total: 0 };
+          }
+          categoryScores[question.category].total++;
+          if (isCorrect) categoryScores[question.category].correct++;
+        });
+
+        const percentage = Math.round((score / currentQuestions.length) * 100);
+
+        document.getElementById("quizScreen").style.display = "none";
+        document.getElementById("resultScreen").style.display = "block";
+
+        document.getElementById("scorePercentage").textContent = percentage + "%";
+        document.getElementById("correctCount").textContent = score;
+        document.getElementById("incorrectCount").textContent = currentQuestions.length - score;
+        document.getElementById("percentageText").textContent = percentage + "%";
+
+        let grade, gradeClass;
+        if (percentage >= 90) {
+          grade = "5.0";
+          gradeClass = "excellent";
+        } else if (percentage >= 80) {
+          grade = "4.5";
+          gradeClass = "good";
+        } else if (percentage >= 70) {
+          grade = "4.0";
+          gradeClass = "good";
+        } else if (percentage >= 60) {
+          grade = "3.5";
+          gradeClass = "pass";
+        } else if (percentage >= 51) {
+          grade = "3.0";
+          gradeClass = "pass";
+        } else {
+          grade = "2.0";
+          gradeClass = "fail";
+        }
+
+        document.getElementById("grade").textContent = grade;
+        document.getElementById("scoreCircle").className = "score-circle " + gradeClass;
+
+        // Wyświetlenie statystyk według kategorii
+        const categoryNames = {
+          podstawy: "Napięcie, prąd, opór",
+          elementy: "Rezystor, cewka, kondensator",
+          mierniki: "Amperomierz i woltomierz",
+          ohm: "Prawo Ohma",
+          kirchhoff: "Prawa Kirchhoffa",
+          rezystory: "Łączenie rezystorów",
+          dzielniki: "Dzielniki U i I",
+          pasma: "Modele pasmowe",
+          polprzewodniki: "Półprzewodniki",
+          dioda: "Dioda i złącze p-n",
+          tranzystory: "Tranzystory",
+          punktpracy: "Punkt pracy"
+        };
+
+        const categoryStatsDiv = document.getElementById("categoryStats");
+        let categoryHTML = "<h3>Wyniki według kategorii:</h3>";
+        
+        for (const [cat, scores] of Object.entries(categoryScores)) {
+          const catPercentage = Math.round((scores.correct / scores.total) * 100);
+          categoryHTML += `
+            <div class="category-bar">
+              <div class="category-bar-header">
+                <span>${categoryNames[cat] || cat}</span>
+                <span>${scores.correct}/${scores.total} (${catPercentage}%)</span>
+              </div>
+              <div class="category-bar-fill">
+                <div class="category-bar-progress" style="width: ${catPercentage}%"></div>
+              </div>
+            </div>
+          `;
+        }
+        categoryStatsDiv.innerHTML = categoryHTML;
+
+        window.scrollTo(0, 0);
+      }
+
+      // Funkcja pokazująca przegląd
+      function showReview() {
+        document.getElementById("resultScreen").style.display = "none";
+        document.getElementById("reviewScreen").style.display = "block";
+
+        const reviewContainer = document.getElementById("reviewContainer");
+        const letters = ["A", "B", "C", "D"];
+        let reviewHTML = "";
+
+        currentQuestions.forEach((question, qIndex) => {
+          const isCorrect = userAnswers[qIndex] === question.correct;
+          reviewHTML += `
+            <div class="review-question ${isCorrect ? 'correct' : 'incorrect'}">
+              <div class="review-question-text">${qIndex + 1}. ${question.question}</div>
+              <div class="review-answers">
+          `;
+          
+          question.answers.forEach((answer, aIndex) => {
+            let answerClass = "";
+            if (aIndex === question.correct) {
+              answerClass = "correct";
+            } else if (aIndex === userAnswers[qIndex] && !isCorrect) {
+              answerClass = "user-incorrect";
+            }
+            reviewHTML += `<div class="review-answer ${answerClass}">${letters[aIndex]}. ${answer}</div>`;
+          });
+
+          reviewHTML += `
+              </div>
+              <div class="explanation" style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                💡 ${question.explanation}
+              </div>
+            </div>
+          `;
+        });
+
+        reviewContainer.innerHTML = reviewHTML;
+        window.scrollTo(0, 0);
+      }
+
+      // Powrót do wyników
+      function backToResults() {
+        document.getElementById("reviewScreen").style.display = "none";
+        document.getElementById("resultScreen").style.display = "block";
+        window.scrollTo(0, 0);
+      }
+
+      // Funkcja restartu quizu
+      function restartQuiz() {
+        document.getElementById("resultScreen").style.display = "none";
+        document.getElementById("reviewScreen").style.display = "none";
+        document.getElementById("startScreen").style.display = "block";
+        window.scrollTo(0, 0);
+      }
+    </script>
+  </body>
+</html>
