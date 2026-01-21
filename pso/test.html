@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PSO - Podstawy Systemow Operacyjnych</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            margin-bottom: 30px;
+        }
+        
+        .start-screen {
+            text-align: center;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .start-screen h2 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+        }
+        
+        .start-screen p {
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            color: #fff;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .question-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-number {
+            color: #00d4ff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .question-image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 10px;
+        }
+        
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .answer:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .answer.selected {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+        
+        .answer.correct {
+            background: rgba(0, 255, 100, 0.2);
+            border-color: #00ff64;
+        }
+        
+        .answer.incorrect {
+            background: rgba(255, 50, 50, 0.2);
+            border-color: #ff3232;
+        }
+        
+        .answer.missed {
+            background: rgba(255, 200, 0, 0.2);
+            border-color: #ffc800;
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .answer.selected .checkbox {
+            background: #00d4ff;
+            border-color: #00d4ff;
+        }
+        
+        .answer.selected .checkbox::after {
+            content: '\2713';
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 30px;
+            color: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #00d4ff, #00ff64);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .results {
+            text-align: center;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            display: none;
+        }
+        
+        .results.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .score {
+            font-size: 72px;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+        
+        .score-label {
+            font-size: 24px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        
+        .explanation {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid #00d4ff;
+            padding: 15px 20px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+            text-align: left;
+            display: none;
+        }
+        
+        .explanation.show {
+            display: block;
+        }
+        
+        .explanation-title {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .open-question textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: #fff;
+            font-size: 16px;
+            resize: vertical;
+        }
+        
+        .open-question textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        .sample-answer {
+            background: rgba(0, 255, 100, 0.1);
+            border-left: 4px solid #00ff64;
+            padding: 15px 20px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+            display: none;
+        }
+        
+        .sample-answer.show {
+            display: block;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.correct { background: rgba(0, 255, 100, 0.5); }
+        .legend-color.incorrect { background: rgba(255, 50, 50, 0.5); }
+        .legend-color.missed { background: rgba(255, 200, 0, 0.5); }
+        
+        .restart-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test PSO</h1>
+        <h2 style="text-align: center; color: #aaa; margin-top: -20px; margin-bottom: 30px;">Podstawy Systemow Operacyjnych</h2>
+        
+        <div class="start-screen" id="startScreen">
+            <h2>Witaj w tescie!</h2>
+            <p>Test zawiera pytania z zakresu podstaw systemow operacyjnych.</p>
+            <button class="btn" id="startBtn">Rozpocznij Test</button>
+        </div>
+        
+        <div id="testArea" style="display: none;">
+            <div class="progress-text" id="progressText">Pytanie 1 z 50</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            
+            <div id="questionsContainer"></div>
+            
+            <div class="navigation">
+                <button class="btn-nav" id="prevBtn">&#8592; Poprzednie</button>
+                <button class="btn" id="checkBtn">Sprawdz</button>
+                <button class="btn-nav" id="nextBtn">Nastepne &#8594;</button>
+            </div>
+            
+            <div class="restart-section">
+                <button class="btn-nav" id="restartBtnTest">Zacznij od poczatku</button>
+            </div>
+        </div>
+        
+        <div class="results" id="results">
+            <h2>Koniec testu!</h2>
+            <div class="score" id="finalScore">0%</div>
+            <div class="score-label" id="scoreDetails">0 / 50 poprawnych odpowiedzi</div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color correct"></div> Poprawna</div>
+                <div class="legend-item"><div class="legend-color incorrect"></div> Bledna</div>
+                <div class="legend-item"><div class="legend-color missed"></div> Pominieta poprawna</div>
+            </div>
+            <br><br>
+            <button class="btn" id="restartBtn">Rozpocznij ponownie</button>
+            <br><br>
+            <button class="btn-nav" id="showAllBtn">Zobacz wszystkie odpowiedzi</button>
+        </div>
+    </div>
+
+    <script>
+        var questions = [
+            {
+                id: 1,
+                question: "Jak dzialal program Monitor?",
+                multi: true,
+                answers: [
+                    { text: "byl programem rezydentnym", correct: true },
+                    { text: "wykonywal rekonfiguracje systemu po kazdym zadaniu", correct: false },
+                    { text: "zapewnial sterowanie urzadzeniami wejscia wyjscia", correct: false },
+                    { text: "zapewnial mozliwosc automatycznego przekazywania sterowania miedzy programami", correct: true },
+                    { text: "wykonywal diagnostyke zajetosci pamieci", correct: false }
+                ],
+                explanation: "Ze slajdow: Rezydentny program monitor. Automatyczne przekazywanie sterowania od jednego zadania do drugiego."
+            },
+            {
+                id: 2,
+                question: "Do czego sluzy sekcja krytyczna?",
+                multi: false,
+                answers: [
+                    { text: "pozwala na podzielenie procesu na watki", correct: false },
+                    { text: "jest segmentem kodu, w ktorym dokonuje sie modyfikacji wspolnych zmiennych", correct: true },
+                    { text: "pozwala na zalogowanie sie uzytkownika", correct: false },
+                    { text: "w sekcji krytycznej definiuje sie zakres dostepnej pamieci", correct: false }
+                ],
+                explanation: "Ze slajdow: Sekcja krytyczna procesu jest segmentem kodu, w ktorym dokonuje sie modyfikacji wspolnych zmiennych."
+            },
+            {
+                id: 3,
+                question: "Wybierz okreslenia dot. pamieci operacyjnej?",
+                multi: true,
+                answers: [
+                    { text: "przechowuje dane i programy", correct: true },
+                    { text: "jest ulotna", correct: true },
+                    { text: "nie jest potrzebna do dzialania systemu komputerowego", correct: false },
+                    { text: "jej pojemnosc nie wplywa na dzialanie komputera", correct: false }
+                ],
+                explanation: "Pamiec operacyjna przechowuje dane i programy, jest ulotna (traci zawartosc po wylaczeniu zasilania), jej pojemnosc wplywa na dzialanie komputera."
+            },
+            {
+                id: 4,
+                question: "Wybierz cele zarzadzania pamiecia:",
+                multi: true,
+                answers: [
+                    { text: "zakaz dostepu do obszarow wspoldzielonych", correct: false },
+                    { text: "organizacja logiczna i fizyczna pamieci", correct: true },
+                    { text: "ochrona zawartosci pamieci", correct: true },
+                    { text: "adresowanie komorek pamieci", correct: false },
+                    { text: "uniemozliwienie relokacji (przemieszczania) procesow w pamieci", correct: false }
+                ],
+                explanation: "Cele zarzadzania pamiecia to m.in.: organizacja logiczna i fizyczna pamieci, ochrona zawartosci pamieci, latwy dostep do danych."
+            },
+            {
+                id: 5,
+                question: "Co oznacza interakcyjny tryb pracy?",
+                multi: false,
+                answers: [
+                    { text: "praca zgodnie z harmonogramem", correct: false },
+                    { text: "wprowadzanie polecen i czekanie na wyniki", correct: true },
+                    { text: "diagnostyke wykorzystania CPU", correct: false }
+                ],
+                explanation: "Interakcyjny tryb pracy to wprowadzanie polecen i czekanie na wyniki (komunikacja uzytkownika z systemem)."
+            },
+            {
+                id: 6,
+                question: "Jakie sa korzysci plynace z programowania wielowatkowego:",
+                multi: true,
+                answers: [
+                    { text: "zdolnosc do reagowania", correct: true },
+                    { text: "mniejsza dostepna pamiec", correct: false },
+                    { text: "dzielenie zasobow miedzy watki", correct: true },
+                    { text: "maksymalne obciazenie jednego rdzenia", correct: false }
+                ],
+                explanation: "Ze slajdow korzysci wielowatkowosci: zdolnosc do reagowania, dzielenie zasobow, oszczednosc, wykorzystanie architektur wieloprocesorowych."
+            },
+            {
+                id: 7,
+                question: "Zalety spoolingu, to:",
+                multi: false,
+                answers: [
+                    { text: "latwy dostep do danych w pamieci", correct: false },
+                    { text: "mozliwosc pracy wspolbieznej", correct: true },
+                    { text: "bezposredni dostep do danych na dysku", correct: false }
+                ],
+                explanation: "Ze slajdow: Spooling daje mozliwosc buforowania zadan dla urzadzen nie tolerujacych przeplatania danych (np. dla drukarki) - kolejka zadan do wykonania - umozliwia prace wspolbiezna."
+            },
+            {
+                id: 8,
+                question: "Co zapewnia wirtualizacja pamieci?",
+                multi: false,
+                answers: [
+                    { text: "utrudniony dostep do danych w pamieci", correct: false },
+                    { text: "brak ochrony zawartosci pamieci", correct: false },
+                    { text: "organizacja logiczna i fizyczna pamieci", correct: true }
+                ],
+                explanation: "Ze slajdow: Wirtualizacja pamieci pozwala programiscie widziec znacznie wieksza przestrzen adresowa anizeli wynosi rzeczywista przestrzen adresow - zapewnia organizacje logiczna i fizyczna."
+            },
+            {
+                id: 9,
+                question: "Do czego sluzy Blok kontrolny procesu?",
+                multi: false,
+                answers: [
+                    { text: "obecnie nie jest potrzebny", correct: false },
+                    { text: "zawiera niezbedne dane dotyczace procesu", correct: true },
+                    { text: "zawiera niezbedne dane dotyczace systemu operacyjnego", correct: false },
+                    { text: "zawiera informacje dotyczace wszystkich uruchomionych procesow", correct: false }
+                ],
+                explanation: "Ze slajdow: Kazdy proces jest odwzorowany w S.O. poprzez przypisany jemu blok kontrolny procesu zawierajacy niezbedne dane dotyczace procesu."
+            },
+            {
+                id: 10,
+                question: "Jakie zadania realizuje mechanizm stronicowania?",
+                multi: true,
+                answers: [
+                    { text: "dzieli odpowiednie ramki w pamieci glownej", correct: false },
+                    { text: "odwzorowuje adresy procesu w numer strony i slowa", correct: true },
+                    { text: "przemieszcza strony pomiedzy pamiecia glowna i pomocnicza", correct: true },
+                    { text: "sprawdza czy ramka jest w pamieci glownej", correct: false }
+                ],
+                explanation: "Ze slajdow: Mechanizm stronicowania realizuje dwa zadania: 1. odwzorowuje adresy procesu w numer strony oraz numer slowa na stronie; 2. przesyla strony pomiedzy pamiecia glowna i pomocnicza."
+            },
+            {
+                id: 11,
+                question: "Plik wymiany, to:",
+                multi: false,
+                answers: [
+                    { text: "chroniony plik do wymiany danych podczas kopiowania plikow", correct: false },
+                    { text: "plik dostepny w przestrzeni systemu operacyjnego, sluzy do zapisu historii zmian w plikach", correct: false },
+                    { text: "ukryty plik do zapisu operacji wykonywanych w przestrzeni uzytkownika", correct: false },
+                    { text: "plik ukryty, chroniony przez system i uzytkownik nie moze go zmieniac bezposrednio", correct: true }
+                ],
+                explanation: "Plik wymiany (swap) to plik ukryty, chroniony przez system, sluzacy do rozszerzenia pamieci wirtualnej. Uzytkownik nie moze go bezposrednio modyfikowac."
+            },
+            {
+                id: 12,
+                question: "Co opisuje definicja: pozwala programiscie widziec znacznie wieksza przestrzen adresowa (przestrzen nazw) anizeli wynosi rzeczywista przestrzen adresow?",
+                multi: false,
+                answers: [
+                    { text: "pamiec pomocnicza", correct: false },
+                    { text: "pamiec stala", correct: false },
+                    { text: "pamiec wirtualna", correct: true },
+                    { text: "pamiec dyskowa", correct: false }
+                ],
+                explanation: "To doslowny cytat ze slajdow definiujacy PAMIEC WIRTUALNA."
+            },
+            {
+                id: 13,
+                question: "Co oznacza okreslenie Wedrujacy dziennik?",
+                multi: false,
+                answers: [
+                    { text: "Dane dziennika zamieniaja sie w dane pliku po zakonczeniu operacji na dysku", correct: true },
+                    { text: "Dane dziennika sa kopiowane na wolne obszary dysku", correct: false },
+                    { text: "System ustawia bit zmiany gdy zakonczy operacje na pliku", correct: false },
+                    { text: "Mozliwosc zapisu danych w locie", correct: false }
+                ],
+                explanation: "Ze slajdow (Reiser4): Gdy zapisywanie do dziennika zostaje zakonczone, status bloku w ktorym mamy zapisany dziennik zmienia sie i blok staje sie normalnym elementem systemu plikow."
+            },
+            {
+                id: 15,
+                question: "Wybierz okreslenie zaleznosci pomiedzy procesami niezaleznymi:",
+                multi: true,
+                answers: [
+                    { text: "wynik jest powtarzalny, czyli dzialanie da sie powielac", correct: true },
+                    { text: "wynik dzialania procesu jest zalezny od stanu innych procesow", correct: false },
+                    { text: "stan procesu jest dzielony z innymi procesami", correct: false },
+                    { text: "na stan procesu nie wplywa zaden inny proces", correct: true }
+                ],
+                explanation: "Ze slajdow procesy NIEZALEZNE: Na stan procesu nie wplywa zaden inny proces. Wynik jest powtarzalny, czyli dzialanie da sie powielac."
+            },
+            {
+                id: 16,
+                question: "Wybierz wady mikro jadra:",
+                multi: true,
+                answers: [
+                    { text: "Zaimplementowana wielofunkcyjnosc", correct: false },
+                    { text: "kolejkowanie dzialan systemu operacyjnego (narzut wydajnosci)", correct: true },
+                    { text: "dodawanie funkcjonalnosci rozbudowuje mikro jadro", correct: true },
+                    { text: "zaimplementowanych niewiele funkcji systemowych", correct: false },
+                    { text: "zla komunikacja z s.o.", correct: false }
+                ],
+                explanation: "Ze slajdow wady mikrojadra: Dodawanie funkcjonalnosci prowadzi do rozbudowy mikrojadra oraz Wydajnosc - zbudowanie, zakolejkowanie, wyslanie, odebranie, potwierdzenie komunikatu."
+            },
+            {
+                id: 17,
+                question: "Wybierz wlasciwie zdefiniowane warunki konieczne do wystapienia blokady:",
+                multi: true,
+                answers: [
+                    { text: "brak wywlaszczen", correct: true },
+                    { text: "wzajemne oddzialywanie", correct: false },
+                    { text: "przekazywanie cykliczne", correct: false },
+                    { text: "niepodzielny zasob (wzajemne wylaczenie)", correct: true },
+                    { text: "przetrzymywanie i oczekiwanie", correct: true },
+                    { text: "istnienie wywlaszczen", correct: false }
+                ],
+                explanation: "4 warunki blokady: 1) Wzajemne wylaczenie (niepodzielny zasob), 2) Przetrzymywanie i oczekiwanie, 3) Brak wywlaszczen, 4) Czekanie cykliczne."
+            },
+            {
+                id: 18,
+                question: "Graf przydzialu zasobow (patrz obrazek). Stan grafu:",
+                multi: true,
+                image: "img/punkt-18.png",
+                answers: [
+                    { text: "z cyklem", correct: true },
+                    { text: "bez blokady", correct: true },
+                    { text: "z blokada", correct: false },
+                    { text: "bez cyklu zakleszczony", correct: false }
+                ],
+                explanation: "Na grafie widac cykl (P1-Z1, P2-Z1, ale zasoby Z1 i Z2 maja po 2 instancje - widac 2 kropki). Gdy zasob ma wiele instancji, sam cykl NIE gwarantuje blokady. Graf jest Z CYKLEM ale BEZ BLOKADY."
+            },
+            {
+                id: 19,
+                question: "Wybierz tablicowe systemy plikow:",
+                multi: true,
+                answers: [
+                    { text: "ext3", correct: false },
+                    { text: "exFAT", correct: true },
+                    { text: "raiser (ReiserFS)", correct: false },
+                    { text: "btrfs", correct: false },
+                    { text: "FAT32", correct: true },
+                    { text: "NTFS", correct: true }
+                ],
+                explanation: "Tablicowe systemy plikow to te oparte na tablicach alokacji: FAT32, exFAT, NTFS (MFT). Systemy ext, ReiserFS, btrfs uzywaja innych struktur (i-wezly, drzewa B+)."
+            },
+            {
+                id: 20,
+                question: "Wybierz warunki konieczne do wystapienia blokady:",
+                multi: true,
+                answers: [
+                    { text: "wzajemne oddzialywanie", correct: false },
+                    { text: "brak wywlaszczen", correct: true },
+                    { text: "przetrzymywanie i oczekiwanie", correct: true },
+                    { text: "istnienie wywlaszczen", correct: false },
+                    { text: "przekazywanie cykliczne", correct: false },
+                    { text: "niepodzielny zasob (= wzajemne wylaczenie)", correct: true }
+                ],
+                explanation: "4 warunki blokady: wzajemne wylaczenie, przetrzymywanie i oczekiwanie, brak wywlaszczen, czekanie cykliczne."
+            },
+            {
+                id: 21,
+                question: "Czym wyroznia sie architektura Harwardzka?",
+                multi: false,
+                answers: [
+                    { text: "rozdzielona szyna danych i rozkazow", correct: true },
+                    { text: "12 bitowa adresacja pamieci", correct: false },
+                    { text: "wspoldzielona szyna danych i rozkazow", correct: false },
+                    { text: "dodatkowa szyna PCI", correct: false }
+                ],
+                explanation: "Architektura Harvarda ma ODDZIELNE szyny dla danych i rozkazow (dwie szyny). Von Neumann ma jedna wspolna szyne."
+            },
+            {
+                id: 22,
+                question: "Strategie wymiany zawartosci pamieci dla systemow ze stronicowaniem:",
+                multi: true,
+                answers: [
+                    { text: "najdawniej uzywana strona (LRU - Least Recently Used)", correct: true },
+                    { text: "najrzadziej wykorzystywana strona (LFU - Least Frequently Used)", correct: true },
+                    { text: "najdawniej zaladowana strona (FIFO)", correct: true },
+                    { text: "strona o najwiekszym rozmiarze", correct: false },
+                    { text: "zamowiona strona", correct: false }
+                ],
+                explanation: "Strategie wymiany stron: FIFO (najdawniej zaladowana), LRU (najdawniej uzywana), LFU (najrzadziej uzywana). Rozmiar strony jest staly!"
+            },
+            {
+                id: 23,
+                question: "Co opisuje diagram (patrz obrazek)?",
+                multi: false,
+                image: "img/punkt-23.png",
+                answers: [
+                    { text: "mozliwe stany procesu od uruchomienia do zakonczenia", correct: true },
+                    { text: "stan programu komputerowego", correct: false },
+                    { text: "metode uruchomienia procesu", correct: false },
+                    { text: "procesy wspolpracujace", correct: false }
+                ],
+                explanation: "Diagram pokazuje stany procesu: Proces wstrzymany, Proces gotowy, Proces wykonywany oraz przejscia miedzy nimi (od Program w pamieci masowej przez Nowy proces do Koniec procesu)."
+            },
+            {
+                id: 24,
+                question: "Co wyroznia tablicowe systemy plikow?",
+                multi: false,
+                answers: [
+                    { text: "Kazdy dysk SSD zawiera tablice MFT", correct: false },
+                    { text: "W przypadku uszkodzenia sektora tablicy FAT, odzyskanie danych moze byc niemozliwe", correct: true },
+                    { text: "Tablica MFT jest umieszczana na kazdej partycji dysku, bez wzgledu na system plikow", correct: false },
+                    { text: "Tablica zawiera nazwy folderow dysku", correct: false }
+                ],
+                explanation: "Tablicowe systemy plikow (FAT) przechowuja informacje o alokacji w tablicy. Uszkodzenie tablicy FAT moze uniemozliwic odzyskanie danych."
+            },
+            {
+                id: 25,
+                question: "Co opisuje slowo dystrybucja w odniesieniu do Linuxa?",
+                multi: false,
+                answers: [
+                    { text: "okresla pore roku wydania dystrybucji", correct: false },
+                    { text: "sklada sie z kernela i systemu plikow", correct: false },
+                    { text: "zawiera kernel i programy narzedziowe", correct: true },
+                    { text: "dystrybucja to rozwiniecie okreslonej linii programistycznej", correct: false }
+                ],
+                explanation: "Dystrybucja Linuxa to pakiet zawierajacy jadro (kernel) oraz programy narzedziowe (np. Ubuntu, Fedora, Debian)."
+            },
+            {
+                id: 26,
+                question: "Co oznacza okreslenie Wedrujacy dziennik? (powtorka)",
+                multi: false,
+                answers: [
+                    { text: "Mozliwosc zapisu danych w locie", correct: false },
+                    { text: "Dane dziennika sa kopiowane na wolne obszary dysku", correct: false },
+                    { text: "System ustawia bit zmiany gdy zakonczy operacje na pliku", correct: false },
+                    { text: "Dane dziennika zamieniaja sie w dane pliku po zakonczeniu operacji na dysku", correct: true }
+                ],
+                explanation: "Ze slajdow (Reiser4): Gdy zapisywanie do dziennika zostaje zakonczone, status bloku w ktorym mamy zapisany dziennik zmienia sie i blok staje sie normalnym elementem systemu plikow."
+            },
+            {
+                id: 27,
+                question: "Co oznacza termin niskopoziomowe formatowanie dysku?",
+                multi: false,
+                answers: [
+                    { text: "podzial na sektory", correct: true },
+                    { text: "podzial na klastry", correct: false },
+                    { text: "utworzenie struktury katalogow", correct: false },
+                    { text: "utworzenie systemu plikow", correct: false }
+                ],
+                explanation: "Ze slajdow: Formatowanie niskopoziomowe polega na podzieleniu dysku na sektory. Struktura danych sektora sklada sie z naglowka, sekcji danych (najczesciej 512B) i zakonczenia."
+            },
+            {
+                id: 28,
+                question: "Na podstawie rysunku (Struktura UNIX) wybierz prawdziwe stwierdzenia:",
+                multi: true,
+                image: "img/punkt-28.png",
+                answers: [
+                    { text: "uzytkownicy nie maja dostepu do funkcji systemowych", correct: false },
+                    { text: "Uzytkownicy komunikuja sie z systemem przez powloki (shells)", correct: true },
+                    { text: "jadro nie udostepnia interfejsu do procesow systemu", correct: false },
+                    { text: "jadro, za posrednictwem funkcji systemowych udostepnia system plikow", correct: true },
+                    { text: "jadro to wszystko, co znajduje sie ponizej interfejsu funkcji systemowych a powyzej sprzetu", correct: true },
+                    { text: "uzytkownik nie ma dostepu do systemu plikow", correct: false },
+                    { text: "planowanie przydzialu procesora, zarzadzanie pamiecia oraz inne funkcje systemu sa dostepne za posrednictwem funkcji systemowych", correct: true }
+                ],
+                explanation: "Rysunek pokazuje strukture UNIX: uzytkownicy - powloki i polecenia - interfejs funkcji systemowych - jadro (system plikow, planowanie CPU, pamiec wirtualna) - sprzetowy interfejs jadra - sprzet."
+            },
+            {
+                id: 29,
+                question: "Jaki to model systemu operacyjnego? (patrz obrazek)",
+                multi: false,
+                image: "img/punkt-29.png",
+                answers: [
+                    { text: "warstwowego", correct: false },
+                    { text: "uslugowego", correct: false },
+                    { text: "proceduralnego", correct: false },
+                    { text: "monolitycznego", correct: true }
+                ],
+                explanation: "Rysunek przedstawia system MONOLITYCZNY z trzema poziomami: procedura glowna (pomaranczowa), procedury uslugowe (niebieskie), procedury uzytkowe (jasne). Jest to klasyczny diagram systemu monolitycznego."
+            },
+            {
+                id: 30,
+                question: "Dla jakiego systemu plikow pokazano podzial woluminu? (patrz obrazek)",
+                multi: false,
+                image: "img/punkt-30.png",
+                answers: [
+                    { text: "NTFS", correct: true },
+                    { text: "FAT32", correct: false },
+                    { text: "BtrFS", correct: false },
+                    { text: "ext2", correct: false }
+                ],
+                explanation: "Rysunek pokazuje: sektor rozruchowy partycji | glowna tablica plikow (MFT) | pliki systemowe | obszar plikow - to struktura woluminu NTFS."
+            },
+            {
+                id: 31,
+                question: "Jaki sposob planowania dostepu do dysku przedstawia rysunek?",
+                multi: false,
+                image: "img/punkt-31.png",
+                answers: [
+                    { text: "Planowanie metoda C-SCAN", correct: false },
+                    { text: "Planowanie metoda FCFS", correct: false },
+                    { text: "Planowanie metoda SSTF", correct: false },
+                    { text: "Planowanie metoda SCAN", correct: true }
+                ],
+                explanation: "Na rysunku glowica startuje z 53, jedzie W LEWO do 0 (obslugujac 37, 14), potem ZAWRACA i jedzie w prawo (65, 67, 98, 122, 124, 183). To algorytm SCAN (winda) - jedzie w jednym kierunku do konca, potem zawraca."
+            },
+            {
+                id: 32,
+                question: "Co ilustruje Problem czytelnikow i pisarzy? (pytanie otwarte - wpisz odpowiedz)",
+                multi: false,
+                open: true,
+                sampleAnswer: "Problem czytelnikow i pisarzy ilustruje sytuacje, gdy obiekt danych podlega wspolbieznemu dzieleniu miedzy kilka procesow - czytelnicy moga czytac jednoczesnie, ale pisarz musi miec wylaczny dostep. Problem polega na zagwarantowaniu wylacznosci pisarzy do obiektow, aby uniknac chaosu przy jednoczesnym dostepie pisarza i innego procesu."
+            },
+            {
+                id: 33,
+                question: "Czym sa i-wezly?",
+                multi: false,
+                answers: [
+                    { text: "to struktury sterujace przechowujace kluczowe informacje dotyczace danego pliku", correct: true },
+                    { text: "to struktury sterujace przechowujace dane i-tego pliku", correct: false },
+                    { text: "to struktury sterujace przechowujace prawa dostepu dla danego pliku", correct: false },
+                    { text: "to struktury sterujace przechowujace adresy blokow i-tego pliku", correct: false }
+                ],
+                explanation: "Ze slajdow: i-wezel (wezel indeksowy) to struktura sterujaca zawierajaca kluczowe informacje potrzebne systemowi operacyjnemu dla danego pliku."
+            },
+            {
+                id: 34,
+                question: "Jakie zalety ma warstwowy system operacyjny?",
+                multi: true,
+                answers: [
+                    { text: "programy narzedziowe uruchamiane sa w pierwszej kolejnosci", correct: false },
+                    { text: "funkcje uzytkownika root sa uruchamiane jako ostatni element systemu", correct: false },
+                    { text: "kazda warstwa ma okreslone zadania", correct: true },
+                    { text: "program graficzny zawsze jest uruchamiany", correct: false },
+                    { text: "przykladowy system, to THE", correct: true },
+                    { text: "realizuje modularnosc systemu", correct: true }
+                ],
+                explanation: "Ze slajdow: System THE jako przyklad systemu warstwowego. Kazda warstwa korzysta z funkcji tylko nizej polozonych warstw - realizuje modularnosc. UWAGA: Warstwa 0 to sprzet, nie jadro!"
+            },
+            {
+                id: 35,
+                question: "Co przedstawia powyzszy rysunek? (patrz obrazek)",
+                multi: false,
+                image: "img/punkt-35.png",
+                answers: [
+                    { text: "strukture logicznego formatowania dysku", correct: false },
+                    { text: "warstwowy system operacyjny", correct: false },
+                    { text: "zalety stosowania mikrojader", correct: true },
+                    { text: "poziom uruchomienia systemu", correct: false }
+                ],
+                explanation: "Rysunek przedstawia architekture mikrojadra - widoczne sa: mikrojadro, sprzet oraz procesy klienta, moduly sterujace, serwer plikow, serwer procesow, pamiec wirtualna dzialajace w trybie uzytkownika."
+            },
+            {
+                id: 36,
+                question: "Extended File System, to:",
+                multi: false,
+                answers: [
+                    { text: "jedyny system plikow dla DOS", correct: false },
+                    { text: "popularny system plikow dla urzadzen przenosnych", correct: false },
+                    { text: "popularny system plikow dla Linuxa", correct: true },
+                    { text: "popularny system plikow dla IOS", correct: false }
+                ],
+                explanation: "Ze slajdow: ext - Rozszerzenie systemu plikow, rozwiniete dla OS na jadrze Linux oraz ext2 byl podstawowym i najszerzej uzywanym systemem plikow dla Linuxa."
+            },
+            {
+                id: 37,
+                question: "Wybierz nazwy systemow plikow:",
+                multi: true,
+                answers: [
+                    { text: "jefs", correct: false },
+                    { text: "Reiser4", correct: true },
+                    { text: "Repacke", correct: false },
+                    { text: "ntfs", correct: true },
+                    { text: "FAT8", correct: false },
+                    { text: "Btrfs", correct: true },
+                    { text: "ext6", correct: false },
+                    { text: "exFAT", correct: true },
+                    { text: "FAT32", correct: true }
+                ],
+                explanation: "Ze slajdow wymienione sa: Reiser4, NTFS, exFAT, FAT32, Btrfs jako istniejace systemy plikow. Nie istnieja: jefs, Repacke, FAT8, ext6."
+            },
+            {
+                id: 38,
+                question: "Czego dotyczy okreslenie: 1 komputer-1 uzytkownik - 1 zadanie?",
+                multi: false,
+                answers: [
+                    { text: "pracy na laboratoriach", correct: false },
+                    { text: "jednozadaniowego systemu operacyjnego", correct: true },
+                    { text: "pracy w konsoli w Windowsie", correct: false },
+                    { text: "pracy w terminalu w Linuxie", correct: false }
+                ],
+                explanation: "Ze slajdow: 1 komputer - 1 uzytkownik - 1 zadanie opisuje system jednozadaniowy, niezapewniajacy ochrony danych, niezarzadzajacy zasobami komputera."
+            },
+            {
+                id: 39,
+                question: "Wybierz okreslenie opisujace wirtualny system plikow w Linuxie:",
+                multi: true,
+                answers: [
+                    { text: "Wirtualny system plikow (VFS) zawiera ujednolicony interfejs systemowy dla procesow uzytkownika", correct: true },
+                    { text: "W VFS przyjmuje sie, ze pliki to obiekty przechowywane w pamieci masowej komputera", correct: true },
+                    { text: "W VFS przyjmuje sie, ze pliki nie sa zapisywane na dysku HDD", correct: false },
+                    { text: "VFS pozwala na obsluge tylko jednego systemu plikow", correct: false }
+                ],
+                explanation: "Ze slajdow: Wirtualny system plikow (VFS) zawiera ujednolicony interfejs systemowy dla procesow uzytkownika oraz W VFS przyjmuje sie, ze pliki to obiekty przechowywane w pamieci masowej komputera."
+            },
+            {
+                id: 42,
+                question: "Ktora architektura posiada szyne danych i szyne rozkazow?",
+                multi: false,
+                answers: [
+                    { text: "Architektura von Neumanna", correct: false },
+                    { text: "Architektura Harwardzka", correct: true },
+                    { text: "Architektura Kalifornijska", correct: false },
+                    { text: "Architektura szynowa", correct: false }
+                ],
+                explanation: "Architektura Harwardzka charakteryzuje sie oddzielnymi szynami (magistralami) dla danych i rozkazow, w przeciwienstwie do architektury von Neumanna, ktora ma wspolna szyne."
+            },
+            {
+                id: 43,
+                question: "Jakie sa zalety mikrojadra?",
+                multi: true,
+                answers: [
+                    { text: "ustawianie zadan systemowych w kolejce procesow gotowych", correct: false },
+                    { text: "latwosc w kontrolowaniu kodu systemu operacyjnego", correct: true },
+                    { text: "niemozliwa przenaszalnosc systemu (na inna architekture)", correct: false },
+                    { text: "mozliwosc latwej rozbudowy", correct: true },
+                    { text: "wysoka niezawodnosc", correct: true },
+                    { text: "jednolity interfejs dla procesow", correct: true }
+                ],
+                explanation: "Ze slajdow: Zalety: Jednolity interfejs dla procesow, Latwosc w kontrolowaniu kodu systemu operacyjnego, Przenaszalnosc systemu (na inna architekture), Niezawodnosc. Mozliwosc latwej rozbudowy wynika z modularnosci."
+            },
+            {
+                id: 45,
+                question: "Wedlug klasyfikacji Flynna, komputery superkomputery, to:",
+                multi: false,
+                answers: [
+                    { text: "SISD (Single Instruction Single Data) - skalarne", correct: false },
+                    { text: "MISD (Multiple Instruction Single Data) - strumieniowe", correct: false },
+                    { text: "SIMD (Single Instruction Multiple Data) - wektorowe (macierzowe)", correct: false },
+                    { text: "MIMD (Multiple Instruction Multiple Data) - rownolegle", correct: true }
+                ],
+                explanation: "Superkomputery naleza do kategorii MIMD - Multiple Instruction Multiple Data (wielokrotny strumien rozkazow, wielokrotny strumien danych) - rownolegle przetwarzanie."
+            },
+            {
+                id: 46,
+                question: "Czy system plikow jest zalezny od systemu operacyjnego? Dlaczego? (pytanie otwarte)",
+                multi: false,
+                open: true,
+                sampleAnswer: "Tak, system plikow jest czesciowo zalezny od systemu operacyjnego, poniewaz kazdy system operacyjny natywnie wspiera okreslone systemy plikow (np. NTFS dla Windows, ext4 dla Linux). Jednak dzieki mechanizmom takim jak VFS (Virtual File System) w Linuxie, jeden system operacyjny moze obslugiwac wiele roznych systemow plikow."
+            },
+            {
+                id: 47,
+                question: "Wybierz definicje systemu operacyjnego:",
+                multi: true,
+                answers: [
+                    { text: "Jest to komputer z programem narzedziowym", correct: false },
+                    { text: "jest programem, ktory dziala jako posrednik pomiedzy uzytkownikiem a sprzetem komputerowym", correct: true },
+                    { text: "jest to specjalny program komputerowy, ktory steruje zarzadza sprzetem", correct: true }
+                ],
+                explanation: "System operacyjny to program posredniczacy miedzy uzytkownikiem a sprzetem oraz program sterujacy i zarzadzajacy sprzetem komputerowym."
+            },
+            {
+                id: 51,
+                question: "Opisz algorytm planowania First Come First Serve (pytanie otwarte)",
+                multi: false,
+                open: true,
+                sampleAnswer: "Algorytm FCFS (First Come First Serve) to najprostszy algorytm planowania, w ktorym procesy sa obslugiwane w kolejnosci ich przybycia do kolejki gotowych. Proces, ktory pierwszy zglosil sie do wykonania, jest pierwszym wykonywanym - dziala na zasadzie kolejki FIFO."
+            },
+            {
+                id: 52,
+                question: "Co opisuje ponizszaa definicja? jest zmienna calkowita, ktora jest dostepna za pomoca dwoch operacji: czekaj i sygnalizuj (pytanie otwarte)",
+                multi: false,
+                open: true,
+                sampleAnswer: "Semafor"
+            },
+            {
+                id: 53,
+                question: "Wybierz warunki konieczne do wystapienia blokady (wersja pelna):",
+                multi: true,
+                answers: [
+                    { text: "wzajemne oddzialywanie", correct: false },
+                    { text: "brak wywlaszczen", correct: true },
+                    { text: "przetrzymywanie i oczekiwanie", correct: true },
+                    { text: "istnienie wywlaszczen", correct: false },
+                    { text: "czekanie cykliczne", correct: true },
+                    { text: "niepodzielny zasob (wzajemne wylaczenie)", correct: true }
+                ],
+                explanation: "Ze slajdow 4 warunki blokady: 1) Wzajemne wylaczenie (niepodzielny zasob), 2) Przetrzymywanie i oczekiwanie, 3) Brak wywlaszczen, 4) Czekanie cykliczne."
+            },
+            {
+                id: 55,
+                question: "Watek-proces lekki - jest:",
+                multi: true,
+                answers: [
+                    { text: "procedura wykonywana w kazdym programie", correct: false },
+                    { text: "podstawowa jednostka wykorzystania procesora", correct: true },
+                    { text: "tworzony w kazdym programie", correct: false },
+                    { text: "uzywany w programowaniu wielowatkowym", correct: true }
+                ],
+                explanation: "Ze slajdow: Watek - proces lekki - jest podstawowa jednostka wykorzystania procesora. Watki sa uzywane w programowaniu wielowatkowym - to ich glowne zastosowanie."
+            },
+            {
+                id: 59,
+                question: "Gdzie stosuje sie macierze RAID? (pytanie otwarte)",
+                multi: false,
+                open: true,
+                sampleAnswer: "Macierze RAID sa powszechnie stosowane w rozwiazaniach serwerowych."
+            },
+            {
+                id: 62,
+                question: "Do czego sluzy plik dziennika w systemie plikow?",
+                multi: false,
+                answers: [
+                    { text: "do zapisu listy powiazanej adresow plikow", correct: false },
+                    { text: "do przechowywania nazw plikow utworzonych przez okreslonego uzytkownika", correct: false },
+                    { text: "do zapisu kompletnie zmienionych blokow, zapisywanych na dysk", correct: true },
+                    { text: "do zapisywania dziennych operacji na plikach", correct: false }
+                ],
+                explanation: "Ze slajdow: Do dziennika zapisywane sa kompletne zmienione bloki, ktore maja byc zapisane na dysk."
+            }
+        ];
+
+        var currentQuestion = 0;
+        var userAnswers = [];
+        var checked = [];
+
+        function startTest() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('testArea').style.display = 'block';
+            renderQuestions();
+            showQuestion(0);
+        }
+
+        function renderQuestions() {
+            var container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            for (var i = 0; i < questions.length; i++) {
+                var q = questions[i];
+                var card = document.createElement('div');
+                card.className = 'question-card';
+                card.id = 'question-' + i;
+                
+                var html = '<div class="question-number">Pytanie ' + q.id + '</div>' +
+                    '<div class="question-text">' + q.question + '</div>';
+                
+                if (q.image) {
+                    html += '<img src="' + q.image + '" alt="Obrazek do pytania ' + q.id + '" class="question-image">';
+                }
+                
+                if (q.open) {
+                    html += '<div class="open-question">' +
+                        '<textarea id="open-answer-' + i + '" placeholder="Wpisz swoja odpowiedz..."></textarea>' +
+                        '</div>' +
+                        '<div class="sample-answer" id="sample-' + i + '">' +
+                        '<div class="explanation-title">Przykladowa odpowiedz:</div>' +
+                        q.sampleAnswer +
+                        '</div>';
+                } else {
+                    html += '<div class="answers" id="answers-' + i + '">';
+                    for (var j = 0; j < q.answers.length; j++) {
+                        html += '<div class="answer" data-question="' + i + '" data-answer="' + j + '">' +
+                            '<div class="checkbox"></div>' +
+                            '<div>' + q.answers[j].text + '</div>' +
+                            '</div>';
+                    }
+                    html += '</div>';
+                }
+                
+                if (q.explanation) {
+                    html += '<div class="explanation" id="explanation-' + i + '">' +
+                        '<div class="explanation-title">Uzasadnienie:</div>' +
+                        q.explanation +
+                        '</div>';
+                }
+                
+                card.innerHTML = html;
+                container.appendChild(card);
+                
+                userAnswers[i] = [];
+                checked[i] = false;
+            }
+            
+            var answerElements = document.querySelectorAll('.answer');
+            for (var k = 0; k < answerElements.length; k++) {
+                answerElements[k].addEventListener('click', function() {
+                    var qIdx = parseInt(this.getAttribute('data-question'));
+                    var aIdx = parseInt(this.getAttribute('data-answer'));
+                    selectAnswer(qIdx, aIdx);
+                });
+            }
+        }
+
+        function showQuestion(index) {
+            var cards = document.querySelectorAll('.question-card');
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].classList.remove('active');
+            }
+            document.getElementById('question-' + index).classList.add('active');
+            currentQuestion = index;
+            
+            updateProgress();
+            updateNavButtons();
+        }
+
+        function updateProgress() {
+            var percent = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = 'Pytanie ' + (currentQuestion + 1) + ' z ' + questions.length;
+        }
+
+        function updateNavButtons() {
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'Zakoncz \u2192' : 'Nastepne \u2192';
+            document.getElementById('checkBtn').disabled = checked[currentQuestion];
+        }
+
+        function selectAnswer(qIndex, aIndex) {
+            if (checked[qIndex]) return;
+            
+            var q = questions[qIndex];
+            var answers = document.querySelectorAll('[data-question="' + qIndex + '"]');
+            
+            if (q.multi) {
+                var idx = userAnswers[qIndex].indexOf(aIndex);
+                if (idx > -1) {
+                    userAnswers[qIndex].splice(idx, 1);
+                    answers[aIndex].classList.remove('selected');
+                } else {
+                    userAnswers[qIndex].push(aIndex);
+                    answers[aIndex].classList.add('selected');
+                }
+            } else {
+                userAnswers[qIndex] = [aIndex];
+                for (var i = 0; i < answers.length; i++) {
+                    if (i === aIndex) {
+                        answers[i].classList.add('selected');
+                    } else {
+                        answers[i].classList.remove('selected');
+                    }
+                }
+            }
+        }
+
+        function checkAnswer() {
+            var q = questions[currentQuestion];
+            
+            if (q.open) {
+                document.getElementById('sample-' + currentQuestion).classList.add('show');
+                checked[currentQuestion] = true;
+                document.getElementById('checkBtn').disabled = true;
+                return;
+            }
+            
+            var answers = document.querySelectorAll('[data-question="' + currentQuestion + '"]');
+            
+            for (var i = 0; i < answers.length; i++) {
+                var isCorrect = q.answers[i].correct;
+                var isSelected = userAnswers[currentQuestion].indexOf(i) > -1;
+                
+                if (isCorrect && isSelected) {
+                    answers[i].classList.add('correct');
+                } else if (!isCorrect && isSelected) {
+                    answers[i].classList.add('incorrect');
+                } else if (isCorrect && !isSelected) {
+                    answers[i].classList.add('missed');
+                }
+            }
+            
+            var explanationEl = document.getElementById('explanation-' + currentQuestion);
+            if (explanationEl) {
+                explanationEl.classList.add('show');
+            }
+            checked[currentQuestion] = true;
+            document.getElementById('checkBtn').disabled = true;
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('testArea').style.display = 'none';
+            document.getElementById('results').classList.add('active');
+            
+            var correctCount = 0;
+            
+            for (var i = 0; i < questions.length; i++) {
+                var q = questions[i];
+                if (q.open) continue;
+                
+                var correctAnswers = [];
+                for (var j = 0; j < q.answers.length; j++) {
+                    if (q.answers[j].correct) {
+                        correctAnswers.push(j);
+                    }
+                }
+                
+                var userSelected = userAnswers[i] || [];
+                
+                var isCorrect = correctAnswers.length === userSelected.length;
+                if (isCorrect) {
+                    for (var k = 0; k < correctAnswers.length; k++) {
+                        if (userSelected.indexOf(correctAnswers[k]) === -1) {
+                            isCorrect = false;
+                            break;
+                        }
+                    }
+                }
+                
+                if (isCorrect) correctCount++;
+            }
+            
+            var totalGraded = 0;
+            for (var m = 0; m < questions.length; m++) {
+                if (!questions[m].open) totalGraded++;
+            }
+            
+            var percent = Math.round((correctCount / totalGraded) * 100);
+            
+            document.getElementById('finalScore').textContent = percent + '%';
+            document.getElementById('scoreDetails').textContent = correctCount + ' / ' + totalGraded + ' poprawnych odpowiedzi';
+        }
+
+        function restartTest() {
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('testArea').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+            currentQuestion = 0;
+            userAnswers = [];
+            checked = [];
+        }
+
+        function showAllAnswers() {
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('testArea').style.display = 'block';
+            
+            for (var i = 0; i < questions.length; i++) {
+                if (!checked[i]) {
+                    checked[i] = true;
+                    var q = questions[i];
+                    
+                    if (q.open) {
+                        document.getElementById('sample-' + i).classList.add('show');
+                    } else {
+                        var answers = document.querySelectorAll('[data-question="' + i + '"]');
+                        for (var j = 0; j < answers.length; j++) {
+                            var isCorrect = q.answers[j].correct;
+                            var isSelected = userAnswers[i].indexOf(j) > -1;
+                            
+                            if (isCorrect && isSelected) {
+                                answers[j].classList.add('correct');
+                            } else if (!isCorrect && isSelected) {
+                                answers[j].classList.add('incorrect');
+                            } else if (isCorrect && !isSelected) {
+                                answers[j].classList.add('missed');
+                            }
+                        }
+                        
+                        var explanationEl = document.getElementById('explanation-' + i);
+                        if (explanationEl) {
+                            explanationEl.classList.add('show');
+                        }
+                    }
+                }
+            }
+            
+            showQuestion(0);
+        }
+
+        document.getElementById('startBtn').addEventListener('click', startTest);
+        document.getElementById('prevBtn').addEventListener('click', prevQuestion);
+        document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+        document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+        document.getElementById('restartBtn').addEventListener('click', restartTest);
+        document.getElementById('restartBtnTest').addEventListener('click', restartTest);
+        document.getElementById('showAllBtn').addEventListener('click', showAllAnswers);
+    </script>
+</body>
+</html>
