@@ -975,7 +975,29 @@
         var userAnswers = [];
         var checked = [];
 
+        // Funkcja do losowania kolejnosci (Fisher-Yates shuffle)
+        function shuffleArray(array) {
+            var shuffled = array.slice();
+            for (var i = shuffled.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = shuffled[i];
+                shuffled[i] = shuffled[j];
+                shuffled[j] = temp;
+            }
+            return shuffled;
+        }
+
         function startTest() {
+            // Losuj kolejnosc pytan
+            questions = shuffleArray(questions);
+            
+            // Losuj kolejnosc odpowiedzi w kazdym pytaniu
+            for (var i = 0; i < questions.length; i++) {
+                if (questions[i].answers) {
+                    questions[i].answers = shuffleArray(questions[i].answers);
+                }
+            }
+            
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('testArea').style.display = 'block';
             renderQuestions();
@@ -992,7 +1014,7 @@
                 card.className = 'question-card';
                 card.id = 'question-' + i;
                 
-                var html = '<div class="question-number">Pytanie ' + q.id + '</div>' +
+                var html = '<div class="question-number">Pytanie ' + (i + 1) + '</div>' +
                     '<div class="question-text">' + q.question + '</div>';
                 
                 if (q.image) {
@@ -1069,27 +1091,16 @@
         function selectAnswer(qIndex, aIndex) {
             if (checked[qIndex]) return;
             
-            var q = questions[qIndex];
             var answers = document.querySelectorAll('[data-question="' + qIndex + '"]');
             
-            if (q.multi) {
-                var idx = userAnswers[qIndex].indexOf(aIndex);
-                if (idx > -1) {
-                    userAnswers[qIndex].splice(idx, 1);
-                    answers[aIndex].classList.remove('selected');
-                } else {
-                    userAnswers[qIndex].push(aIndex);
-                    answers[aIndex].classList.add('selected');
-                }
+            // Zawsze checkbox - mozna zaznaczac i odznaczac wiele odpowiedzi
+            var idx = userAnswers[qIndex].indexOf(aIndex);
+            if (idx > -1) {
+                userAnswers[qIndex].splice(idx, 1);
+                answers[aIndex].classList.remove('selected');
             } else {
-                userAnswers[qIndex] = [aIndex];
-                for (var i = 0; i < answers.length; i++) {
-                    if (i === aIndex) {
-                        answers[i].classList.add('selected');
-                    } else {
-                        answers[i].classList.remove('selected');
-                    }
-                }
+                userAnswers[qIndex].push(aIndex);
+                answers[aIndex].classList.add('selected');
             }
         }
 
@@ -1190,6 +1201,14 @@
             currentQuestion = 0;
             userAnswers = [];
             checked = [];
+            
+            // Losuj na nowo przy ponownym uruchomieniu
+            questions = shuffleArray(questions);
+            for (var i = 0; i < questions.length; i++) {
+                if (questions[i].answers) {
+                    questions[i].answers = shuffleArray(questions[i].answers);
+                }
+            }
         }
 
         function showAllAnswers() {
