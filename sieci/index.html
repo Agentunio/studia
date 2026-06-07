@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quiz Kolokwium 2 - Sieci komputerowe</title>
+    <meta
+      name="description"
+      content="Responsywny quiz do nauki na kolokwium z sieci komputerowych: OSI, IPv4, IPv6, VLSM, Ethernet, routing i NAT."
+    >
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-content">
+        <div>
+          <p class="eyebrow">Kolokwium 2</p>
+          <h1>Quiz z sieci komputerowych</h1>
+          <p class="lead">
+            Pytania z arkuszy są przepisane jako baza nauki. Pytania dopisane są oznaczone tekstem
+            „(stworzone przez AI)”.
+          </p>
+        </div>
+        <div class="network-visual" aria-hidden="true">
+          <span class="node node-a"></span>
+          <span class="node node-b"></span>
+          <span class="node node-c"></span>
+          <span class="node node-d"></span>
+          <span class="node node-e"></span>
+          <span class="link link-a"></span>
+          <span class="link link-b"></span>
+          <span class="link link-c"></span>
+          <span class="link link-d"></span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="view-switcher" aria-label="Tryb nauki">
+      <button id="quizViewButton" type="button" class="is-active" aria-pressed="true">Quiz</button>
+      <button id="flashcardsViewButton" type="button" aria-pressed="false">Fiszki</button>
+      <button id="examViewButton" type="button" aria-pressed="false">Egzamin</button>
+    </nav>
+
+    <main class="layout">
+      <aside id="quizToolbar" class="toolbar" aria-label="Filtry quizu">
+        <div class="summary">
+          <p class="summary-label">Poziom</p>
+          <p>
+            Podstawowy i średni. Najwięcej praktyki jest z adresacji IPv4/IPv6, VLSM, OSI i warstwy
+            łącza danych.
+          </p>
+        </div>
+
+        <label class="field">
+          <span>Szukaj</span>
+          <input id="searchInput" type="search" placeholder="np. VLSM, IPv6, NAT" autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span>Dział</span>
+          <select id="categorySelect"></select>
+        </label>
+
+        <label class="field">
+          <span>Źródło</span>
+          <select id="sourceSelect">
+            <option value="all">Wszystkie</option>
+            <option value="sheet">Z arkuszy</option>
+            <option value="ai">Stworzone przez AI</option>
+          </select>
+        </label>
+
+        <div class="toggle-row">
+          <label>
+            <input id="showAnswersToggle" type="checkbox">
+            <span>Pokaż wszystkie odpowiedzi</span>
+          </label>
+          <label>
+            <input id="repeatOnlyToggle" type="checkbox">
+            <span>Tylko do powtórki</span>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="shuffleButton" type="button">Losuj kolejność</button>
+          <button id="resetButton" type="button">Reset filtrów</button>
+        </div>
+
+        <div class="stats" aria-live="polite">
+          <span id="visibleCount">0</span>
+          <span>pytań widocznych</span>
+        </div>
+      </aside>
+
+      <section id="quizArea" class="quiz-area" aria-label="Lista pytań">
+        <div class="section-head">
+          <div>
+            <h2>Pytania do nauki</h2>
+            <p id="progressText">Oznaczaj pytania jako „umiem” albo „powtórz”, żeby zawęzić naukę.</p>
+          </div>
+        </div>
+        <div id="questionList" class="question-list"></div>
+        <p id="emptyState" class="empty-state" hidden>Brak pytań dla wybranych filtrów.</p>
+      </section>
+
+      <section id="flashcardArea" class="flashcards-area" aria-label="Fiszki do nauki" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Fiszki</h2>
+            <p>
+              Oparte wyłącznie na PDF i oryginalnych pytaniach z arkuszy. Bez pytań AI jako źródła.
+            </p>
+          </div>
+        </div>
+
+        <div class="flashcard-controls">
+          <label class="field">
+            <span>Szukaj fiszek</span>
+            <input id="flashcardSearchInput" type="search" placeholder="np. ARP, NAT, TCP" autocomplete="off">
+          </label>
+
+          <label class="field">
+            <span>Dział</span>
+            <select id="flashcardCategorySelect"></select>
+          </label>
+
+          <label class="field">
+            <span>Źródło</span>
+            <select id="flashcardSourceSelect"></select>
+          </label>
+        </div>
+
+        <div class="flashcard-stage">
+          <p class="flashcard-counter" id="flashcardCounter">0 / 0</p>
+          <button id="flashcardCard" class="flashcard-card" type="button" aria-live="polite">
+            <span id="flashcardSide" class="flashcard-side">Przód</span>
+            <strong id="flashcardFront"></strong>
+            <span id="flashcardBack" hidden></span>
+          </button>
+
+          <div class="flashcard-actions">
+            <button id="prevFlashcardButton" type="button">Poprzednia</button>
+            <button id="flipFlashcardButton" type="button">Odwróć</button>
+            <button id="nextFlashcardButton" type="button">Następna</button>
+            <button id="shuffleFlashcardsButton" type="button">Losuj fiszki</button>
+          </div>
+        </div>
+
+        <div class="flashcard-list-head">
+          <h3>Lista fiszek</h3>
+          <p id="flashcardListCount">0 fiszek</p>
+        </div>
+        <div id="flashcardList" class="flashcard-list"></div>
+        <p id="flashcardEmptyState" class="empty-state" hidden>Brak fiszek dla wybranych filtrów.</p>
+      </section>
+
+      <section id="examArea" class="exam-area" aria-label="Tryb egzaminacyjny" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Tryb egzaminacyjny</h2>
+            <p>
+              Wybierz liczbę pytań, rozpocznij losowy zestaw i sprawdź wynik na końcu. Otwarte pytania
+              są do samooceny.
+            </p>
+          </div>
+        </div>
+
+        <form id="examSetupForm" class="exam-setup">
+          <label class="field">
+            <span>Liczba pytań</span>
+            <input id="examCountInput" type="number" min="1" value="20" inputmode="numeric">
+          </label>
+          <button id="startExamButton" type="submit">Rozpocznij egzamin</button>
+        </form>
+
+        <div class="exam-status" aria-live="polite">
+          <p id="examStatusText">Ustaw liczbę pytań i rozpocznij egzamin.</p>
+          <button id="finishExamButton" type="button" hidden>Zakończ i sprawdź</button>
+        </div>
+
+        <div id="examResultPanel" class="exam-result" hidden></div>
+        <div id="examQuestionList" class="question-list"></div>
+        <p id="examEmptyState" class="empty-state">Egzamin nie został jeszcze rozpoczęty.</p>
+      </section>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
