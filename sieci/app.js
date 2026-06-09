@@ -57,6 +57,7 @@ const elements = {
   showAnswersToggle: document.querySelector("#showAnswersToggle"),
   repeatOnlyToggle: document.querySelector("#repeatOnlyToggle"),
   shuffleButton: document.querySelector("#shuffleButton"),
+  resetAnswersButton: document.querySelector("#resetAnswersButton"),
   resetButton: document.querySelector("#resetButton"),
   visibleCount: document.querySelector("#visibleCount"),
   questionList: document.querySelector("#questionList"),
@@ -230,6 +231,10 @@ function bindEvents() {
     render();
   });
 
+  elements.resetAnswersButton.addEventListener("click", () => {
+    resetQuizAnswers();
+  });
+
   elements.resetButton.addEventListener("click", () => {
     state.query = "";
     state.category = "all";
@@ -368,6 +373,19 @@ function render() {
   renderProgress();
 
   elements.questionList.innerHTML = filteredQuestions.map(renderQuestion).join("");
+}
+
+function resetQuizAnswers() {
+  Object.keys(userAnswers).forEach((id) => {
+    delete userAnswers[id];
+  });
+  Object.keys(checkResults).forEach((id) => {
+    delete checkResults[id];
+  });
+  revealedAnswers.clear();
+  state.showAnswers = false;
+  elements.showAnswersToggle.checked = false;
+  render();
 }
 
 function switchView(view) {
