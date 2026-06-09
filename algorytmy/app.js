@@ -1,6 +1,5 @@
 const sourceNames = {
-  sheet: "z listy pytań",
-  ai: "dodatkowe"
+  sheet: "z listy pytań"
 };
 
 const speculativeQuestionIds = new Set([]);

@@ -420,14 +420,6 @@ const FLASHCARDS = [
       "Opisuje tempo wzrostu kosztu algorytmu dla rosnacego wejscia, z pominieciem stalych i mniej istotnych skladnikow."
   },
   {
-    id: "fc-common-complexities",
-    category: "Analiza algorytmow",
-    source: "material uzupelniajacy",
-    front: "Typowe klasy zlozonosci",
-    back:
-      "O(1), O(log n), O(n), O(n log n), O(n^2). Im wolniej rosnie funkcja, tym lepiej dla duzych danych."
-  },
-  {
     id: "fc-flowchart",
     category: "Schematy blokowe",
     source: "lista pytan",
@@ -450,14 +442,6 @@ const FLASHCARDS = [
     front: "Rekurencja",
     back:
       "Funkcja wywoluje sama siebie dla mniejszego podproblemu az do przypadku bazowego."
-  },
-  {
-    id: "fc-recursion-risk",
-    category: "Iteracja i rekurencja",
-    source: "material uzupelniajacy",
-    front: "Glowne ryzyko rekurencji",
-    back:
-      "Zbyt gleboka rekurencja moze przepelnic stos, a zle zaprojektowana moze wielokrotnie liczyc te same podproblemy."
   },
   {
     id: "fc-data-structure",
@@ -650,21 +634,5 @@ const FLASHCARDS = [
     front: "Zlozonosc MergeSort",
     back:
       "Czas O(n log n) w najlepszym, srednim i najgorszym przypadku. Typowo pamiec O(n)."
-  },
-  {
-    id: "fc-quicksort-speedups",
-    category: "Sortowanie zaawansowane",
-    source: "material uzupelniajacy",
-    front: "Jak przyspieszyc QuickSort?",
-    back:
-      "Lepszy pivot, np. losowy lub mediana z trzech, InsertionSort dla malych podtablic i ograniczanie glebokosci rekurencji."
-  },
-  {
-    id: "fc-mergesort-speedups",
-    category: "Sortowanie zaawansowane",
-    source: "material uzupelniajacy",
-    front: "Jak przyspieszyc MergeSort?",
-    back:
-      "Jedna tablica pomocnicza, pomijanie scalania juz uporzadkowanych czesci i InsertionSort dla malych fragmentow."
   }
 ];
