@@ -421,6 +421,21 @@ h3 {
   padding-left: 1.15rem;
 }
 
+.question-figure {
+  display: inline-flex;
+  margin: 0.35rem 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f4f5ef;
+  padding: 0.55rem;
+}
+
+.question-figure img {
+  display: block;
+  width: min(280px, 100%);
+  height: auto;
+}
+
 .interactive-block {
   display: grid;
   gap: 0.85rem;

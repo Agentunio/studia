@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" role="img" aria-labelledby="title desc">
+  <title id="title">Topologia magistrali</title>
+  <desc id="desc">Piec komputerow podlaczonych do jednej wspolnej linii transmisyjnej.</desc>
+  <rect width="360" height="150" fill="#f4f5ef"/>
+  <g fill="none" stroke="#1d2420" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 86H328" stroke-width="6"/>
+    <path d="M78 58V86M146 58V86M214 58V86M120 86V116M238 86V116" stroke-width="4"/>
+  </g>
+  <g fill="#e8ece5" stroke="#1d2420" stroke-width="4" stroke-linejoin="round">
+    <rect x="57" y="26" width="42" height="30" rx="2"/>
+    <path d="M67 64H90M75 56v8M82 56v8"/>
+    <rect x="125" y="26" width="42" height="30" rx="2"/>
+    <path d="M135 64h23M143 56v8M150 56v8"/>
+    <rect x="193" y="26" width="42" height="30" rx="2"/>
+    <path d="M203 64h23M211 56v8M218 56v8"/>
+    <rect x="99" y="116" width="42" height="30" rx="2"/>
+    <path d="M109 108h23M117 116v-8M124 116v-8"/>
+    <rect x="217" y="116" width="42" height="30" rx="2"/>
+    <path d="M227 108h23M235 116v-8M242 116v-8"/>
+  </g>
+</svg>

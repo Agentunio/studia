@@ -140,7 +140,7 @@ const QUESTIONS = [
       "FE94",
       "A9CD:47FF:FE57:FE94"
     ],
-    answer: "A9CD:47FF:FE57:FE94",
+    answer: ["47FF:FE57:FE94", "FE57:FE94", "FE94", "A9CD:47FF:FE57:FE94"],
     explanation:
       "W typowym adresowaniu IPv6 identyfikator interfejsu to ostatnie 64 bity adresu, czyli ostatnie cztery hekstety. Uwaga: zapis /128 oznacza pojedynczy adres hosta, ale w tym typie pytania zwykle sprawdzana jest znajomość ostatnich 64 bitów."
   },
@@ -266,6 +266,10 @@ const QUESTIONS = [
     level: "podstawowy",
     question:
       "Jak nazywana jest poniższa topologia fizyczna? Czy jest wykorzystywana? Przedstaw wady i zalety.",
+    image: {
+      src: "assets/bus-topology.svg",
+      alt: "Schemat topologii magistrali: komputery podlaczone do jednej wspolnej linii."
+    },
     answer:
       "To topologia magistrali. Obecnie jest raczej historyczna i praktycznie nieużywana w nowych sieciach Ethernet.",
     explanation:

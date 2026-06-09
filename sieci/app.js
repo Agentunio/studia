@@ -24,6 +24,7 @@ const state = {
   showAnswers: false,
   repeatOnly: false,
   order: QUESTIONS.map((question) => question.id),
+  optionOrders: {},
   flashcardQuery: "",
   flashcardCategory: "all",
   flashcardSource: "all",
@@ -225,6 +226,7 @@ function bindEvents() {
 
   elements.shuffleButton.addEventListener("click", () => {
     state.order = shuffle([...state.order]);
+    shuffleAnswerOptions(QUESTIONS);
     render();
   });
 
@@ -235,6 +237,7 @@ function bindEvents() {
     state.showAnswers = false;
     state.repeatOnly = false;
     state.order = QUESTIONS.map((question) => question.id);
+    state.optionOrders = {};
     revealedAnswers.clear();
     elements.searchInput.value = "";
     elements.categorySelect.value = "all";
@@ -496,12 +499,50 @@ function moveFlashcard(direction) {
   renderFlashcards();
 }
 
+function shuffleAnswerOptions(questions) {
+  questions.forEach((question) => {
+    if (question.options?.length > 1) {
+      state.optionOrders[question.id] = shuffle([...question.options.keys()]);
+    }
+
+    const groups = getGroupChoiceData(question);
+    groups.forEach((group, index) => {
+      if (group.choices.length > 1) {
+        state.optionOrders[getGroupChoiceOrderKey(question, index)] = shuffle([
+          ...group.choices.keys()
+        ]);
+      }
+    });
+  });
+}
+
+function getOrderedOptions(question) {
+  if (!question.options?.length) return [];
+
+  const order = state.optionOrders[question.id];
+  if (!order || order.length !== question.options.length) return question.options;
+
+  return order.map((index) => question.options[index]).filter((option) => option !== undefined);
+}
+
+function getOrderedGroupChoices(question, group, index) {
+  const order = state.optionOrders[getGroupChoiceOrderKey(question, index)];
+  if (!order || order.length !== group.choices.length) return group.choices;
+
+  return order.map((choiceIndex) => group.choices[choiceIndex]).filter(Boolean);
+}
+
+function getGroupChoiceOrderKey(question, index) {
+  return `${question.id}:group:${index}`;
+}
+
 function startExam() {
   const count = getExamCount();
   state.examCount = count;
   state.examQuestionIds = shuffle(QUESTIONS.map((question) => question.id)).slice(0, count);
   state.examFinished = false;
   state.examScore = null;
+  shuffleAnswerOptions(getExamQuestions());
 
   state.examQuestionIds.forEach((id) => {
     delete userAnswers[id];
@@ -583,6 +624,7 @@ function renderExamQuestion(question, index) {
           <span class="tag">${escapeHtml(type === "open" ? "otwarte" : "zamknięte")}</span>
         </div>
         <h3>${index + 1}. ${escapeHtml(question.question)}</h3>
+        ${renderQuestionImage(question)}
         ${renderUncertainty(question)}
         ${renderInteractiveQuestion(question, {
           disabled: state.examFinished,
@@ -698,6 +740,7 @@ function renderQuestion(question) {
           ${statusTag}
         </div>
         <h3>${escapeHtml(question.question)}</h3>
+        ${renderQuestionImage(question)}
         ${renderUncertainty(question)}
         ${renderInteractiveQuestion(question)}
       </div>
@@ -755,19 +798,30 @@ function renderInteractiveQuestion(question, options = {}) {
   return renderOpenQuestion(question, options);
 }
 
+function renderQuestionImage(question) {
+  if (!question.image?.src) return "";
+
+  return `
+    <figure class="question-figure">
+      <img src="${escapeAttribute(question.image.src)}" alt="${escapeAttribute(question.image.alt || "")}">
+    </figure>
+  `;
+}
+
 function renderChoice(question, type, options = {}) {
   const selected = userAnswers[question.id] || {};
   const result = checkResults[question.id];
   const inputType = type === "singleChoice" ? "radio" : "checkbox";
   const selectedValues = type === "singleChoice" ? [selected.choice] : selected.choices || [];
+  const orderedOptions = getOrderedOptions(question);
   const namePrefix = options.inputNamePrefix || "";
   const disabled = options.disabled ? "disabled" : "";
 
   return `
     <div class="interactive-block">
       <div class="choice-list">
-        ${question.options
-          .map((option, index) => {
+        ${orderedOptions
+          .map((option) => {
             const checked = selectedValues.includes(option);
             const className = getChoiceClass(question, option, result);
             return `
@@ -794,7 +848,7 @@ function renderChoice(question, type, options = {}) {
 function renderMatching(question, options = {}) {
   const selected = userAnswers[question.id]?.matching || {};
   const result = checkResults[question.id];
-  const choices = question.options.map((option) => stripOptionPrefix(option));
+  const choices = getOrderedOptions(question).map((option) => stripOptionPrefix(option));
   const disabled = options.disabled ? "disabled" : "";
 
   return `
@@ -843,10 +897,11 @@ function renderGroupChoice(question, options = {}) {
           .map((group, index) => {
             const rowResult = result?.details?.[index];
             const rowClass = rowResult === true ? "is-correct" : rowResult === false ? "is-wrong" : "";
+            const choices = getOrderedGroupChoices(question, group, index);
             return `
               <fieldset class="group-choice ${rowClass}">
                 <legend>${escapeHtml(group.prompt)}</legend>
-                ${group.choices
+                ${choices
                   .map(
                     (choice) => `
                       <label class="choice-item compact">
@@ -1010,8 +1065,20 @@ function evaluateClosedAnswer(question) {
 function getCorrectOptions(question) {
   const answerItems = Array.isArray(question.answer) ? question.answer : [question.answer];
   return question.options.filter((option) =>
-    answerItems.some((answer) => answerContainsOption(answer, option))
+    answerItems.some((answer) =>
+      Array.isArray(question.answer)
+        ? answerMatchesOption(answer, option)
+        : answerContainsOption(answer, option)
+    )
   );
+}
+
+function answerMatchesOption(answer, option) {
+  const cleanAnswer = normalizeText(answer);
+  const cleanOption = normalizeText(option);
+  const optionWithoutLetter = normalizeText(stripOptionPrefix(option));
+
+  return cleanAnswer === cleanOption || cleanAnswer === optionWithoutLetter;
 }
 
 function answerContainsOption(answer, option) {
