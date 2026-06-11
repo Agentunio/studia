@@ -1,6 +1,13 @@
 const sourceNames = {
-  sheet: "z listy pytań"
+  sheet: "z listy pytań",
+  notatki: "z notatek"
 };
+
+function sourceTagClass(source) {
+  if (source === "notatki") return "tag-notatki";
+  if (source === "ai") return "tag-ai";
+  return "tag-sheet";
+}
 
 const speculativeQuestionIds = new Set([]);
 
@@ -57,6 +64,7 @@ const elements = {
   flashcardSide: document.querySelector("#flashcardSide"),
   flashcardFront: document.querySelector("#flashcardFront"),
   flashcardBack: document.querySelector("#flashcardBack"),
+  flashcardImage: document.querySelector("#flashcardImage"),
   prevFlashcardButton: document.querySelector("#prevFlashcardButton"),
   flipFlashcardButton: document.querySelector("#flipFlashcardButton"),
   nextFlashcardButton: document.querySelector("#nextFlashcardButton"),
@@ -430,6 +438,8 @@ function renderFlashcards() {
     elements.flashcardFront.textContent = "Brak fiszek";
     elements.flashcardBack.hidden = true;
     elements.flashcardBack.textContent = "";
+    elements.flashcardImage.hidden = true;
+    elements.flashcardImage.removeAttribute("src");
     elements.flashcardList.innerHTML = "";
     return;
   }
@@ -438,6 +448,16 @@ function renderFlashcards() {
   elements.flashcardFront.textContent = state.flashcardFlipped ? current.back : current.front;
   elements.flashcardBack.hidden = !state.flashcardFlipped;
   elements.flashcardBack.textContent = state.flashcardFlipped ? `Źródło: ${current.source}` : "";
+
+  const showImage = state.flashcardFlipped && Boolean(current.image && current.image.src);
+  elements.flashcardImage.hidden = !showImage;
+  if (showImage) {
+    elements.flashcardImage.src = current.image.src;
+    elements.flashcardImage.alt = current.image.alt || "";
+  } else {
+    elements.flashcardImage.removeAttribute("src");
+    elements.flashcardImage.alt = "";
+  }
 
   elements.flashcardList.innerHTML = filtered
     .map(
@@ -559,7 +579,7 @@ function renderExam() {
 function renderExamQuestion(question, index) {
   const type = getQuestionType(question);
   const closed = isClosedQuestion(question);
-  const sourceClass = question.source === "ai" ? "tag-ai" : "tag-sheet";
+  const sourceClass = sourceTagClass(question.source);
 
   return `
     <article class="question-card exam-question" data-question-id="${escapeAttribute(question.id)}">
@@ -671,7 +691,7 @@ function renderQuestion(question) {
   if (status === "known") cardClasses.push("is-known");
   if (status === "repeat") cardClasses.push("is-repeat");
 
-  const sourceClass = question.source === "ai" ? "tag-ai" : "tag-sheet";
+  const sourceClass = sourceTagClass(question.source);
   const statusTag =
     status === "known"
       ? '<span class="tag tag-known">umiem</span>'
