@@ -1140,3 +1140,412 @@ const FLASHCARDS = [
     }
   }
 ];
+
+// Legenda symboli schematu blokowego (wykorzystywana w widoku "Schematy").
+const DIAGRAM_LEGEND = [
+  {
+    type: "terminator",
+    name: "Terminator (owal)",
+    use: "Początek (START) i koniec (STOP / KONIEC) algorytmu. Każdy schemat ma dokładnie jeden START i co najmniej jeden STOP."
+  },
+  {
+    type: "io",
+    name: "Równoległobok",
+    use: "Wejście danych (czytaj / wczytaj) albo wyjście wyników (pisz / wypisz)."
+  },
+  {
+    type: "process",
+    name: "Prostokąt",
+    use: "Operacja, obliczenie lub przypisanie wartości, np. s := s + i."
+  },
+  {
+    type: "decision",
+    name: "Romb (decyzja)",
+    use: "Warunek logiczny z dwoma wyjściami: Tak i Nie. Steruje rozgałęzieniami i pętlami."
+  },
+  {
+    type: "connector",
+    name: "Łącznik (koło)",
+    use: "Połączenie z innym miejscem schematu, np. gdy strzałka nie mieści się na rysunku."
+  }
+];
+
+// Zadania do ćwiczenia rysowania schematów blokowych.
+// solution: lista bloków głównej gałęzi (z góry na dół).
+//   decision: downLabel = etykieta strzałki w dół, branchLabel = etykieta gałęzi w prawo,
+//             branch = samodzielna gałąź prawa (kończy się terminatorem).
+//   loopTo: id wcześniejszego bloku, do którego wraca strzałka pętli.
+const DIAGRAM_TASKS = [
+  {
+    id: "diag-even-odd",
+    title: "Liczba parzysta czy nieparzysta",
+    prompt:
+      "Narysuj schemat blokowy, który wczytuje liczbę całkowitą n i wypisuje, czy jest ona parzysta, czy nieparzysta.",
+    hint:
+      "Potrzebne bloki: START, wczytanie n, romb z warunkiem n mod 2 = 0, dwa wyjścia (Tak / Nie) z wypisaniem wyniku, STOP.",
+    solution: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj n" },
+      {
+        type: "decision",
+        text: "n mod 2 = 0?",
+        downLabel: "Tak",
+        branchLabel: "Nie",
+        branch: [
+          { type: "io", text: "Wypisz: nieparzysta" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "io", text: "Wypisz: parzysta" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "diag-max-two",
+    title: "Większa z dwóch liczb",
+    prompt:
+      "Narysuj schemat blokowy, który wczytuje dwie liczby a i b oraz wypisuje większą z nich.",
+    hint:
+      "Jeden romb z warunkiem a > b wystarczy. Gałąź Tak wypisuje a, gałąź Nie wypisuje b.",
+    solution: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj a, b" },
+      {
+        type: "decision",
+        text: "a > b?",
+        downLabel: "Tak",
+        branchLabel: "Nie",
+        branch: [
+          { type: "io", text: "Wypisz b" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "io", text: "Wypisz a" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "diag-abs",
+    title: "Wartość bezwzględna liczby",
+    prompt:
+      "Narysuj schemat blokowy, który wczytuje liczbę x i wypisuje jej wartość bezwzględną |x|.",
+    hint:
+      "Sprawdź warunek x < 0. Jeśli Tak, zmień x na -x, a następnie wypisz x. Obie ścieżki kończą się wypisaniem wyniku.",
+    solution: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj x" },
+      {
+        type: "decision",
+        text: "x < 0?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branch: [
+          { type: "process", text: "x := -x" },
+          { type: "io", text: "Wypisz x" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "io", text: "Wypisz x" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "diag-sum",
+    title: "Suma liczb od 1 do n (pętla)",
+    prompt:
+      "Narysuj schemat blokowy, który dla wczytanej liczby n oblicza i wypisuje sumę 1 + 2 + ... + n.",
+    hint:
+      "To pętla. Ustaw s := 0 oraz i := 1. W rombie sprawdzaj i <= n: gałąź Tak dodaje i do s i zwiększa i, a strzałka wraca do rombu; gałąź Nie wypisuje s.",
+    solution: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj n" },
+      { type: "process", text: "s := 0" },
+      { type: "process", text: "i := 1" },
+      {
+        id: "loop",
+        type: "decision",
+        text: "i <= n?",
+        downLabel: "Tak",
+        branchLabel: "Nie",
+        branch: [
+          { type: "io", text: "Wypisz s" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "process", text: "s := s + i" },
+      { type: "process", text: "i := i + 1", loopTo: "loop", loopLabel: "powtórz" }
+    ]
+  },
+  {
+    id: "diag-factorial",
+    title: "Silnia n! (pętla)",
+    prompt:
+      "Narysuj schemat blokowy, który dla wczytanej liczby n oblicza i wypisuje silnię n! = 1 · 2 · ... · n.",
+    hint:
+      "Bardzo podobne do sumy, ale zaczynasz od wynik := 1 i w pętli mnożysz: wynik := wynik · i.",
+    solution: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj n" },
+      { type: "process", text: "wynik := 1" },
+      { type: "process", text: "i := 1" },
+      {
+        id: "loop",
+        type: "decision",
+        text: "i <= n?",
+        downLabel: "Tak",
+        branchLabel: "Nie",
+        branch: [
+          { type: "io", text: "Wypisz wynik" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "process", text: "wynik := wynik * i" },
+      { type: "process", text: "i := i + 1", loopTo: "loop", loopLabel: "powtórz" }
+    ]
+  },
+  {
+    id: "diag-sign",
+    title: "Znak liczby (dodatnia / ujemna / zero)",
+    prompt:
+      "Narysuj schemat blokowy, który wczytuje liczbę x i wypisuje, czy jest dodatnia, ujemna, czy równa zero.",
+    hint:
+      "Potrzebne są dwa romby. Najpierw sprawdź x > 0, potem x < 0. Jeśli oba warunki są fałszywe, liczba jest równa zero.",
+    solution: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj x" },
+      {
+        type: "decision",
+        text: "x > 0?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branch: [
+          { type: "io", text: "Wypisz: dodatnia" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      {
+        type: "decision",
+        text: "x < 0?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branch: [
+          { type: "io", text: "Wypisz: ujemna" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "io", text: "Wypisz: zero" },
+      { type: "terminator", text: "STOP" }
+    ]
+  }
+];
+
+// Przykładowy schemat ładowany przyciskiem „Wczytaj przykład” w kreatorze.
+const DIAGRAM_SAMPLE = [
+  { type: "terminator", text: "START" },
+  { type: "io", text: "Wczytaj n" },
+  { type: "decision", text: "n mod 2 = 0?", mainBranch: "Tak", branchText: "Wypisz: nieparzysta" },
+  { type: "io", text: "Wypisz: parzysta" },
+  { type: "terminator", text: "STOP" }
+];
+
+// Schematy blokowe sortowań (te same, co na fiszkach z obrazkami).
+//   steps:   kanoniczna kolejność kroków — student układa je od nowa, a aplikacja
+//            sprawdza dokładnie tę kolejność (tryb „Układanie bloków”).
+//   diagram: pełny model do narysowania wzorcowego schematu (SVG).
+//            decision: downLabel = strzałka w dół, branchLabel = odnoga w bok,
+//            branch = bloki odnogi; branchRejoin = odnoga wraca do głównej osi;
+//            branchLoop = odnoga to ciało pętli wracające do warunku;
+//            loopTo = strzałka pętli do bloku o danym id.
+const SORTING_DIAGRAMS = [
+  {
+    id: "sort-bubble",
+    title: "Sortowanie bąbelkowe",
+    note:
+      "Pętla powtarzana, dopóki lista nie jest posortowana. W każdym przebiegu porównujemy sąsiednie pary i zamieniamy je, gdy są w złej kolejności.",
+    steps: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj listę" },
+      { type: "process", text: "Zmniejsz zakres (początek pętli)" },
+      { type: "process", text: "Porównaj sąsiednią parę A[i] i A[i+1]" },
+      { type: "decision", text: "A[i] > A[i+1]?" },
+      { type: "process", text: "Zamień A[i] z A[i+1] (gdy warunek spełniony)" },
+      { type: "decision", text: "Czy lista jest posortowana?" },
+      { type: "io", text: "Wypisz posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ],
+    diagram: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj listę" },
+      { id: "bbl-loop", type: "process", text: "Zmniejsz zakres" },
+      { type: "process", text: "Porównaj parę (i, i+1)" },
+      {
+        type: "decision",
+        text: "A[i] > A[i+1]?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branchRejoin: true,
+        branch: [{ type: "process", text: "Zamień A[i] z A[i+1]" }]
+      },
+      {
+        type: "decision",
+        text: "Czy lista posortowana?",
+        downLabel: "Tak",
+        loopTo: "bbl-loop",
+        loopLabel: "Nie"
+      },
+      { type: "io", text: "Wypisz posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "sort-insertion",
+    title: "Sortowanie przez wstawianie",
+    note:
+      "Dla każdego elementu (klucza) cofamy się po posortowanej części i przesuwamy większe elementy w prawo, aż znajdziemy miejsce na klucz.",
+    steps: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj listę" },
+      { type: "process", text: "Dla i od 1 do N-1 (pętla zewnętrzna)" },
+      { type: "process", text: "klucz := A[i]" },
+      { type: "process", text: "j := i - 1" },
+      { type: "decision", text: "j ≥ 0 oraz A[j] > klucz?" },
+      { type: "process", text: "Przesuń A[j] na pozycję j+1" },
+      { type: "process", text: "Zmniejsz j (j := j - 1) i sprawdź warunek ponownie" },
+      { type: "process", text: "Wstaw klucz na pozycję j+1" },
+      { type: "io", text: "Wypisz posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ],
+    diagram: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj listę" },
+      { type: "process", text: "Dla i od 1 do N-1" },
+      { type: "process", text: "klucz := A[i]" },
+      { type: "process", text: "j := i - 1" },
+      {
+        type: "decision",
+        text: "j ≥ 0 i A[j] > klucz?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branchLoop: true,
+        loopLabel: "powtórz",
+        branch: [
+          { type: "process", text: "Przesuń A[j] na A[j+1]" },
+          { type: "process", text: "j := j - 1" }
+        ]
+      },
+      { type: "process", text: "Wstaw klucz na A[j+1]" },
+      { type: "io", text: "Wypisz posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "sort-selection",
+    title: "Sortowanie przez wybór",
+    note:
+      "Dla każdej pozycji i szukamy indeksu najmniejszego elementu w pozostałej części listy, a potem zamieniamy go z elementem na pozycji i.",
+    steps: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj listę" },
+      { type: "process", text: "Dla i od 0 do N-2 (pętla zewnętrzna)" },
+      { type: "process", text: "Ustaw indeks_min := i" },
+      { type: "process", text: "Dla j od i+1 do N-1 (pętla wewnętrzna)" },
+      { type: "decision", text: "A[j] < A[indeks_min]?" },
+      { type: "process", text: "Ustaw indeks_min := j (gdy warunek spełniony)" },
+      { type: "process", text: "Zamień A[i] z A[indeks_min]" },
+      { type: "io", text: "Wypisz posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ],
+    diagram: [
+      { type: "terminator", text: "START" },
+      { type: "io", text: "Wczytaj listę" },
+      { type: "process", text: "Dla i od 0 do N-2" },
+      { type: "process", text: "indeks_min := i" },
+      { type: "process", text: "Dla j od i+1 do N-1" },
+      {
+        type: "decision",
+        text: "A[j] < A[indeks_min]?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branchRejoin: true,
+        branch: [{ type: "process", text: "indeks_min := j" }]
+      },
+      { type: "process", text: "Zamień A[i] z A[indeks_min]" },
+      { type: "io", text: "Wypisz posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "sort-merge",
+    title: "Sortowanie przez scalanie",
+    note:
+      "Algorytm rekurencyjny typu „dziel i zwyciężaj”: dziel listę na pół, posortuj każdą połowę osobno, a potem scal posortowane połowy.",
+    steps: [
+      { type: "terminator", text: "START" },
+      { type: "decision", text: "Czy długość listy < 2?" },
+      { type: "process", text: "Zwróć listę (przypadek bazowy)" },
+      { type: "process", text: "Podziel listę na dwie połowy" },
+      { type: "process", text: "Posortuj lewą połowę (rekurencyjnie)" },
+      { type: "process", text: "Posortuj prawą połowę (rekurencyjnie)" },
+      { type: "process", text: "Scal posortowane połowy" },
+      { type: "io", text: "Zwróć posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ],
+    diagram: [
+      { type: "terminator", text: "START" },
+      {
+        type: "decision",
+        text: "Długość < 2?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branch: [
+          { type: "process", text: "Zwróć listę" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "process", text: "Podziel na dwie połowy" },
+      { type: "process", text: "Posortuj lewą połowę (rekur.)" },
+      { type: "process", text: "Posortuj prawą połowę (rekur.)" },
+      { type: "process", text: "Scal posortowane połowy" },
+      { type: "io", text: "Zwróć posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ]
+  },
+  {
+    id: "sort-quick",
+    title: "Sortowanie szybkie (QuickSort)",
+    note:
+      "Algorytm rekurencyjny: wybierz element osiowy (pivot), podziel listę na mniejsze i większe od pivota, posortuj obie części i połącz wynik.",
+    steps: [
+      { type: "terminator", text: "START" },
+      { type: "decision", text: "Czy długość listy ≤ 1?" },
+      { type: "process", text: "Zwróć listę (przypadek bazowy)" },
+      { type: "process", text: "Wybierz element osiowy (pivot)" },
+      { type: "process", text: "Podziel na mniejsze i większe od pivota" },
+      { type: "process", text: "Posortuj lewą część (rekurencyjnie)" },
+      { type: "process", text: "Posortuj prawą część (rekurencyjnie)" },
+      { type: "process", text: "Połącz: lewa + pivot + prawa" },
+      { type: "io", text: "Zwróć posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ],
+    diagram: [
+      { type: "terminator", text: "START" },
+      {
+        type: "decision",
+        text: "Długość ≤ 1?",
+        downLabel: "Nie",
+        branchLabel: "Tak",
+        branch: [
+          { type: "process", text: "Zwróć listę" },
+          { type: "terminator", text: "STOP" }
+        ]
+      },
+      { type: "process", text: "Wybierz pivot" },
+      { type: "process", text: "Podział: mniejsze | większe" },
+      { type: "process", text: "Posortuj lewą część (rekur.)" },
+      { type: "process", text: "Posortuj prawą część (rekur.)" },
+      { type: "process", text: "Połącz: lewa + pivot + prawa" },
+      { type: "io", text: "Zwróć posortowaną listę" },
+      { type: "terminator", text: "STOP" }
+    ]
+  }
+];

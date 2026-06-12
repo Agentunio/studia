@@ -40,6 +40,7 @@
       <button id="quizViewButton" type="button" class="is-active" aria-pressed="true">Quiz</button>
       <button id="flashcardsViewButton" type="button" aria-pressed="false">Fiszki</button>
       <button id="examViewButton" type="button" aria-pressed="false">Egzamin</button>
+      <button id="diagramViewButton" type="button" aria-pressed="false">Schematy</button>
     </nav>
 
     <main class="layout">
@@ -184,6 +185,121 @@
         <div id="examResultPanel" class="exam-result" hidden></div>
         <div id="examQuestionList" class="question-list"></div>
         <p id="examEmptyState" class="empty-state">Egzamin nie został jeszcze rozpoczęty.</p>
+      </section>
+
+      <section id="diagramArea" class="diagram-area" aria-label="Schematy blokowe" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Schematy blokowe</h2>
+            <p>
+              Powtórz symbole, samodzielnie zbuduj schemat w kreatorze i sprawdź się na zadaniach.
+              Twój schemat zapisuje się automatycznie w przeglądarce.
+            </p>
+          </div>
+        </div>
+
+        <div class="diagram-panel">
+          <h3>Legenda — symbole</h3>
+          <p class="panel-sub">
+            Każdy blok ma ustalony kształt i znaczenie. Najpierw je rozpoznaj, potem używaj ich w kreatorze.
+          </p>
+          <div id="diagramLegend" class="diagram-legend"></div>
+        </div>
+
+        <div class="diagram-panel">
+          <h3>Kreator schematu</h3>
+          <p class="panel-sub">
+            Dodawaj bloki z palety, wpisuj treść i ustawiaj kolejność. Po prawej widzisz gotowy rysunek.
+          </p>
+          <div id="diagramPalette" class="diagram-palette">
+            <button type="button" data-add="terminator">+ Start / Koniec</button>
+            <button type="button" data-add="io">+ Wejście / Wyjście</button>
+            <button type="button" data-add="process">+ Operacja</button>
+            <button type="button" data-add="decision">+ Decyzja</button>
+            <button type="button" data-add="connector">+ Łącznik</button>
+          </div>
+
+          <div class="diagram-builder">
+            <div class="diagram-editor">
+              <div id="diagramEditorList" class="diagram-editor-list"></div>
+              <p id="diagramEditorEmpty" class="diagram-empty">
+                Brak bloków. Zacznij od „+ Start / Koniec” albo wczytaj przykład.
+              </p>
+              <div class="diagram-builder-actions">
+                <button id="diagramScaffoldButton" type="button">Wstaw START i STOP</button>
+                <button id="diagramSampleButton" type="button">Wczytaj przykład</button>
+                <button id="diagramCheckButton" type="button">Sprawdź schemat</button>
+                <button id="diagramClearButton" type="button">Wyczyść</button>
+              </div>
+              <div id="diagramFeedback" class="diagram-feedback" aria-live="polite" hidden></div>
+            </div>
+
+            <div class="diagram-preview">
+              <p class="diagram-preview-label">Podgląd</p>
+              <div id="diagramCanvas" class="diagram-canvas"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="diagram-panel">
+          <h3>Zadania do ćwiczeń</h3>
+          <p class="panel-sub">
+            Wybierz zadanie, zbuduj schemat w kreatorze powyżej, a na końcu porównaj go z przykładowym rozwiązaniem.
+          </p>
+          <label class="field">
+            <span>Zadanie</span>
+            <select id="diagramTaskSelect"></select>
+          </label>
+          <div id="diagramTaskBody" class="diagram-task-body"></div>
+        </div>
+
+        <div class="diagram-panel">
+          <h3>Sortowania — odtwórz schemat</h3>
+          <p class="panel-sub">
+            Wybierz sortowanie. W trybie „Układanie” poukładaj pomieszane bloki w poprawnej kolejności
+            (aplikacja sprawdza dokładnie). Możesz też narysować schemat samodzielnie w kreatorze powyżej
+            i porównać go z wzorcowym schematem.
+          </p>
+
+          <label class="field">
+            <span>Sortowanie</span>
+            <select id="sortSelect"></select>
+          </label>
+          <p id="sortNote" class="diagram-sort-note"></p>
+
+          <div class="diagram-sort-recon">
+            <div class="diagram-sort-head">
+              <h4>Układanie bloków (auto‑sprawdzanie)</h4>
+              <div class="diagram-sort-actions">
+                <button id="sortShuffleButton" type="button">Wymieszaj ponownie</button>
+                <button id="sortCheckButton" type="button">Sprawdź ułożenie</button>
+              </div>
+            </div>
+            <p class="diagram-sort-hint">
+              Ustaw bloki w kolejności od START do STOP, używając przycisków ↑ / ↓.
+            </p>
+            <div id="sortReconList" class="diagram-sort-list"></div>
+            <div id="sortReconFeedback" class="diagram-feedback" aria-live="polite" hidden></div>
+          </div>
+
+          <div class="diagram-sort-model">
+            <div class="diagram-sort-head">
+              <h4>Rysowanie samodzielne</h4>
+              <div class="diagram-sort-actions">
+                <button id="sortScaffoldButton" type="button">Rysuj w kreatorze</button>
+                <button id="sortModelButton" type="button">Pokaż wzorcowy schemat</button>
+              </div>
+            </div>
+            <p class="diagram-sort-hint">
+              „Rysuj w kreatorze” wstawia START i STOP do kreatora powyżej — dorysuj resztę, a potem
+              odsłoń wzorzec i porównaj.
+            </p>
+            <div id="sortModelWrap" class="diagram-solution" hidden>
+              <p class="diagram-preview-label">Wzorcowy schemat</p>
+              <div id="sortModelCanvas" class="diagram-canvas"></div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
 

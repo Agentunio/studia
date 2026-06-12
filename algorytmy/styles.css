@@ -624,7 +624,8 @@ h3 {
 }
 
 .flashcards-area,
-.exam-area {
+.exam-area,
+.diagram-area {
   grid-column: 1 / -1;
 }
 
@@ -792,6 +793,460 @@ h3 {
   background: var(--accent-soft);
 }
 
+/* Schematy blokowe */
+.diagram-area {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.diagram-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 10px 25px rgba(24, 34, 30, 0.06);
+  padding: 1.1rem;
+}
+
+.diagram-panel h3 {
+  margin-bottom: 0.3rem;
+}
+
+.panel-sub {
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.diagram-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.8rem;
+}
+
+.diagram-legend-card {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  padding: 0.7rem;
+}
+
+.diagram-legend-symbol {
+  display: flex;
+  justify-content: center;
+}
+
+.diagram-legend-card h4 {
+  margin: 0 0 0.25rem;
+  color: var(--accent-strong);
+  font-size: 0.98rem;
+}
+
+.diagram-legend-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.diagram-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.diagram-palette button {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.diagram-palette button:hover,
+.diagram-palette button:focus-visible {
+  border-color: var(--accent);
+}
+
+.diagram-builder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.diagram-editor-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.diagram-block-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.6rem;
+}
+
+.diagram-block-badge {
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  min-height: 28px;
+  max-width: 92px;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.badge-terminator {
+  background: var(--accent);
+  color: #fff;
+}
+
+.badge-io {
+  background: #e5eef8;
+  color: var(--blue);
+}
+
+.badge-process {
+  background: var(--surface-strong);
+  color: var(--accent-strong);
+}
+
+.badge-decision {
+  background: #fff0de;
+  color: var(--amber);
+}
+
+.badge-connector {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.diagram-block-fields {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.diagram-block-fields input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 0.55rem 0.65rem;
+}
+
+.diagram-block-fields input:focus,
+.diagram-decision-extra select:focus {
+  border-color: var(--accent);
+  outline: 3px solid var(--accent-soft);
+}
+
+.diagram-decision-extra {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.6fr) minmax(0, 1.4fr);
+  gap: 0.5rem;
+}
+
+.diagram-decision-extra label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.diagram-decision-extra select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 0.5rem 0.55rem;
+}
+
+.diagram-loop-field {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.diagram-loop-field select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  padding: 0.5rem 0.55rem;
+}
+
+.diagram-loop-field select:focus {
+  border-color: var(--accent);
+  outline: 3px solid var(--accent-soft);
+}
+
+.diagram-block-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.diagram-block-controls button {
+  min-height: 32px;
+  min-width: 38px;
+  padding: 0.2rem 0.4rem;
+}
+
+.diagram-block-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.diagram-builder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.diagram-empty {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--muted);
+  background: var(--surface);
+  margin: 0;
+}
+
+.diagram-feedback {
+  margin-top: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 0.8rem 0.9rem;
+}
+
+.diagram-feedback h4 {
+  margin: 0 0 0.5rem;
+  color: var(--accent-strong);
+  font-size: 0.95rem;
+}
+
+.diagram-feedback ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.diagram-feedback-ok {
+  color: #315f25;
+}
+
+.diagram-feedback-warn {
+  color: #8e4f12;
+}
+
+.diagram-preview {
+  position: sticky;
+  top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-strong);
+  padding: 0.8rem;
+}
+
+.diagram-preview-label {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.diagram-canvas {
+  overflow-x: auto;
+  display: flex;
+  justify-content: flex-start;
+  border-radius: 6px;
+  background: #fff;
+  padding: 0.6rem;
+}
+
+.flowchart-svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram-task-body {
+  margin-top: 0.8rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.diagram-task-prompt {
+  margin: 0;
+  font-weight: 700;
+}
+
+.diagram-hint {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff7eb;
+  padding: 0.5rem 0.75rem;
+}
+
+.diagram-hint summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: #8e4f12;
+}
+
+.diagram-hint p {
+  margin: 0.6rem 0 0;
+  color: #7a4a17;
+}
+
+.diagram-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.diagram-solution .diagram-canvas {
+  background: #fff;
+}
+
+.diagram-sort-note {
+  margin: 0.2rem 0 1rem;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  padding: 0.6rem 0.8rem;
+  font-weight: 600;
+}
+
+.diagram-sort-recon,
+.diagram-sort-model {
+  margin-top: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 0.9rem;
+}
+
+.diagram-sort-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.diagram-sort-head h4 {
+  margin: 0;
+  color: var(--accent-strong);
+}
+
+.diagram-sort-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.diagram-sort-actions button {
+  min-height: 38px;
+  padding: 0.4rem 0.7rem;
+}
+
+#sortCheckButton {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+#sortCheckButton:hover,
+#sortCheckButton:focus-visible {
+  background: var(--accent-strong);
+}
+
+.diagram-sort-hint {
+  margin: 0.5rem 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.diagram-sort-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.diagram-sort-item {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.55rem 0.65rem;
+}
+
+.diagram-sort-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.diagram-sort-text {
+  min-width: 0;
+  font-weight: 600;
+}
+
+.diagram-sort-controls {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.diagram-sort-controls button {
+  min-height: 34px;
+  min-width: 38px;
+  padding: 0.2rem 0.45rem;
+}
+
+.diagram-sort-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.diagram-sort-item.is-correct {
+  border-color: #6dad63;
+  background: #f0f8ee;
+}
+
+.diagram-sort-item.is-wrong {
+  border-color: #cf8f8f;
+  background: #fff3f3;
+}
+
 @media (max-width: 860px) {
   .header-content {
     grid-template-columns: 1fr;
@@ -812,6 +1267,20 @@ h3 {
   .flashcard-controls,
   .exam-setup {
     grid-template-columns: 1fr;
+  }
+
+  .diagram-builder {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram-preview {
+    position: static;
+  }
+
+  .diagram-legend-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
   }
 }
 
@@ -855,6 +1324,18 @@ h3 {
   }
 
   .matching-row {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram-sort-item {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .diagram-sort-item .diagram-block-badge {
+    display: none;
+  }
+
+  .diagram-decision-extra {
     grid-template-columns: 1fr;
   }
 }
