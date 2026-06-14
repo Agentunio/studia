@@ -665,6 +665,181 @@ const QUESTIONS = [
     ],
     explanation:
       "Dwukierunkowa lista jest wygodniejsza w przechodzeniu w obie strony kosztem dodatkowego wskaźnika w każdym elemencie."
+  },
+  {
+    id: "cph-applications",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Wymień zastosowania szyfrów.",
+    answer: [
+      "Ochrona poufności danych — wiadomości, plików i haseł.",
+      "Bezpieczna komunikacja w sieci (HTTPS, VPN, poczta, komunikatory).",
+      "Uwierzytelnianie i podpis cyfrowy — potwierdzenie tożsamości i autentyczności.",
+      "Ochrona danych przechowywanych (szyfrowanie dysków i baz danych).",
+      "Bankowość, płatności i transakcje elektroniczne.",
+      "Wojsko, dyplomacja i wywiad — tajna łączność.",
+      "Zastosowania edukacyjne i rozrywkowe (harcerstwo, gry, łamigłówki)."
+    ],
+    explanation:
+      "Ogólnie szyfry zapewniają poufność, integralność i uwierzytelnienie danych — zarówno przesyłanych, jak i przechowywanych."
+  },
+  {
+    id: "cph-three-types",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Podaj i opisz 3 główne typy szyfrów wraz z przykładami.",
+    answer: [
+      "Podstawieniowe (substytucyjne) — każdą literę zastępujemy inną literą lub symbolem; przykłady: Cezar, Atbasz, Vigenère, szyfr ze słowem-kluczem.",
+      "Przestawieniowe (transpozycyjne) — litery pozostają te same, zmienia się tylko ich kolejność; przykłady: szyfr płotkowy, prosty szyfr kolumnowy.",
+      "Współczesne (komputerowe) — operują na bitach; dzielą się na symetryczne (jeden klucz, np. XOR, AES) i asymetryczne (para kluczy, np. RSA)."
+    ],
+    explanation:
+      "Klasyczny podział to szyfry podstawieniowe i przestawieniowe. Współcześnie dochodzi podział na symetryczne i asymetryczne (z kluczem publicznym i prywatnym)."
+  },
+  {
+    id: "cph-caesar",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Wyjaśnij zasadę działania szyfru Cezara.",
+    answer:
+      "Szyfr Cezara to szyfr podstawieniowy, w którym każdą literę tekstu zastępujemy literą oddaloną o stałą liczbę pozycji w alfabecie (klasycznie o 3). Przy przesunięciu 3: A→D, B→E, C→F itd., a koniec alfabetu „zawija się” na początek (X→A, Y→B, Z→C). Deszyfrowanie to przesunięcie o tyle samo pozycji w przeciwną stronę.",
+    explanation:
+      "Kluczem jest wielkość przesunięcia. Alfabet traktujemy cyklicznie (mod 26), więc po literze Z wracamy do A. To najprostszy szyfr przesuwający."
+  },
+  {
+    id: "cph-morse",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Wyjaśnij zasadę działania kodu Morse'a.",
+    answer:
+      "Kod Morse'a zamienia litery, cyfry i znaki na ciągi krótkich (kropka ·) i długich (kreska −) sygnałów. Litery oddzielamy krótką przerwą, a wyrazy dłuższą. Np. A = ·−, S = ···, O = −−−, więc SOS = ··· −−− ···.",
+    explanation:
+      "To nie jest typowy szyfr utajniający, lecz kod — sposób reprezentacji znaków sygnałem (dźwiękiem, światłem). Częściej używane litery mają krótsze kody."
+  },
+  {
+    id: "cph-xor",
+    source: "sheet",
+    category: "Szyfry",
+    level: "średni",
+    question: "Wyjaśnij zasadę działania szyfru XOR.",
+    answer:
+      "Szyfr XOR wykonuje bitową operację różnicy symetrycznej (XOR) między bitami tekstu jawnego a bitami klucza. Ta sama operacja z tym samym kluczem odszyfrowuje tekst, ponieważ (T XOR K) XOR K = T. Gdy klucz jest losowy i tej samej długości co wiadomość (one-time pad), szyfr jest teoretycznie nie do złamania.",
+    explanation:
+      "XOR daje 1, gdy bity się różnią, a 0, gdy są takie same. Jest odwracalny tym samym kluczem, dlatego stanowi podstawę wielu szyfrów strumieniowych."
+  },
+  {
+    id: "cph-transposition",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Wyjaśnij zasadę działania prostego szyfru przestawieniowego.",
+    answer:
+      "W szyfrze przestawieniowym nie zmieniamy liter, a jedynie ich kolejność. W prostym wariancie kolumnowym wpisujemy tekst wierszami do tabeli o ustalonej liczbie kolumn, a następnie odczytujemy go kolumnami (często w kolejności wyznaczonej przez słowo-klucz).",
+    explanation:
+      "Zbiór liter pozostaje ten sam (jak w anagramie), zmienia się tylko ich ułożenie. Kluczem jest sposób i porządek przestawienia."
+  },
+  {
+    id: "cph-railfence",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Wyjaśnij zasadę działania szyfru płotkowego.",
+    answer:
+      "Szyfr płotkowy to szyfr przestawieniowy: tekst zapisujemy zygzakiem na kilku poziomych „płotkach” (wierszach) — w dół i w górę — a szyfrogram odczytujemy wiersz po wierszu. Kluczem jest liczba płotków (wierszy).",
+    explanation:
+      "Np. dla 2 płotków kolejne litery trafiają na przemian do górnego i dolnego wiersza, a następnie czytamy najpierw cały górny, potem cały dolny wiersz."
+  },
+  {
+    id: "cph-keyword",
+    source: "sheet",
+    category: "Szyfry",
+    level: "średni",
+    question: "Wyjaśnij zasadę działania szyfru ze słowem-kluczem. Jakie słowa klucze można użyć do kodowania?",
+    answer:
+      "To szyfr podstawieniowy z mieszanym alfabetem. Pod zwykłym alfabetem zapisujemy alfabet szyfrujący: najpierw litery słowa-klucza (bez powtórzeń), a potem pozostałe, niewykorzystane litery alfabetu w kolejności. Każdą literę tekstu zastępujemy literą stojącą pod nią. Jako klucza można użyć dowolnego słowa lub frazy, ale najlepiej takiej o niepowtarzających się literach — powtórzone litery i tak pomijamy (np. ze słowa „SZKOLNICTWO” bierzemy S, Z, K, O, L, N, I, C, T, W).",
+    explanation:
+      "Słowo-klucz wyznacza początek przemieszanego alfabetu. Im więcej różnych liter w kluczu, tym mocniej przestawiony alfabet szyfrujący."
+  },
+  {
+    id: "cph-vowels",
+    source: "sheet",
+    category: "Szyfry",
+    level: "średni",
+    question: "Wyjaśnij zasadę działania szyfru z samogłoskami.",
+    answer:
+      "Szyfr z samogłoskami (samogłoskowy) wykorzystuje samogłoski jako współrzędne w tablicy liter — to odmiana tablicy Polibiusza. Litery alfabetu wpisujemy do kwadratu, a wiersze i kolumny oznaczamy samogłoskami (np. A, E, I, O, U). Każdą literę zapisujemy parą samogłosek: pierwsza wskazuje wiersz, druga — kolumnę.",
+    explanation:
+      "Zamiast cyfr (jak w tablicy Polibiusza) współrzędnymi są samogłoski, więc szyfrogram składa się z par samogłosek. W prostszej wersji samogłoskowej zamienia się jedynie same samogłoski na umówione znaki lub cyfry."
+  },
+  {
+    id: "cph-atbash",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Wyjaśnij zasadę działania szyfru Atbasz.",
+    answer:
+      "Atbasz to szyfr podstawieniowy z odwróconym alfabetem: pierwszą literę zamieniamy na ostatnią, drugą na przedostatnią itd. Dla alfabetu łacińskiego A↔Z, B↔Y, C↔X, … Operacja jest symetryczna — szyfrowanie i deszyfrowanie wykonuje się tak samo.",
+    explanation:
+      "Nazwa pochodzi od hebrajskich liter A-T-B-SZ. Atbasz nie ma klucza — to stałe odbicie alfabetu, więc jest bardzo łatwy do złamania."
+  },
+  {
+    id: "cph-fraction",
+    source: "sheet",
+    category: "Szyfry",
+    level: "średni",
+    question: "Wyjaśnij zasadę działania szyfru ułamkowego.",
+    answer:
+      "Szyfr ułamkowy zapisuje każdą literę w postaci ułamka utworzonego z jej współrzędnych w tablicy liter (typu Polibiusza). Numer wiersza staje się licznikiem, a numer kolumny mianownikiem (lub odwrotnie), więc literę przedstawiamy jako wiersz/kolumna.",
+    explanation:
+      "To wariant szyfru współrzędnościowego: zamiast pary cyfr piszemy ułamek. Podstawą jest kwadrat z literami, taki jak tablica Polibiusza."
+  },
+  {
+    id: "cph-vigenere",
+    source: "sheet",
+    category: "Szyfry",
+    level: "średni",
+    question: "Wyjaśnij zasadę działania szyfru Vigenere'a.",
+    answer:
+      "Szyfr Vigenère'a to wieloalfabetowy szyfr podstawieniowy. Pod tekstem zapisujemy powtarzane słowo-klucz; każda litera klucza wyznacza przesunięcie (jak w szyfrze Cezara) dla odpowiadającej jej litery tekstu. Litery „dodajemy” modulo długość alfabetu, korzystając z tablicy Vigenère'a (tabula recta).",
+    explanation:
+      "Ponieważ przesunięcie zmienia się litera po literze, ta sama litera tekstu może zaszyfrować się na różne sposoby. Utrudnia to analizę częstości i przez wieki szyfr uchodził za nie do złamania."
+  },
+  {
+    id: "cph-sanatorium",
+    source: "sheet",
+    category: "Szyfry",
+    level: "średni",
+    question: "Wyjaśnij zasadę działania szyfru Sanatorium.",
+    answer:
+      "Szyfr Sanatorium należy do rodziny GA-DE-RY-PO-LU-KI (szyfrów harcerskich). Słowo-klucz SANATORIUM dzielimy na pary liter: SA, NA, TO, RI, UM. W tekście każdą literę z pary zastępujemy jej partnerką (S↔A, N↔A, T↔O, R↔I, U↔M), a litery spoza klucza pozostawiamy bez zmian. Szyfrowanie i deszyfrowanie działa tak samo.",
+    explanation:
+      "To szyfr podstawieniowy działający na parach liter. Zasada jest taka sama jak w GA-DE-RY-PO-LU-KI, tylko z innym słowem-kluczem (SANATORIUM)."
+  },
+  {
+    id: "cph-vic",
+    source: "sheet",
+    category: "Szyfry",
+    level: "zaawansowany",
+    question: "Opisz szyfr VIC.",
+    answer:
+      "Szyfr VIC to bardzo złożony szyfr „ołówkowo-papierowy”, używany w latach 50. XX w. przez radzieckiego szpiega o pseudonimie VICTOR. Łączy kilka technik: szachownicę zamieniającą litery na cyfry (straddling checkerboard, czyli odmianę podstawienia), a następnie kilkukrotne przestawienia i dodawanie modulo. Klucze wyprowadza się ze skomplikowanej kombinacji daty, frazy/piosenki oraz osobistego numeru agenta.",
+    explanation:
+      "VIC uchodzi za jeden z najtrudniejszych ręcznych szyfrów — łączy podstawienie z wielostopniową transpozycją i złożonym generowaniem klucza, dzięki czemu długo opierał się kryptoanalizie."
+  },
+  {
+    id: "cph-polybius",
+    source: "sheet",
+    category: "Szyfry",
+    level: "podstawowy",
+    question: "Czym jest tablica Polibiusza?",
+    answer:
+      "Tablica (kwadrat) Polibiusza to kwadrat 5×5, w którego pola wpisujemy kolejne litery alfabetu (zwykle łącząc I oraz J, aby zmieścić 25 liter). Wiersze i kolumny numerujemy od 1 do 5, a każdą literę zapisujemy parą liczb: numerem wiersza i numerem kolumny (np. litera w 2. wierszu i 3. kolumnie to 23).",
+    explanation:
+      "Tablica Polibiusza zamienia litery na pary współrzędnych (liczb). Jest podstawą wielu innych szyfrów: ułamkowego, z samogłoskami, a także szachownicy w szyfrze VIC."
   }
 ];
 
@@ -1085,15 +1260,132 @@ const FLASHCARDS = [
       "Jednokierunkowa: wskaźnik na następny. Dwukierunkowa: na następny i poprzedni (czytanie w obie strony)."
   },
   {
+    id: "cph-fc-applications",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Zastosowania szyfrów",
+    back:
+      "Poufność danych, bezpieczna komunikacja (HTTPS, VPN), uwierzytelnianie i podpis cyfrowy, szyfrowanie dysków, bankowość, wojsko i dyplomacja."
+  },
+  {
+    id: "cph-fc-types",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "3 typy szyfrów",
+    back:
+      "Podstawieniowe (Cezar, Atbasz, Vigenère), przestawieniowe (płotkowy, kolumnowy) oraz współczesne komputerowe: symetryczne (XOR, AES) i asymetryczne (RSA)."
+  },
+  {
+    id: "cph-fc-caesar",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr Cezara",
+    back:
+      "Podstawieniowy: każdą literę przesuwamy o stałą liczbę pozycji w alfabecie (klasycznie o 3), z zawijaniem Z→A."
+  },
+  {
+    id: "cph-fc-morse",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Kod Morse'a",
+    back:
+      "Zamienia znaki na ciągi kropek (·) i kresek (−) oddzielanych przerwami; SOS = ··· −−− ···."
+  },
+  {
+    id: "cph-fc-xor",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr XOR",
+    back:
+      "Bitowy XOR tekstu z kluczem; ten sam klucz odszyfrowuje, bo (T XOR K) XOR K = T."
+  },
+  {
+    id: "cph-fc-transposition",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr przestawieniowy",
+    back:
+      "Litery zostają te same, zmienia się ich kolejność (np. wpis wierszami do tabeli, odczyt kolumnami)."
+  },
+  {
+    id: "cph-fc-railfence",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr płotkowy",
+    back:
+      "Przestawieniowy: tekst pisany zygzakiem na kilku wierszach (płotkach), odczyt wiersz po wierszu; klucz = liczba płotków."
+  },
+  {
+    id: "cph-fc-keyword",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr ze słowem-kluczem",
+    back:
+      "Alfabet szyfrujący zaczyna się od liter klucza (bez powtórzeń), potem reszta alfabetu; klucz to słowo o unikalnych literach."
+  },
+  {
+    id: "cph-fc-vowels",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr z samogłoskami",
+    back:
+      "Odmiana tablicy Polibiusza: wiersze i kolumny oznaczone samogłoskami, litera = para samogłosek (wiersz, kolumna)."
+  },
+  {
+    id: "cph-fc-atbash",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr Atbasz",
+    back:
+      "Odwrócony alfabet: A↔Z, B↔Y, C↔X…; symetryczny, bez klucza."
+  },
+  {
+    id: "cph-fc-fraction",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr ułamkowy",
+    back:
+      "Litera jako ułamek ze współrzędnych tablicy (typu Polibiusza): wiersz/kolumna."
+  },
+  {
+    id: "cph-fc-vigenere",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr Vigenère'a",
+    back:
+      "Wieloalfabetowy: powtarzane słowo-klucz wyznacza przesunięcie (jak Cezar) dla każdej litery; tabula recta."
+  },
+  {
+    id: "cph-fc-sanatorium",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr Sanatorium",
+    back:
+      "Rodzina GA-DE-RY-PO-LU-KI: pary z klucza SANATORIUM (SA-NA-TO-RI-UM) zamieniają się miejscami, reszta liter bez zmian."
+  },
+  {
+    id: "cph-fc-vic",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Szyfr VIC",
+    back:
+      "Bardzo złożony szyfr ręczny: szachownica (litery→cyfry) + wielokrotna transpozycja i klucze z daty, frazy i numeru agenta."
+  },
+  {
+    id: "cph-fc-polybius",
+    category: "Szyfry",
+    source: "lista pytań",
+    front: "Tablica Polibiusza",
+    back:
+      "Kwadrat 5×5 z literami (I=J); litera = para liczb (wiersz, kolumna), np. 23."
+  },
+  {
     id: "nt-fc-diagram-bubble",
     category: "Sortowanie proste",
     source: "notatki",
     front: "Schemat blokowy: sortowanie bąbelkowe",
     back: "Sortowanie bąbelkowe - zamiana sąsiednich elementów; największe wypływają na koniec.",
-    image: {
-      src: "assets/sortowanie-babelkowe.png",
-      alt: "Schemat blokowy sortowania bąbelkowego."
-    }
+    diagramId: "sort-bubble"
   },
   {
     id: "nt-fc-diagram-insertion",
@@ -1101,10 +1393,7 @@ const FLASHCARDS = [
     source: "notatki",
     front: "Schemat blokowy: sortowanie przez wstawianie",
     back: "Sortowanie przez wstawianie - wstawianie elementu w odpowiednie miejsce części posortowanej.",
-    image: {
-      src: "assets/sortowanie-przez-wstawianie.png",
-      alt: "Schemat blokowy sortowania przez wstawianie."
-    }
+    diagramId: "sort-insertion"
   },
   {
     id: "nt-fc-diagram-selection",
@@ -1112,10 +1401,7 @@ const FLASHCARDS = [
     source: "notatki",
     front: "Schemat blokowy: sortowanie przez wybór",
     back: "Sortowanie przez wybór - szukanie minimum i zamiana z pierwszym nieposortowanym.",
-    image: {
-      src: "assets/sortowanie-przez-wybor.png",
-      alt: "Schemat blokowy sortowania przez wybór."
-    }
+    diagramId: "sort-selection"
   },
   {
     id: "nt-fc-diagram-merge",
@@ -1123,10 +1409,7 @@ const FLASHCARDS = [
     source: "notatki",
     front: "Schemat blokowy: sortowanie przez scalanie",
     back: "Sortowanie przez scalanie - dziel na pół i scalaj posortowane fragmenty.",
-    image: {
-      src: "assets/sortowanie-przez-scalanie.png",
-      alt: "Schemat blokowy sortowania przez scalanie."
-    }
+    diagramId: "sort-merge"
   },
   {
     id: "nt-fc-diagram-quick",
@@ -1134,10 +1417,7 @@ const FLASHCARDS = [
     source: "notatki",
     front: "Schemat blokowy: sortowanie szybkie",
     back: "Sortowanie szybkie - pivot, podział na mniejsze i większe, rekurencja.",
-    image: {
-      src: "assets/sortowanie-szybkie.png",
-      alt: "Schemat blokowy sortowania szybkiego (QuickSort)."
-    }
+    diagramId: "sort-quick"
   }
 ];
 
@@ -1361,37 +1641,44 @@ const SORTING_DIAGRAMS = [
     id: "sort-bubble",
     title: "Sortowanie bąbelkowe",
     note:
-      "Pętla powtarzana, dopóki lista nie jest posortowana. W każdym przebiegu porównujemy sąsiednie pary i zamieniamy je, gdy są w złej kolejności.",
+      "Dwie zagnieżdżone pętle. Pętla wewnętrzna w jednym przebiegu porównuje sąsiednie pary i zamienia je, gdy są w złej kolejności — wtedy największy element „wypływa” na koniec. Pętla zewnętrzna powtarza przebiegi.",
     steps: [
       { type: "terminator", text: "START" },
-      { type: "io", text: "Wczytaj listę" },
-      { type: "process", text: "Zmniejsz zakres (początek pętli)" },
-      { type: "process", text: "Porównaj sąsiednią parę A[i] i A[i+1]" },
-      { type: "decision", text: "A[i] > A[i+1]?" },
-      { type: "process", text: "Zamień A[i] z A[i+1] (gdy warunek spełniony)" },
-      { type: "decision", text: "Czy lista jest posortowana?" },
+      { type: "io", text: "Wczytaj listę (A, N)" },
+      { type: "process", text: "i := 0 (licznik przebiegów)" },
+      { type: "process", text: "j := 0 (początek przebiegu)" },
+      { type: "decision", text: "j < N-1-i? (pętla wewnętrzna)" },
+      { type: "process", text: "Jeśli A[j] > A[j+1], zamień sąsiednie elementy" },
+      { type: "process", text: "j := j + 1" },
+      { type: "process", text: "i := i + 1 (koniec przebiegu)" },
+      { type: "decision", text: "i < N-1? (pętla zewnętrzna)" },
       { type: "io", text: "Wypisz posortowaną listę" },
       { type: "terminator", text: "STOP" }
     ],
     diagram: [
       { type: "terminator", text: "START" },
-      { type: "io", text: "Wczytaj listę" },
-      { id: "bbl-loop", type: "process", text: "Zmniejsz zakres" },
-      { type: "process", text: "Porównaj parę (i, i+1)" },
+      { type: "io", text: "Wczytaj listę (A, N)" },
+      { type: "process", text: "i := 0" },
+      { id: "bbl-outer", type: "process", text: "j := 0" },
       {
         type: "decision",
-        text: "A[i] > A[i+1]?",
+        text: "j < N-1-i?",
         downLabel: "Nie",
         branchLabel: "Tak",
-        branchRejoin: true,
-        branch: [{ type: "process", text: "Zamień A[i] z A[i+1]" }]
+        branchLoop: true,
+        loopLabel: "powtórz",
+        branch: [
+          { type: "process", text: "Jeśli A[j] > A[j+1], zamień je" },
+          { type: "process", text: "j := j + 1" }
+        ]
       },
+      { type: "process", text: "i := i + 1" },
       {
         type: "decision",
-        text: "Czy lista posortowana?",
-        downLabel: "Tak",
-        loopTo: "bbl-loop",
-        loopLabel: "Nie"
+        text: "i < N-1?",
+        downLabel: "Nie",
+        loopTo: "bbl-outer",
+        loopLabel: "Tak"
       },
       { type: "io", text: "Wypisz posortowaną listę" },
       { type: "terminator", text: "STOP" }
@@ -1401,25 +1688,27 @@ const SORTING_DIAGRAMS = [
     id: "sort-insertion",
     title: "Sortowanie przez wstawianie",
     note:
-      "Dla każdego elementu (klucza) cofamy się po posortowanej części i przesuwamy większe elementy w prawo, aż znajdziemy miejsce na klucz.",
+      "Pętla zewnętrzna bierze kolejny element (klucz). Pętla wewnętrzna cofa się po posortowanej części i przesuwa większe elementy w prawo, aż znajdzie miejsce na klucz.",
     steps: [
       { type: "terminator", text: "START" },
-      { type: "io", text: "Wczytaj listę" },
-      { type: "process", text: "Dla i od 1 do N-1 (pętla zewnętrzna)" },
+      { type: "io", text: "Wczytaj listę (A, N)" },
+      { type: "process", text: "i := 1" },
       { type: "process", text: "klucz := A[i]" },
       { type: "process", text: "j := i - 1" },
-      { type: "decision", text: "j ≥ 0 oraz A[j] > klucz?" },
-      { type: "process", text: "Przesuń A[j] na pozycję j+1" },
-      { type: "process", text: "Zmniejsz j (j := j - 1) i sprawdź warunek ponownie" },
-      { type: "process", text: "Wstaw klucz na pozycję j+1" },
+      { type: "decision", text: "j ≥ 0 oraz A[j] > klucz? (pętla wewnętrzna)" },
+      { type: "process", text: "A[j+1] := A[j] (przesuń w prawo)" },
+      { type: "process", text: "j := j - 1" },
+      { type: "process", text: "A[j+1] := klucz (wstaw klucz)" },
+      { type: "process", text: "i := i + 1" },
+      { type: "decision", text: "i < N? (pętla zewnętrzna)" },
       { type: "io", text: "Wypisz posortowaną listę" },
       { type: "terminator", text: "STOP" }
     ],
     diagram: [
       { type: "terminator", text: "START" },
-      { type: "io", text: "Wczytaj listę" },
-      { type: "process", text: "Dla i od 1 do N-1" },
-      { type: "process", text: "klucz := A[i]" },
+      { type: "io", text: "Wczytaj listę (A, N)" },
+      { type: "process", text: "i := 1" },
+      { id: "ins-outer", type: "process", text: "klucz := A[i]" },
       { type: "process", text: "j := i - 1" },
       {
         type: "decision",
@@ -1429,11 +1718,19 @@ const SORTING_DIAGRAMS = [
         branchLoop: true,
         loopLabel: "powtórz",
         branch: [
-          { type: "process", text: "Przesuń A[j] na A[j+1]" },
+          { type: "process", text: "A[j+1] := A[j]" },
           { type: "process", text: "j := j - 1" }
         ]
       },
-      { type: "process", text: "Wstaw klucz na A[j+1]" },
+      { type: "process", text: "A[j+1] := klucz" },
+      { type: "process", text: "i := i + 1" },
+      {
+        type: "decision",
+        text: "i < N?",
+        downLabel: "Nie",
+        loopTo: "ins-outer",
+        loopLabel: "Tak"
+      },
       { type: "io", text: "Wypisz posortowaną listę" },
       { type: "terminator", text: "STOP" }
     ]
@@ -1442,34 +1739,49 @@ const SORTING_DIAGRAMS = [
     id: "sort-selection",
     title: "Sortowanie przez wybór",
     note:
-      "Dla każdej pozycji i szukamy indeksu najmniejszego elementu w pozostałej części listy, a potem zamieniamy go z elementem na pozycji i.",
+      "Pętla zewnętrzna ustala pozycję i. Pętla wewnętrzna szuka indeksu najmniejszego elementu w pozostałej części listy, a potem zamieniamy go z elementem na pozycji i.",
     steps: [
       { type: "terminator", text: "START" },
-      { type: "io", text: "Wczytaj listę" },
-      { type: "process", text: "Dla i od 0 do N-2 (pętla zewnętrzna)" },
-      { type: "process", text: "Ustaw indeks_min := i" },
-      { type: "process", text: "Dla j od i+1 do N-1 (pętla wewnętrzna)" },
-      { type: "decision", text: "A[j] < A[indeks_min]?" },
-      { type: "process", text: "Ustaw indeks_min := j (gdy warunek spełniony)" },
+      { type: "io", text: "Wczytaj listę (A, N)" },
+      { type: "process", text: "i := 0" },
+      { type: "process", text: "indeks_min := i" },
+      { type: "process", text: "j := i + 1" },
+      { type: "decision", text: "j < N? (pętla wewnętrzna)" },
+      { type: "process", text: "Jeśli A[j] < A[indeks_min], to indeks_min := j" },
+      { type: "process", text: "j := j + 1" },
       { type: "process", text: "Zamień A[i] z A[indeks_min]" },
+      { type: "process", text: "i := i + 1" },
+      { type: "decision", text: "i < N-1? (pętla zewnętrzna)" },
       { type: "io", text: "Wypisz posortowaną listę" },
       { type: "terminator", text: "STOP" }
     ],
     diagram: [
       { type: "terminator", text: "START" },
-      { type: "io", text: "Wczytaj listę" },
-      { type: "process", text: "Dla i od 0 do N-2" },
-      { type: "process", text: "indeks_min := i" },
-      { type: "process", text: "Dla j od i+1 do N-1" },
+      { type: "io", text: "Wczytaj listę (A, N)" },
+      { type: "process", text: "i := 0" },
+      { id: "sel-outer", type: "process", text: "indeks_min := i" },
+      { type: "process", text: "j := i + 1" },
       {
         type: "decision",
-        text: "A[j] < A[indeks_min]?",
+        text: "j < N?",
         downLabel: "Nie",
         branchLabel: "Tak",
-        branchRejoin: true,
-        branch: [{ type: "process", text: "indeks_min := j" }]
+        branchLoop: true,
+        loopLabel: "powtórz",
+        branch: [
+          { type: "process", text: "Jeśli A[j] < A[indeks_min]: indeks_min := j" },
+          { type: "process", text: "j := j + 1" }
+        ]
       },
       { type: "process", text: "Zamień A[i] z A[indeks_min]" },
+      { type: "process", text: "i := i + 1" },
+      {
+        type: "decision",
+        text: "i < N-1?",
+        downLabel: "Nie",
+        loopTo: "sel-outer",
+        loopLabel: "Tak"
+      },
       { type: "io", text: "Wypisz posortowaną listę" },
       { type: "terminator", text: "STOP" }
     ]

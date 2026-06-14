@@ -72,6 +72,7 @@ const elements = {
   flashcardFront: document.querySelector("#flashcardFront"),
   flashcardBack: document.querySelector("#flashcardBack"),
   flashcardImage: document.querySelector("#flashcardImage"),
+  flashcardDiagram: document.querySelector("#flashcardDiagram"),
   prevFlashcardButton: document.querySelector("#prevFlashcardButton"),
   flipFlashcardButton: document.querySelector("#flipFlashcardButton"),
   nextFlashcardButton: document.querySelector("#nextFlashcardButton"),
@@ -486,6 +487,8 @@ function renderFlashcards() {
     elements.flashcardBack.textContent = "";
     elements.flashcardImage.hidden = true;
     elements.flashcardImage.removeAttribute("src");
+    elements.flashcardDiagram.hidden = true;
+    elements.flashcardDiagram.innerHTML = "";
     elements.flashcardList.innerHTML = "";
     return;
   }
@@ -504,6 +507,13 @@ function renderFlashcards() {
     elements.flashcardImage.removeAttribute("src");
     elements.flashcardImage.alt = "";
   }
+
+  const sortDiagram = current.diagramId
+    ? SORTING_DIAGRAMS.find((sort) => sort.id === current.diagramId)
+    : null;
+  const showDiagram = state.flashcardFlipped && Boolean(sortDiagram);
+  elements.flashcardDiagram.hidden = !showDiagram;
+  elements.flashcardDiagram.innerHTML = showDiagram ? buildFlowchartSvg(sortDiagram.diagram) || "" : "";
 
   elements.flashcardList.innerHTML = filtered
     .map(
