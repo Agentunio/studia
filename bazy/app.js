@@ -1083,12 +1083,15 @@ function evaluateClosedAnswer(question) {
 
 function getCorrectOptions(question) {
   const answerItems = Array.isArray(question.answer) ? question.answer : [question.answer];
+  // Najpierw dokładne dopasowanie (odpowiedź = pełny tekst opcji). Zapobiega to fałszywym
+  // trafieniom, gdy krótka opcja jest podłańcuchem odpowiedzi (np. "*" lub "1" w "0..1 lub 0..*").
+  const exact = question.options.filter((option) =>
+    answerItems.some((answer) => answerMatchesOption(answer, option))
+  );
+  if (exact.length) return exact;
+  // Odpowiedzi opisowe (zawierające treść opcji) — dopasowanie "zawiera".
   return question.options.filter((option) =>
-    answerItems.some((answer) =>
-      Array.isArray(question.answer)
-        ? answerMatchesOption(answer, option)
-        : answerContainsOption(answer, option)
-    )
+    answerItems.some((answer) => answerContainsOption(answer, option))
   );
 }
 
